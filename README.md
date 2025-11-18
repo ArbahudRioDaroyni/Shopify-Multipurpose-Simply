@@ -2,8 +2,6 @@
 
 A clean and flexible Shopify theme designed for any type of store. Built with a simple layout and optimized for high conversion, this theme delivers fast performance, easy customization, and a modern shopping experience.
 
-TEST Commit USER
-
 ## Features
 - Minimal and modern design
 - High-conversion layout
