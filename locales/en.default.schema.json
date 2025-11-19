@@ -35,6 +35,8 @@
   },
   "labels": {
     "alignment": "Alignment",
+    "primary": "Primary",
+    "secondary": "Secondary",
     "background": "Background",
     "foreground": "Foreground",
     "grid_gap": "Grid spacing",

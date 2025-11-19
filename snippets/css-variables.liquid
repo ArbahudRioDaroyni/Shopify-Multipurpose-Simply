@@ -11,8 +11,53 @@
     --font-primary--weight: {{ settings.type_primary_font.weight }};
     --page-width: {{ settings.max_page_width }};
     --page-margin: {{ settings.min_page_margin }}px;
-    --color-background: {{ settings.background_color }};
-    --color-foreground: {{ settings.foreground_color }};
     --style-border-radius-inputs: {{ settings.input_corner_radius }}px;
   }
+
+  {% comment %} Generate CSS variables for each color scheme {% endcomment %}
+  {% for scheme in settings.color_schemes %}
+    {% assign scheme_id = scheme.id %}
+    .color-{{ scheme_id }} {
+      --color-background: {{ scheme.settings.background }};
+      --color-foreground: {{ scheme.settings.foreground }};
+      --color-foreground-heading: {{ scheme.settings.foreground_heading }};
+      --color-primary: {{ scheme.settings.primary }};
+      --color-primary-hover: {{ scheme.settings.primary_hover }};
+      --color-border: {{ scheme.settings.border }};
+      --color-shadow: {{ scheme.settings.shadow }};
+      
+      --color-button-primary-bg: {{ scheme.settings.primary_button_background }};
+      --color-button-primary-text: {{ scheme.settings.primary_button_text }};
+      --color-button-primary-border: {{ scheme.settings.primary_button_border }};
+      --color-button-primary-hover-bg: {{ scheme.settings.primary_button_hover_background }};
+      --color-button-primary-hover-text: {{ scheme.settings.primary_button_hover_text }};
+      --color-button-primary-hover-border: {{ scheme.settings.primary_button_hover_border }};
+      
+      --color-button-secondary-bg: {{ scheme.settings.secondary_button_background }};
+      --color-button-secondary-text: {{ scheme.settings.secondary_button_text }};
+      --color-button-secondary-border: {{ scheme.settings.secondary_button_border }};
+      --color-button-secondary-hover-bg: {{ scheme.settings.secondary_button_hover_background }};
+      --color-button-secondary-hover-text: {{ scheme.settings.secondary_button_hover_text }};
+      --color-button-secondary-hover-border: {{ scheme.settings.secondary_button_hover_border }};
+      
+      --color-input-bg: {{ scheme.settings.input_background }};
+      --color-input-text: {{ scheme.settings.input_text_color }};
+      --color-input-border: {{ scheme.settings.input_border_color }};
+      --color-input-hover-bg: {{ scheme.settings.input_hover_background }};
+      
+      --color-variant-bg: {{ scheme.settings.variant_background_color }};
+      --color-variant-text: {{ scheme.settings.variant_text_color }};
+      --color-variant-border: {{ scheme.settings.variant_border_color }};
+      --color-variant-hover-bg: {{ scheme.settings.variant_hover_background_color }};
+      --color-variant-hover-text: {{ scheme.settings.variant_hover_text_color }};
+      --color-variant-hover-border: {{ scheme.settings.variant_hover_border_color }};
+      
+      --color-variant-selected-bg: {{ scheme.settings.selected_variant_background_color }};
+      --color-variant-selected-text: {{ scheme.settings.selected_variant_text_color }};
+      --color-variant-selected-border: {{ scheme.settings.selected_variant_border_color }};
+      --color-variant-selected-hover-bg: {{ scheme.settings.selected_variant_hover_background_color }};
+      --color-variant-selected-hover-text: {{ scheme.settings.selected_variant_hover_text_color }};
+      --color-variant-selected-hover-border: {{ scheme.settings.selected_variant_hover_border_color }};
+    }
+  {% endfor %}
 {% endstyle %}
