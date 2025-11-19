@@ -1,5 +1,138 @@
-<header>
-  TEST
+<div class="header__top container color-{{ section.settings.color_scheme }}">
+  <div class="header__top-wrapper">
+    <!-- Logo -->
+    <div class="header__logo">
+      <a href="{{ routes.root_url }}" class="logo">
+        {% if section.settings.logo %}
+          <img src="{{ section.settings.logo | image_url: width: 200 }}" alt="{{ shop.name }}" loading="lazy" width="200" height="200">
+        {% else %}
+          <span class="logo__text">
+            <span class="logo__left">TheBlue</span><span class="logo__right">Space</span>
+          </span>
+          <span class="logo__subtitle">Bathroom Online</span>
+        {% endif %}
+      </a>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="header__search">
+      <div class="search-wrapper">
+        <select id="search-category" class="search__category" aria-label="Select category">
+          <option value="">All Categories</option>
+          {% for collection in collections %}
+            <option value="{{ collection.handle }}">{{ collection.title }}</option>
+          {% endfor %}
+        </select>
+        
+        <form action="{{ routes.search_url }}" method="get" class="search__form" role="search">
+          <input type="search" 
+                 name="q" 
+                 placeholder="Search for more than 20,000 products" 
+                 class="search__input"
+                 value="{{ search.terms | escape }}">
+          <button type="submit" class="search__button" aria-label="Search">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M21.71 20.29L18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a1 1 0 0 0 1.42 0a1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 7-7a7 7 0 0 1-7 7Z"></path>
+            </svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Icons -->
+    <div class="header__actions">
+      <!-- Support -->
+      <div class="header__support">
+        <span class="support__label">For Support?</span>
+        <h5 class="support__phone">{{ section.settings.phone | default: '+980-34984089' }}</h5>
+      </div>
+
+      <!-- Account Icon -->
+      {% if shop.customer_accounts_enabled %}
+        <a href="{{ routes.account_url }}" class="header__icon header__account" aria-label="Account">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+          </svg>
+        </a>
+      {% endif %}
+
+      <!-- Wishlist Icon -->
+      <a href="{{ routes.root_url }}pages/wishlist" class="header__icon header__wishlist" aria-label="Wishlist">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+          <path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
+        </svg>
+      </a>
+
+      <!-- Cart -->
+      <a href="{{ routes.cart_url }}" class="header__cart" aria-label="Cart">
+        <div class="cart__content">
+          <span class="cart__label">Your Cart</span>
+          <span class="cart__total">{{ cart.total_price | money }}</span>
+        </div>
+        {% if cart.item_count > 0 %}
+          <span class="cart__count">{{ cart.item_count }}</span>
+        {% endif %}
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<div class="header__nav container color-{{ section.settings.color_scheme }}">
+  <nav class="navigation" role="navigation">
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navigation Menu -->
+    <div class="navigation__wrapper">
+      <div class="navigation__header">
+        <button type="button" class="navbar-close" aria-label="Close menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="navigation__content">
+        <!-- Shop by Departments Dropdown -->
+        <div class="nav__departments">
+          <button class="departments__toggle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"></path>
+            </svg>
+            <span>Shop by Departments</span>
+            <svg class="departments__arrow" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M7 10l5 5 5-5z"></path>
+            </svg>
+          </button>
+          <div class="departments__dropdown">
+            {% if section.settings.departments_menu != blank %}
+              <ul class="departments__list">
+                {% for link in section.settings.departments_menu.links %}
+                  <li class="departments__item">
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Main Menu -->
+        <ul class="nav__menu">
+          {% for link in section.settings.menu.links %}
+            <li class="nav__item">
+              <a href="{{ link.url }}" class="nav__link">{{ link.title }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>
+{% comment %} <header>
   <h2 class="header__title">
     {{ shop.name | link_to: routes.root_url }}
   </h2>
@@ -23,44 +156,581 @@
       {{ 'icon-cart.svg' | inline_asset_content }}
     </a>
   </div>
-</header>
+</header> {% endcomment %}
 
 {% stylesheet %}
-  header {
-    height: 5rem;
+.container {
+  margin: 1rem auto;
+  background: #fff;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Header Top */
+/* .header__top {
+} */
+
+.header__top-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+
+/* Logo */
+.header__logo {
+  max-height: 68px;
+  flex-shrink: 0;
+}
+
+.logo {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo__text {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.logo__left {
+  color: var(--color-secondary);
+}
+
+.logo__right {
+  color: var(--color-primary);
+}
+
+.logo__subtitle {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #666;
+  font-weight: 400;
+}
+
+/* Search */
+.header__search {
+  flex: 1;
+  max-width: 600px;
+}
+
+.search-wrapper {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--color-foreground);
+}
+
+.search__category {
+  padding: 12px 15px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: #666;
+  min-width: 150px;
+  cursor: pointer;
+  outline: none;
+}
+
+.search__form {
+  display: flex;
+  flex: 1;
+  align-items: center;
+}
+
+.search__input {
+  flex: 1;
+  padding: 12px 15px;
+  border: none;
+  font-size: 14px;
+  outline: none;
+  background: var(--color-foreground);
+}
+
+.search__input::placeholder {
+  color: var(--color-primary);
+}
+
+.search__button {
+  padding: 12px 20px;
+  background: var(--color-foreground);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: background 0.3s;
+}
+
+/* Header Actions */
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-shrink: 0;
+}
+
+.header__support {
+  display: flex;
+  flex-direction: column;
+  padding-right: 20px;
+}
+
+.support__label {
+  font-size: 12px;
+  color: #666;
+}
+
+.support__phone {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.header__icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.header__icon:hover {
+  color: var(--color-primary);
+}
+
+.header__cart {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: #333;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.header__cart:hover {
+  background: #444;
+}
+
+.cart__content {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart__label {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.cart__total {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cart__count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff6b35;
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Navigation */
+.header__nav {
+  background: #fff;
+  padding: 0;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.navbar-toggler {
+  display: none;
+  padding: 10px;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.navbar-toggler-icon {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: #333;
+  position: relative;
+}
+
+.navbar-toggler-icon::before,
+.navbar-toggler-icon::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: #333;
+  left: 0;
+}
+
+.navbar-toggler-icon::before {
+  top: -8px;
+}
+
+.navbar-toggler-icon::after {
+  bottom: -8px;
+}
+
+.navigation__wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 30px;
+}
+
+.navigation__header {
+  display: none;
+}
+
+.navbar-close {
+  display: none;
+}
+
+.navigation__content {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  width: 100%;
+}
+
+/* Departments Dropdown */
+.nav__departments {
+  position: relative;
+}
+
+.departments__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  color: #000000;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.departments__arrow {
+  transition: transform 0.3s;
+}
+
+.nav__departments:hover .departments__arrow {
+  transform: rotate(180deg);
+}
+
+.departments__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  min-width: 250px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s;
+  z-index: 100;
+  margin-top: 10px;
+}
+
+.nav__departments:hover .departments__dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.departments__list {
+  list-style: none;
+  margin: 0;
+  padding: 10px 0;
+}
+
+.departments__item a {
+  display: block;
+  padding: 12px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.departments__item a:hover {
+  background: #f8f8f8;
+  color: var(--color-primary);
+  padding-left: 25px;
+}
+
+/* Main Menu */
+.nav__menu {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav__item {
+  position: relative;
+}
+
+.nav__link {
+  display: block;
+  padding: 20px 0;
+  color: #333;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav__link:hover {
+  color: var(--color-primary);
+}
+
+/* Mobile Styles */
+@media (max-width: 991px) {
+  .header__top-wrapper {
+    flex-wrap: wrap;
+  }
+
+  .header__search {
+    order: 3;
+    width: 100%;
+    max-width: 100%;
+    margin-top: 15px;
+  }
+
+  .search__category {
+    min-width: 120px;
+    font-size: 13px;
+  }
+
+  .header__support {
+    display: none;
+  }
+
+  .navbar-toggler {
     display: flex;
-    align-items: center;
+  }
+
+  .navigation__wrapper {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 300px;
+    height: 100vh;
+    background: #fff;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    transition: left 0.3s;
+    z-index: 1000;
+    overflow-y: auto;
+  }
+
+  .navigation__wrapper.active {
+    left: 0;
+  }
+
+  .navigation__header {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    margin-bottom: 20px;
+  }
+
+  .navbar-close {
+    display: flex;
+    padding: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #333;
+  }
+
+  .navigation__content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    width: 100%;
+  }
+
+  .departments__toggle {
+    width: 100%;
     justify-content: space-between;
   }
-  header a {
-    position: relative;
-    text-decoration: none;
-    color: var(--color-foreground);
+
+  .departments__dropdown {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    display: none;
+    width: 100%;
+    margin-top: 10px;
   }
-  header a sup {
-    position: absolute;
-    left: 100%;
-    overflow: hidden;
-    max-width: var(--page-margin);
+
+  .nav__departments:hover .departments__dropdown {
+    display: block;
   }
-  header svg {
-    width: 2rem;
+
+  .nav__menu {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    margin-top: 20px;
   }
-  header .header__menu,
-  header .header__icons {
-    display: flex;
-    gap: 1rem;
+
+  .nav__link {
+    width: 100%;
+    padding: 15px 0;
   }
+}
+
+@media (max-width: 576px) {
+  .header__logo .logo__text {
+    font-size: 24px;
+  }
+
+  .header__logo .logo__subtitle {
+    font-size: 9px;
+  }
+
+  .header__actions {
+    gap: 10px;
+  }
+
+  .header__cart {
+    padding: 10px 15px;
+  }
+
+  .cart__label {
+    font-size: 11px;
+  }
+
+  .cart__total {
+    font-size: 14px;
+  }
+
+  .search__input {
+    font-size: 13px;
+  }
+}
+
 {% endstylesheet %}
+
+{% javascript %}
+// Mobile menu toggle
+document.addEventListener('DOMContentLoaded', function() {
+  const toggler = document.querySelector('.navbar-toggler');
+  const closeBtn = document.querySelector('.navbar-close');
+  const navWrapper = document.querySelector('.navigation__wrapper');
+  const departmentsToggle = document.querySelector('.departments__toggle');
+  
+  if (toggler) {
+    toggler.addEventListener('click', function() {
+      navWrapper.classList.add('active');
+    });
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function() {
+      navWrapper.classList.remove('active');
+    });
+  }
+
+  // Close menu when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.navigation') && navWrapper.classList.contains('active')) {
+      navWrapper.classList.remove('active');
+    }
+  });
+
+  // Mobile departments dropdown
+  if (departmentsToggle) {
+    departmentsToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const dropdown = this.nextElementSibling;
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+  }
+});
+{% endjavascript %}
 
 {% schema %}
 {
-  "name": "t:general.header",
+  "name": "Header",
+  "tag": "header",
+  "class": "header section-header",
   "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color Scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image"
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Support Phone",
+      "default": "+980-34984089"
+    },
     {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "Main Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "link_list",
+      "id": "departments_menu",
+      "label": "Departments Menu"
     }
   ]
 }
