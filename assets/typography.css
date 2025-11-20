@@ -11,7 +11,7 @@ body {
 	font-family: 'Inter', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
 	font-size: 1rem; /* 16px mobile default */
 	line-height: 1.5;
-	color: #222;
+	color: var(--color-text);
 }
 
 /* -----------------------------------------------------------

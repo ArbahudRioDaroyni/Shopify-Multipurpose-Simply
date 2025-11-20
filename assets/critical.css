@@ -71,11 +71,18 @@ p:empty {
   margin-block-end: 0;
 }
 
+/** Base typography styles imported from typography.css */
+
+/** Based on research: comfortable line-height 1.5 **/
+html {
+	font-size: 100%; /* 16px browser default */
+}
+
 /** Theme styles below */
 body {
   font-family: var(--font-primary--family);
   background-color: var(--color-background);
-  color: var(--color-foreground);
+  color: var(--color-text);
 }
 
 .container {
