@@ -74,5 +74,19 @@
       "subtitle": "Subtitle",
       "normal": "Normal text"
     },
+  },
+  "settings": {
+    "color_schemes": {
+      "background": "Background color",
+      "foreground": "Foreground color",
+      "primary": "Primary color",
+      "primary_hover": "Primary hover color",
+      "secondary": "Secondary color",
+      "secondary_hover": "Secondary hover color",
+      "text": "Text color",
+      "icons": "Icons color",
+      "border": "Border color",
+      "shadow": "Shadow color"
+    }
   }
 }

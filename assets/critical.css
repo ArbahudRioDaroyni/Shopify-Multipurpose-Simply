@@ -71,11 +71,23 @@ p:empty {
   margin-block-end: 0;
 }
 
+/** Base typography styles imported from typography.css */
+
+/** Based on research: comfortable line-height 1.5 **/
+html {
+	font-size: 100%; /* 16px browser default */
+}
+
 /** Theme styles below */
 body {
   font-family: var(--font-primary--family);
   background-color: var(--color-background);
-  color: var(--color-foreground);
+  color: var(--color-text);
+}
+
+.container {
+  width: min(var(--page-width), 90%);
+  margin: 5rem auto;
 }
 
 /** Section layout utilities */
@@ -91,7 +103,7 @@ body {
  * When a child element is given the `full-width` class, it will span
  * the entire viewport.
  */
-.shopify-section {
+/* .shopify-section {
   --content-width: min(
     calc(var(--page-width) - var(--page-margin) * 2),
     calc(100% - var(--page-margin) * 2)
@@ -99,19 +111,19 @@ body {
   --content-margin: minmax(var(--page-margin), 1fr);
   --content-grid: var(--content-margin) var(--content-width) var(--content-margin);
 
-  /* This is required to make <img> elements work as background images */
+  // This is required to make <img> elements work as background images
   position: relative;
   grid-template-columns: var(--content-grid);
   display: grid;
   width: 100%;
-}
+} */
 
 /* Child elements, by default, are constrained to the central column of the grid. */
-.shopify-section > * {
+/* .shopify-section > * {
   grid-column: 2;
-}
+} */
 
 /* Child elements that use the full-width utility class span the entire viewport. */
-.shopify-section > .full-width {
+/* .shopify-section > .full-width {
   grid-column: 1 / -1;
-}
+} */

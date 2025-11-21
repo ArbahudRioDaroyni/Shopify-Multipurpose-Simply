@@ -57,56 +57,83 @@
     "name": "t:general.colors",
     "settings": [
       {
+        "type": "color_scheme",
+        "id": "color_scheme",
+        "label": "Select Color Scheme",
+        "default": "scheme-1"
+      },
+      {
         "type": "color_scheme_group",
         "id": "color_schemes",
         "definition": [
           {
             "type": "color",
             "id": "background",
-            "label": "t:settings.background",
+            "label": "t:settings.color_schemes.background",
             "default": "#FFFFFF",
             "alpha": true
           },
           {
             "type": "color",
-            "id": "foreground_heading",
-            "label": "t:settings.headings",
-            "default": "#000000",
-            "alpha": true
-          },
-          {
-            "type": "color",
             "id": "foreground",
-            "label": "t:settings.text",
-            "default": "#000000",
+            "label": "t:settings.color_schemes.foreground",
+            "default": "#F4F4F4",
             "alpha": true
           },
           {
             "type": "color",
             "id": "primary",
-            "label": "t:settings.primary_color",
+            "label": "t:settings.color_schemes.primary",
             "default": "#000F9F",
             "alpha": true
           },
           {
             "type": "color",
             "id": "primary_hover",
-            "label": "t:settings.primary_hover_color",
-            "default": "#000000",
+            "label": "t:settings.color_schemes.primary_hover",
+            "default": "#0a2e44",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "secondary",
+            "label": "t:settings.color_schemes.secondary",
+            "default": "#000F9F",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "secondary_hover",
+            "label": "t:settings.color_schemes.secondary_hover",
+            "default": "#0a2e44",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "text",
+            "label": "t:settings.color_schemes.text",
+            "default": "#1a1a1a",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "icons",
+            "label": "t:settings.color_schemes.icons",
+            "default": "#666666",
             "alpha": true
           },
           {
             "type": "color",
             "id": "border",
-            "label": "t:settings.borders",
+            "label": "t:settings.color_schemes.border",
             "default": "#E6E6E6",
             "alpha": true
           },
           {
             "type": "color",
             "id": "shadow",
-            "label": "t:settings.shadow_color",
-            "default": "#000000",
+            "label": "t:settings.color_schemes.shadow",
+            "default": "#0000001a",
             "alpha": true
           },
           {
@@ -327,10 +354,10 @@
           }
         ],
         "role": {
-          "text": "foreground",
+          "text": "text",
           "background": "background",
           "links": "primary",
-          "icons": "foreground",
+          "icons": "icons",
           "primary_button": "primary_button_background",
           "on_primary_button": "primary_button_text",
           "primary_button_border": "primary_button_border",
