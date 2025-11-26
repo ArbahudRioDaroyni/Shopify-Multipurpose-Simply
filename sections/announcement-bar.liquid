@@ -1,0 +1,233 @@
+<a
+  href="{{ section.settings.link_url }}"
+  id="announcement-bar-{{ section.id }}"
+  class="announcement-bar"
+  style="--background-color: {{ section.settings.background_color }}; --text-color: {{ section.settings.text_color }};"
+>
+  <span class="announcement-bar__content">
+    <span class="announcement-bar__text--mobile">{{ section.settings.mobile_text }}</span>
+    <span class="announcement-bar__text--desktop">{{ section.settings.desktop_text }}</span>
+  </span>
+  <strong class="announcement-bar__count-down">
+    {% if section.settings.show_countdown %}
+      &nbsp;
+      {{- section.settings.text_countdown -}}
+      <count-down data-end-date="{{ section.settings.end_date_countdown }}">0 days 00:00:00</count-down>
+    {% endif %}
+  </strong>
+  {% comment %} <a href="{{ section.settings.link_url }}" class="announcement-bar__link">
+    {{ section.settings.link_text }}
+  </a> {% endcomment %}
+  <span class="announcement-bar__close-button" role="button" tabindex="0" aria-label="Close banner">
+    &times;
+  </span>
+</a>
+
+{% stylesheet %}
+  .announcement-bar {
+    --background-color: var(--color-primary);
+    --text-color: var(--color-foreground);
+
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.875rem 1rem;
+    position: relative;
+    font-size: 0.875rem;
+    text-align: center;
+    text-decoration: none;
+  }
+  
+  .announcement-bar__content,
+  .announcement-bar__count-down {
+    white-space: nowrap;
+  }
+
+  .announcement-bar__text--mobile {
+    display: none;
+  }
+
+  .announcement-bar__text--desktop {
+    display: inline;
+  }
+
+  .announcement-bar__count-down {
+    display: flex;
+    justify-content: center;
+    gap: .25rem;
+  }
+
+  .announcement-bar__count-down count-down {
+    min-width: 120px;
+    display: flex;
+    will-change: contents;
+  }
+  
+  .announcement-bar__link {
+    color: var(--text-color);
+    font-weight: bold;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  
+  .announcement-bar__close-button {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  @media (max-width: 768px) {
+    .announcement-bar {
+      flex-wrap: wrap;
+      row-gap: .5rem;
+      padding: 1rem 2rem;
+    }
+    
+    .announcement-bar__content,
+    .announcement-bar__count-down {
+      flex: 0 1 auto;
+    }
+
+    .announcement-bar__text--mobile {
+      display: inline;
+    }
+    
+    .announcement-bar__text--desktop {
+      display: none;
+    }
+
+    .announcement-bar__link {
+      flex: 1 1 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class CountDown extends HTMLElement {
+    constructor() {
+      super();
+      this.endDate = null;
+      this.intervalId = null;
+    }
+
+    connectedCallback() {
+      const endDateStr = this.dataset.endDate;
+      if (endDateStr) {
+        this.endDate = new Date(endDateStr);
+        this.startCountdown();
+      }
+    }
+
+    disconnectedCallback() {
+      if (this.intervalId) {
+        clearInterval(this.intervalId);
+      }
+    }
+
+    startCountdown() {
+      this.updateCountdown();
+      this.intervalId = setInterval(() => {
+        this.updateCountdown();
+      }, 1000);
+    }
+
+    updateCountdown() {
+      const now = new Date().getTime();
+      const distance = this.endDate.getTime() - now;
+
+      if (distance < 0) {
+        this.textContent = '0 days 00:00:00';
+        if (this.intervalId) {
+          clearInterval(this.intervalId);
+        }
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      this.textContent = `${days} days ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+  }
+
+  customElements.define('count-down', CountDown);
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:sections.announcement_bar.title",
+  "settings": [
+    {
+      "type": "text",
+      "id": "mobile_text",
+      "label": "t:sections.announcement_bar.mobile_text",
+      "default": "Blue November - Up to 70% off + Free Gifts!"
+    },
+    {
+      "type": "text",
+      "id": "desktop_text",
+      "label": "t:sections.announcement_bar.desktop_text",
+      "default": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!"
+    },
+    {
+      "type": "text",
+      "id": "link_text",
+      "label": "t:sections.announcement_bar.link_text",
+      "default": "Hurry up!"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:sections.announcement_bar.link_url",
+      "default": "/collections/all"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "t:sections.announcement_bar.background_color",
+      "default": "#af000f"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.announcement_bar.text_color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_countdown",
+      "label": "t:sections.announcement_bar.show_countdown",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "text_countdown",
+      "label": "t:sections.announcement_bar.text_countdown",
+      "default": "End in"
+    },
+    {
+      "type": "text",
+      "id": "end_date_countdown",
+      "label": "t:sections.announcement_bar.countdown_end_date",
+      "info": "Format: YYYY-MM-DD HH:MM:SS (e.g., 2025-12-31 23:59:59)",
+      "default": "2025-12-31 23:59:59"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.announcement_bar.title",
+      "category": "Header"
+    }
+  ]
+}
+{% endschema %}
