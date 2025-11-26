@@ -1,5 +1,104 @@
 🚨 MANDATORY: YOU MUST CALL "learn_shopify_api" ONCE WHEN WORKING WITH LIQUID THEMES.
 
+## Git Commit Standards
+
+Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for all commit messages.
+
+### Commit message format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- **feat**: A new feature
+- **fix**: A bug fix
+- **docs**: Documentation only changes
+- **style**: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+- **refactor**: A code change that neither fixes a bug nor adds a feature
+- **perf**: A code change that improves performance
+- **test**: Adding missing tests or correcting existing tests
+- **build**: Changes that affect the build system or external dependencies
+- **ci**: Changes to CI configuration files and scripts
+- **chore**: Other changes that don't modify src or test files
+- **revert**: Reverts a previous commit
+
+### Scope (optional)
+
+The scope should be the name of the component or feature affected:
+- `header`
+- `footer`
+- `product`
+- `cart`
+- `checkout`
+- `collection`
+- `search`
+- etc.
+
+### Subject
+
+- Use imperative, present tense: "change" not "changed" nor "changes"
+- Don't capitalize first letter
+- No period (.) at the end
+- Maximum 50 characters
+
+### Body (optional)
+
+- Use imperative, present tense
+- Include motivation for the change and contrast with previous behavior
+- Wrap at 72 characters
+
+### Footer (optional)
+
+- Reference issues and pull requests
+- Note breaking changes with `BREAKING CHANGE:`
+
+### Examples
+
+```bash
+# Simple feature
+feat(header): add countdown timer to banner promotion
+
+# Bug fix with scope
+fix(cart): resolve quantity update issue on mobile
+
+# Feature with body
+feat(product): add product recommendation section
+
+Add a new section that displays related products based on
+product tags and customer browsing history.
+
+# Breaking change
+feat(checkout)!: update payment gateway integration
+
+BREAKING CHANGE: Update payment API to v2. Merchants need to
+re-authenticate their payment gateway credentials.
+
+# Multiple types
+feat(header): add announcement bar with countdown
+fix(header): resolve mobile layout wrap issue
+refactor(header): improve CSS structure for countdown element
+
+# Documentation
+docs: update theme installation instructions
+
+# Chore
+chore: update dependencies to latest versions
+```
+
+### Best practices
+
+- Make atomic commits (one logical change per commit)
+- Commit often to maintain a clear history
+- Write clear, descriptive commit messages
+- Reference issue numbers when applicable
+- Use `!` after type/scope to indicate breaking changes: `feat!:` or `feat(api)!:`
+
 ## Theme Architecture
 
 **Key principles: focus on generating snippets, blocks, and sections; users may create templates using the theme editor**

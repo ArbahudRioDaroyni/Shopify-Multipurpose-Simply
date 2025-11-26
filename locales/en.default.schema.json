@@ -88,5 +88,19 @@
       "border": "Border color",
       "shadow": "Shadow color"
     }
+  },
+  "sections": {
+    "announcement_bar": {
+      "title": "Announcement bar",
+      "mobile_text": "Mobile text",
+      "desktop_text": "Desktop text",
+      "link_text": "Link text",
+      "link_url": "Link URL",
+      "background_color": "Background color",
+      "text_color": "Text color",
+      "show_countdown": "Show countdown?",
+      "text_countdown": "Text countdown",
+      "countdown_end_date": "Countdown end date"
+    }
   }
 }
