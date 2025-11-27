@@ -14,12 +14,16 @@
     "announcement-bar": {
       "type": "announcement-bar"
     },
+    "header-info-bar": {
+      "type": "header-info-bar"
+    },
     "header": {
       "type": "header"
     }
   },
   "order": [
     "announcement-bar",
+    "header-info-bar",
     "header"
   ],
 }

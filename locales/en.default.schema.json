@@ -101,6 +101,32 @@
       "show_countdown": "Show countdown?",
       "text_countdown": "Text countdown",
       "countdown_end_date": "Countdown end date"
+    },
+    "header_info_bar": {
+      "title": "Header info bar",
+      "settings": {
+        "header": {
+          "general": "General",
+          "contact": "Contact information",
+          "promo": "Promotional text",
+          "location": "Location",
+          "selectors": "Currency & language"
+        },
+        "background_color": "Background color",
+        "text_color": "Text color",
+        "show_phone": "Show phone",
+        "phone": "Phone number",
+        "show_email": "Show email",
+        "email": "Email address",
+        "show_promo_text": "Show promo text",
+        "promo_text": "Promo text",
+        "promo_link": "Promo link URL",
+        "promo_link_text": "Promo link text",
+        "show_location": "Show location",
+        "location_text": "Location text",
+        "show_currency_selector": "Show currency selector",
+        "show_language_selector": "Show language selector"
+      }
     }
   }
 }
