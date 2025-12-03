@@ -8,11 +8,16 @@
   as well as how you can use LiquidDoc to document your code.
 
   @param {image} image - The image to be rendered
+  @param {string} [alt] - Alternative text for the image
   @param {string} [url] - An optional destination URL for the image
   @param {string} [class] - Optional class to be added to the image wrapper
   @param {number} [width] - The highest resolution width of the image to be rendered
   @param {number} [height] - The highest resolution height of the image to be rendered
   @param {string} [crop] - The crop position of the image
+  @param {number} [w_min] - Minimum width for responsive srcset (default: 154)
+  @param {number} [w_max] - Maximum width for responsive srcset (default: 2048)
+  @param {string} [attr] - Custom attributes to add to the img tag (e.g., 'draggable="false" loading="lazy"')
+  @param {boolean} [wrapper] - Whether to wrap image in container element (default: true)
 
   @example
   {% render 'image', image: product.featured_image %}
@@ -20,10 +25,15 @@
   {% render 'image',
     class: 'product__image',
     image: product.featured_image,
+    alt: product.featured_image.alt,
     url: product.url,
-    width: 1200,
-    height: 800,
+    width: 1206,
+    height: 1206,
     crop: 'center',
+    w_min: 154,
+    w_max: 2048,
+    attr: 'draggable="false" loading="lazy"',
+    wrapper: false
   %}
 {% enddoc %}
 
@@ -32,33 +42,118 @@
     assign width = width | default: image.width
   endunless
 
-  if url
-    assign wrapper = 'a'
+  assign wrapper = wrapper | default: false
+  
+  if wrapper
+    assign wrapper_tag = 'a'
+    if url == blank
+      assign wrapper_tag = 'figure'
+    endif
+  endif
+
+  assign w_min = w_min | default: 20
+  assign w_max = w_max | default: 2048
+  assign available_widths = '20,48,96,154,246,448,600,768,800,960,1024,1206,1426,1646,1946,2048' | split: ','
+  assign width_str = width | append: ''
+  assign unavailable_widths = available_widths | has: width_str
+  unless unavailable_widths == false
+    assign width_array = width_str | split: ','
+    assign available_widths = available_widths | concat: width_array
+  endunless
+
+  assign filtered_widths_array = ''
+  assign filtered_srcset = ''
+
+  if w_min == w_max
+    assign filtered_widths_array = w_min
+    assign filtered_srcset = image | image_url: width: w_min, format: 'webp', crop: crop | append: ' ' | append: w_min | append: 'w'
   else
-    assign wrapper = 'div'
+    for width_str in available_widths
+      assign current_width = width_str | plus: 0
+      if current_width >= w_min and current_width <= w_max
+        if filtered_widths_array == ''
+          assign filtered_widths_array = width_str
+        else
+          assign filtered_widths_array = filtered_widths_array | append: ', ' | append: width_str
+        endif
+        
+        assign srcset_item = image | image_url: width: current_width, format: 'webp', crop: crop | append: ' ' | append: current_width | append: 'w'
+        if filtered_srcset == ''
+          assign filtered_srcset = srcset_item
+        else
+          assign filtered_srcset = filtered_srcset | append: ', ' | append: srcset_item
+        endif
+      endif
+    endfor
+
+    if filtered_widths_array == ''
+      assign filtered_widths_array = w_min | append: ', ' | append: w_max
+      assign srcset_min = image | image_url: width: w_min, format: 'webp', crop: crop | append: ' ' | append: w_min | append: 'w'
+      assign srcset_max = image | image_url: width: w_max, format: 'webp', crop: crop | append: ' ' | append: w_max | append: 'w'
+      assign filtered_srcset = srcset_min | append: ', ' | append: srcset_max
+    endif
+  endif
+
+  assign filtered_widths_split = filtered_widths_array | split: ', '
+  assign widths_count = filtered_widths_split.size
+  
+  if widths_count == 1
+    assign filtered_sizes = filtered_widths_split[0] | append: 'px'
+  else
+    assign filtered_sizes = ''
+    for i in (0..widths_count)
+      assign index = widths_count | minus: i | minus: 1
+      if index >= 0
+        assign current_width = filtered_widths_split[index] | plus: 0
+        if filtered_sizes == ''
+          assign filtered_sizes = '(min-width: ' | append: current_width | append: 'px) ' | append: current_width | append: 'px'
+        else
+          assign filtered_sizes = filtered_sizes | append: ', (min-width: ' | append: current_width | append: 'px) ' | append: current_width | append: 'px'
+        endif
+      endif
+    endfor
+    assign smallest_width = filtered_widths_split.last | plus: 0
+    assign filtered_sizes = filtered_sizes | append: ', ' | append: smallest_width | append: 'px'
   endif
 %}
 
-<{{ wrapper }}
+{% if wrapper %}
+<{{ wrapper_tag }}
   class="image {{ class }}"
   {% if url %}
     href="{{ url }}"
   {% endif %}
 >
-  {{ image | image_url: width: width, height: height, crop: crop | image_tag }}
-</{{ wrapper }}>
+{% endif %}
+  <img
+    class="{% if wrapper %}thumbnail-image{% else %}{{ class }}{% endif %} image-backdround-skeleton"
+    src="{{ image | image_url: width: width, format: 'webp' }}"
+    srcset="{{ filtered_srcset }}"
+    sizes="{{ filtered_sizes }}"
+    widths="{{ filtered_widths_array }}"
+    width="{{ width }}"
+    height="{{ width }}"
+    alt="{{ alt | escape }}"
+    title="{{ alt | escape }}"
+    decoding="async"
+    referrerpolicy="no-referrer-when-downgrade"
+    {{ attr }}
+  />
+{% if wrapper %}
+</{{ wrapper_tag }}>
+{% endif %}
 
 {% stylesheet %}
-  .image {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    height: auto;
+  /* .image-backdround-skeleton {
+    animation: background-pulse 2s infinite ease-in-out;
   }
 
-  .image > img {
-    width: 100%;
-    height: auto;
-  }
+  @keyframes background-pulse {
+    0%, 100% {
+      background-color: var(--color-icons);
+    }
+    50% {
+      background-color: rgb(from var(--color-icons) r g b / 40%);
+    }
+  } */
 {% endstylesheet %}

@@ -48,5 +48,20 @@
     "submit": "Search",
     "no_results_html": "No results found for {{ terms }}",
     "results_for_html": "{{ count }} results found for {{ terms }}"
+  },
+  "products": {
+    "select_option": "Select an option",
+    "add_to_cart": "Add to Cart",
+    "sold_out": "Sold out",
+    "variant": "Variant",
+    "size_guide": "Size Guide",
+    "delivery_return": "Delivery & Return",
+    "ask_question": "Ask a Question",
+    "availability": "Availability",
+    "in_stock": "In stock",
+    "out_of_stock": "Out of stock",
+    "vendor": "Vendor",
+    "categories": "Categories",
+    "tags": "Tags"
   }
 }

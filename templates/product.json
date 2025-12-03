@@ -9,12 +9,16 @@
  */
 {
   "sections": {
-    "main": {
-      "type": "product",
-      "settings": {}
-    }
+    "default": {
+      "type": "product-main-default",
+    },
+    // "main": {
+    //   "type": "product",
+    //   "settings": {}
+    // }
   },
   "order": [
-    "main"
+    "default",
+    // "main",
   ]
 }
