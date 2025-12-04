@@ -144,6 +144,8 @@ Button styles
 
   width: max-content;
   position: relative;
+  display: flex;
+  gap: .5rem;
   font-size: var(--font-size);
   padding: var(--padding);
   text-decoration: none;
