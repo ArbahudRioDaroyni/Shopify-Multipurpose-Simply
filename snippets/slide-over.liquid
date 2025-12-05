@@ -1,0 +1,728 @@
+{% doc %}
+  Renders a slide-over panel that slides in from the right side of the screen.
+  
+  @param {string} [id] - Unique identifier for the slide-over
+  @param {string} [size] - Size of the slide-over: 'sm', 'md', 'lg', 'xl' (default: 'md')
+  @param {string} [position] - Position of the slide-over: 'left', 'right', 'top', 'bottom' (default: 'right')
+  @param {string} [title] - Title displayed in the header
+  @param {string} [description] - Description displayed under the title
+  @param {boolean} [show_close] - Whether to show the close button (default: true)
+  @param {string} [content] - HTML content to display in the body
+
+  @example
+  {% render 'slide-over', 
+    id: 'my-slideover',
+    title: 'Product Information',
+    description: 'View detailed product specifications',
+    size: 'lg',
+    position: 'right',
+    content: '<div>Product details here...</div>'
+  %}
+
+  @example
+  Right sidebar (default)
+  {% render 'slide-over', id: 'product-details', position: 'right' %}
+
+  Left filter panel
+  {% render 'slide-over', id: 'filters', position: 'left', size: 'md' %}
+
+  Top notification bar
+  {% render 'slide-over', id: 'notifications', position: 'top', size: 'sm' %}
+
+  Bottom sheet
+  {% render 'slide-over', id: 'actions', position: 'bottom', size: 'lg' %}
+
+  @example
+  Trigger from Button
+  <button data-slide-over-target="my-slideover">
+    Open Slide Over
+  </button>
+
+  @description
+  JavaScript API:
+
+  ==> Open/Close Methods
+  document.getElementById('my-slideover').open();
+  document.getElementById('my-slideover').close();
+  document.getElementById('my-slideover').toggle();
+
+  ==> Global Utilities
+  SlideOverUtils.open('my-slideover');
+  SlideOverUtils.close('my-slideover');  
+  SlideOverUtils.toggle('my-slideover');
+  SlideOverUtils.closeAll();
+
+  ==> Dynamic Content
+  const slideOver = document.getElementById('my-slideover');
+  slideOver.setTitle('New Title');
+  slideOver.setDescription('New description');
+  slideOver.setContent('<p>Dynamic content</p>');
+  slideOver.setFooter('<button>Save</button>');
+  slideOver.showFooter();
+  slideOver.hideFooter();
+
+  ==> Custom Events
+  slideOver.addEventListener('slide-over:opened', (e) => {
+    console.log('Opened:', e.detail.slideOver);
+  });
+  slideOver.addEventListener('slide-over:closed', (e) => {
+    console.log('Closed:', e.detail.slideOver);
+  });
+
+  ==> Dispatch Events
+  slideOver.dispatchEvent(new CustomEvent('slide-over:open'));
+  slideOver.dispatchEvent(new CustomEvent('slide-over:close'));
+  slideOver.dispatchEvent(new CustomEvent('slide-over:toggle'));
+{% enddoc %}
+
+{% liquid
+  assign slide_id = id | default: 'slide-over'
+  assign slide_size = size | default: 'md'
+  assign slide_position = position | default: 'right'
+  assign slide_title = title | default: ''
+  assign slide_description = description | default: ''
+  assign show_close_btn = show_close | default: true
+  assign slide_content = content | default: ''
+%}
+
+<slide-over id="{{ slide_id }}" class="slide-over slide-over--{{ slide_size }} slide-over--{{ slide_position }}" data-size="{{ slide_size }}" data-position="{{ slide_position }}">
+  <!-- Backdrop -->
+  <div class="slide-over__backdrop"></div>
+  
+  <!-- Panel -->
+  <div class="slide-over__panel">
+    <!-- Header -->
+    {% if slide_title != blank or show_close_btn %}
+      <div class="slide-over__header">
+        <div class="slide-over__header-content">
+          {% if slide_title != blank %}
+            <div class="slide-over__title-section">
+              <h2 class="slide-over__title">{{ slide_title }}</h2>
+              {% if slide_description != blank %}
+                <p class="slide-over__description">{{ slide_description }}</p>
+              {% endif %}
+            </div>
+          {% endif %}
+          
+          {% if show_close_btn %}
+            <button class="slide-over__close" aria-label="Close panel">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Body -->
+    <div class="slide-over__body">
+      {% if slide_content != blank %}
+        {{ slide_content }}
+      {% else %}
+        <div class="slide-over__content">
+          <!-- Content will be injected here -->
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Footer (optional slot) -->
+    <div class="slide-over__footer" style="display: none;">
+      <!-- Footer content can be added via JavaScript -->
+    </div>
+  </div>
+</slide-over>
+
+{% stylesheet %}
+  .slide-over {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1000;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0.3s ease, opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .slide-over.active {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .slide-over__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .slide-over.active .slide-over__backdrop {
+    opacity: 1;
+  }
+
+  /* Custom mouse cursor for backdrop */
+  .slide-over__backdrop::after {
+    content: '';
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10001;
+    left: var(--mouse-x, 0);
+    top: var(--mouse-y, 0);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .slide-over__backdrop.show-cursor::after {
+    opacity: 1;
+  }
+
+  .slide-over__backdrop::before {
+    content: '×';
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    color: #374151;
+    pointer-events: none;
+    z-index: 10002;
+    left: var(--mouse-x, 0);
+    top: var(--mouse-y, 0);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .slide-over__backdrop.show-cursor::before {
+    opacity: 1;
+  }
+
+  .slide-over__panel {
+    position: absolute;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+    overflow: hidden;
+  }
+
+  /* Position variants - Right (default) */
+  .slide-over--right .slide-over__panel {
+    top: 0;
+    right: 0;
+    height: 100%;
+    box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%);
+  }
+
+  .slide-over--right.active .slide-over__panel {
+    transform: translateX(0);
+  }
+
+  /* Position variants - Left */
+  .slide-over--left .slide-over__panel {
+    top: 0;
+    left: 0;
+    height: 100%;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+    transform: translateX(-100%);
+  }
+
+  .slide-over--left.active .slide-over__panel {
+    transform: translateX(0);
+  }
+
+  /* Position variants - Top */
+  .slide-over--top .slide-over__panel {
+    top: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(-100%);
+  }
+
+  .slide-over--top.active .slide-over__panel {
+    transform: translateY(0);
+  }
+
+  /* Position variants - Bottom */
+  .slide-over--bottom .slide-over__panel {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    transform: translateY(100%);
+  }
+
+  .slide-over--bottom.active .slide-over__panel {
+    transform: translateY(0);
+  }
+
+  /* Size variants - Left & Right positions */
+  .slide-over--right.slide-over--sm .slide-over__panel,
+  .slide-over--left.slide-over--sm .slide-over__panel {
+    width: 320px;
+    max-width: 90vw;
+  }
+
+  .slide-over--right.slide-over--md .slide-over__panel,
+  .slide-over--left.slide-over--md .slide-over__panel {
+    width: 448px;
+    max-width: 90vw;
+  }
+
+  .slide-over--right.slide-over--lg .slide-over__panel,
+  .slide-over--left.slide-over--lg .slide-over__panel {
+    width: 640px;
+    max-width: 90vw;
+  }
+
+  .slide-over--right.slide-over--xl .slide-over__panel,
+  .slide-over--left.slide-over--xl .slide-over__panel {
+    width: 768px;
+    max-width: 90vw;
+  }
+
+  /* Size variants - Top & Bottom positions */
+  .slide-over--top.slide-over--sm .slide-over__panel,
+  .slide-over--bottom.slide-over--sm .slide-over__panel {
+    height: 320px;
+    max-height: 90vh;
+  }
+
+  .slide-over--top.slide-over--md .slide-over__panel,
+  .slide-over--bottom.slide-over--md .slide-over__panel {
+    height: 448px;
+    max-height: 90vh;
+  }
+
+  .slide-over--top.slide-over--lg .slide-over__panel,
+  .slide-over--bottom.slide-over--lg .slide-over__panel {
+    height: 640px;
+    max-height: 90vh;
+  }
+
+  .slide-over--top.slide-over--xl .slide-over__panel,
+  .slide-over--bottom.slide-over--xl .slide-over__panel {
+    height: 768px;
+    max-height: 90vh;
+  }
+
+  /* Header */
+  .slide-over__header {
+    flex-shrink: 0;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 24px;
+    background: white;
+  }
+
+  .slide-over__header-content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .slide-over__title-section {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .slide-over__title {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin: 0 0 4px 0;
+    color: #111827;
+  }
+
+  .slide-over__description {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .slide-over__close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: #6b7280;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .slide-over__close:hover {
+    background: #f3f4f6;
+    color: #111827;
+  }
+
+  /* Body */
+  .slide-over__body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    background: white;
+  }
+
+  .slide-over__content {
+    min-height: 100%;
+  }
+
+  /* Footer */
+  .slide-over__footer {
+    flex-shrink: 0;
+    border-top: 1px solid #e5e7eb;
+    padding: 16px 24px;
+    background: #f9fafb;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 640px) {
+    .slide-over--right .slide-over__panel,
+    .slide-over--left .slide-over__panel {
+      width: 100%;
+      max-width: 100vw;
+    }
+
+    .slide-over--top .slide-over__panel,
+    .slide-over--bottom .slide-over__panel {
+      height: 90vh;
+      max-height: 90vh;
+    }
+
+    .slide-over__header {
+      padding: 20px;
+    }
+
+    .slide-over__body {
+      padding: 20px;
+    }
+
+    .slide-over__footer {
+      padding: 16px 20px;
+    }
+
+    .slide-over__title {
+      font-size: 16px;
+    }
+  }
+
+  /* Scroll lock for better mobile support */
+  html.slide-over-open {
+    overflow: hidden;
+    touch-action: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  html.slide-over-open body {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* Prevent iOS bounce scroll */
+  .slide-over.active {
+    -webkit-overflow-scrolling: auto;
+  }
+
+  /* Accessibility and animations */
+  @media (prefers-reduced-motion: reduce) {
+    .slide-over,
+    .slide-over__backdrop,
+    .slide-over__panel,
+    .slide-over__close {
+      transition: none;
+    }
+  }
+
+  /* Focus management */
+  .slide-over:focus-within .slide-over__panel {
+    outline: none;
+  }
+
+  .slide-over__close:focus {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class SlideOver extends HTMLElement {
+    constructor() {
+      super();
+      this.backdrop = this.querySelector('.slide-over__backdrop');
+      this.panel = this.querySelector('.slide-over__panel');
+      this.closeBtn = this.querySelector('.slide-over__close');
+      this.isOpen = false;
+      this.previousFocus = null;
+      
+      this.init();
+    }
+
+    init() {
+      // Close button event
+      if (this.closeBtn) {
+        this.closeBtn.addEventListener('click', () => this.close());
+      }
+
+      // Backdrop click to close
+      if (this.backdrop) {
+        this.backdrop.addEventListener('click', () => this.close());
+        
+        // Prevent scroll/swipe on backdrop (mobile fix)
+        this.backdrop.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+        }, { passive: false });
+        
+        this.backdrop.addEventListener('wheel', (e) => {
+          e.preventDefault();
+        }, { passive: false });
+        
+        // Custom cursor on backdrop
+        this.backdrop.addEventListener('mouseenter', () => {
+          this.backdrop.classList.add('show-cursor');
+        });
+        
+        this.backdrop.addEventListener('mouseleave', () => {
+          this.backdrop.classList.remove('show-cursor');
+        });
+        
+        this.backdrop.addEventListener('mousemove', (e) => {
+          if (this.backdrop.classList.contains('show-cursor')) {
+            this.backdrop.style.setProperty('--mouse-x', e.clientX + 'px');
+            this.backdrop.style.setProperty('--mouse-y', e.clientY + 'px');
+          }
+        });
+      }
+
+      // Prevent scroll on panel content when scrolled to edges (mobile)
+      if (this.panel) {
+        this.panel.addEventListener('touchstart', (e) => {
+          this.startY = e.touches[0].clientY;
+        });
+
+        this.panel.addEventListener('touchmove', (e) => {
+          const panel = e.currentTarget;
+          const scrollableArea = panel.querySelector('.slide-over__body');
+          
+          if (!scrollableArea) return;
+          
+          const currentY = e.touches[0].clientY;
+          const deltaY = this.startY - currentY;
+          
+          // Check if we're at the scroll boundaries
+          const isAtTop = scrollableArea.scrollTop === 0;
+          const isAtBottom = scrollableArea.scrollTop + scrollableArea.clientHeight >= scrollableArea.scrollHeight;
+          
+          // Prevent scroll if we're trying to scroll beyond boundaries
+          if ((isAtTop && deltaY < 0) || (isAtBottom && deltaY > 0)) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+      }
+
+      // Keyboard events
+      this.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.close();
+        }
+      });
+
+      // Listen for external triggers
+      document.addEventListener('click', (e) => {
+        const trigger = e.target.closest(`[data-slide-over-target="${this.id}"]`);
+        if (trigger) {
+          e.preventDefault();
+          this.open();
+        }
+      });
+
+      // Custom events
+      this.addEventListener('slide-over:open', () => this.open());
+      this.addEventListener('slide-over:close', () => this.close());
+      this.addEventListener('slide-over:toggle', () => this.toggle());
+    }
+
+    open() {
+      if (this.isOpen) return;
+
+      this.isOpen = true;
+      this.previousFocus = document.activeElement;
+      
+      // Store current scroll position
+      this.scrollY = window.scrollY;
+      
+      // Add active class
+      this.classList.add('active');
+      
+      // Prevent body scroll (better mobile support)
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${this.scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Add scroll lock class
+      document.documentElement.classList.add('slide-over-open');
+      
+      // Focus management
+      requestAnimationFrame(() => {
+        const focusableElement = this.querySelector('input, button, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusableElement) {
+          focusableElement.focus();
+        } else if (this.closeBtn) {
+          this.closeBtn.focus();
+        }
+      });
+
+      // Dispatch event
+      this.dispatchEvent(new CustomEvent('slide-over:opened', {
+        bubbles: true,
+        detail: { slideOver: this }
+      }));
+    }
+
+    close() {
+      if (!this.isOpen) return;
+
+      this.isOpen = false;
+      
+      // Remove active class
+      this.classList.remove('active');
+      
+      // Restore body scroll (better mobile support)
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      document.body.style.overflow = '';
+      
+      // Remove scroll lock class
+      document.documentElement.classList.remove('slide-over-open');
+      
+      // Restore scroll position
+      if (this.scrollY !== undefined) {
+        window.scrollTo(0, this.scrollY);
+        this.scrollY = undefined;
+      }
+      
+      // Restore focus
+      if (this.previousFocus) {
+        this.previousFocus.focus();
+        this.previousFocus = null;
+      }
+
+      // Dispatch event
+      this.dispatchEvent(new CustomEvent('slide-over:closed', {
+        bubbles: true,
+        detail: { slideOver: this }
+      }));
+    }
+
+    toggle() {
+      if (this.isOpen) {
+        this.close();
+      } else {
+        this.open();
+      }
+    }
+
+    // Public methods
+    setTitle(title) {
+      const titleElement = this.querySelector('.slide-over__title');
+      if (titleElement) {
+        titleElement.textContent = title;
+      }
+    }
+
+    setDescription(description) {
+      const descElement = this.querySelector('.slide-over__description');
+      if (descElement) {
+        descElement.textContent = description;
+      }
+    }
+
+    setContent(content) {
+      const contentElement = this.querySelector('.slide-over__content') || this.querySelector('.slide-over__body');
+      if (contentElement) {
+        contentElement.innerHTML = content;
+      }
+    }
+
+    setFooter(footerContent) {
+      const footerElement = this.querySelector('.slide-over__footer');
+      if (footerElement) {
+        footerElement.innerHTML = footerContent;
+        footerElement.style.display = footerContent ? 'block' : 'none';
+      }
+    }
+
+    // Utility methods
+    showFooter() {
+      const footerElement = this.querySelector('.slide-over__footer');
+      if (footerElement) {
+        footerElement.style.display = 'block';
+      }
+    }
+
+    hideFooter() {
+      const footerElement = this.querySelector('.slide-over__footer');
+      if (footerElement) {
+        footerElement.style.display = 'none';
+      }
+    }
+  }
+
+  // Register custom element
+  if (!customElements.get('slide-over')) {
+    customElements.define('slide-over', SlideOver);
+  }
+
+  // Global utilities
+  window.SlideOverUtils = {
+    open: (id) => {
+      const slideOver = document.getElementById(id);
+      if (slideOver) slideOver.open();
+    },
+    
+    close: (id) => {
+      const slideOver = document.getElementById(id);
+      if (slideOver) slideOver.close();
+    },
+    
+    toggle: (id) => {
+      const slideOver = document.getElementById(id);
+      if (slideOver) slideOver.toggle();
+    },
+
+    closeAll: () => {
+      document.querySelectorAll('slide-over.active').forEach(slideOver => {
+        slideOver.close();
+      });
+    }
+  };
+{% endjavascript %}
