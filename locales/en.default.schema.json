@@ -127,6 +127,54 @@
         "show_currency_selector": "Show currency selector",
         "show_language_selector": "Show language selector"
       }
+    },
+    "breadcrumbs": {
+      "name": "Breadcrumbs",
+      "settings": {
+        "layout": {
+          "header": "Layout"
+        },
+        "typography": {
+          "header": "Typography"
+        },
+        "spacing": {
+          "header": "Spacing"
+        },
+        "alignment": {
+          "label": "Alignment",
+          "options": {
+            "left": "Left",
+            "center": "Center",
+            "right": "Right"
+          }
+        },
+        "separator_text": {
+          "label": "Separator"
+        },
+        "text_size": {
+          "label": "Text size"
+        },
+        "text_color": {
+          "label": "Text color"
+        },
+        "link_color": {
+          "label": "Link color"
+        },
+        "separator_color": {
+          "label": "Separator color"
+        },
+        "padding_top": {
+          "label": "Top padding"
+        },
+        "padding_bottom": {
+          "label": "Bottom padding"
+        }
+      },
+      "presets": {
+        "default": {
+          "name": "Breadcrumbs"
+        }
+      }
     }
   }
 }
