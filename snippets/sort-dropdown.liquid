@@ -1,0 +1,363 @@
+{% doc %}
+  Renders sort dropdown for product collections.
+  
+  @param {collection} collection - The collection object
+  
+  @example
+  {% render 'sort-dropdown', collection: collection %}
+{% enddoc %}
+
+{% liquid
+  assign sort_by = collection.sort_by | default: collection.default_sort_by
+%}
+
+<sort-dropdown class="sort-dropdown" data-current-sort="{{ sort_by }}">
+  <button class="sort-dropdown__toggle" aria-expanded="false">
+    <span class="sort-dropdown__label">{{ 'collections.sort.sort_by' | t | default: 'Sort by' }}</span>
+    <span class="sort-dropdown__value" data-sort-label>
+      {% for option in collection.sort_options %}
+        {% if option.value == sort_by %}
+          {{ option.name }}
+        {% endif %}
+      {% endfor %}
+    </span>
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+  
+  <div class="sort-dropdown__menu">
+    {% for option in collection.sort_options %}
+      <button 
+        class="sort-dropdown__option {% if option.value == sort_by %}active{% endif %}" 
+        data-value="{{ option.value }}"
+      >
+        {{ option.name }}
+      </button>
+    {% endfor %}
+  </div>
+</sort-dropdown>
+
+{% stylesheet %}
+  .sort-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .sort-dropdown__toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    min-width: 200px;
+    text-align: left;
+  }
+
+  .sort-dropdown__toggle:hover {
+    border-color: #dee2e6;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .sort-dropdown__toggle svg {
+    transition: transform 0.3s ease;
+    color: #6c757d;
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+  }
+
+  .sort-dropdown[aria-expanded="true"] .sort-dropdown__toggle svg {
+    transform: rotate(180deg);
+  }
+
+  .sort-dropdown__label {
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .sort-dropdown__value {
+    color: var(--color-text);
+    flex: 1;
+  }
+
+  .sort-dropdown__menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    z-index: 10;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    margin-top: 4px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .sort-dropdown[aria-expanded="true"] .sort-dropdown__menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .sort-dropdown__option {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    text-align: left;
+    font-size: 14px;
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid #f8f9fa;
+  }
+
+  .sort-dropdown__option:last-child {
+    border-bottom: none;
+  }
+
+  .sort-dropdown__option:hover {
+    background: #f8f9fa;
+  }
+
+  .sort-dropdown__option.active {
+    background: var(--color-primary-light, #e3f2fd);
+    color: var(--color-primary);
+    font-weight: 500;
+  }
+
+  @media (max-width: 576px) {
+    .sort-dropdown__toggle {
+      min-width: 160px;
+      padding: 10px 12px;
+      font-size: 13px;
+    }
+
+    .sort-dropdown__menu {
+      left: -50%;
+      right: -50%;
+    }
+  }
+
+  /* Loading state */
+  .sort-loading {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+  }
+
+  .sort-loading__spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid rgba(0,0,0,0.1);
+    border-left-color: var(--color-primary, #007bff);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class SortDropdown extends HTMLElement {
+    constructor() {
+      super();
+      this.toggle = this.querySelector('.sort-dropdown__toggle');
+      this.menu = this.querySelector('.sort-dropdown__menu');
+      this.options = this.querySelectorAll('.sort-dropdown__option');
+      this.valueDisplay = this.querySelector('.sort-dropdown__value');
+      this.currentSort = this.dataset.currentSort || 'manual';
+      this.isOpen = false;
+      this.init();
+    }
+
+    init() {
+      // Toggle dropdown
+      this.toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.toggleDropdown();
+      });
+
+      // Handle option selection
+      this.options.forEach(option => {
+        option.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.selectOption(option);
+        });
+      });
+
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!this.contains(e.target)) {
+          this.closeDropdown();
+        }
+      });
+
+      // Close on escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isOpen) {
+          this.closeDropdown();
+        }
+      });
+    }
+
+    toggleDropdown() {
+      this.isOpen ? this.closeDropdown() : this.openDropdown();
+    }
+
+    openDropdown() {
+      this.isOpen = true;
+      this.setAttribute('aria-expanded', 'true');
+      this.toggle.setAttribute('aria-expanded', 'true');
+    }
+
+    closeDropdown() {
+      this.isOpen = false;
+      this.setAttribute('aria-expanded', 'false');
+      this.toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    selectOption(option) {
+      const value = option.dataset.value;
+      const text = option.textContent.trim();
+      
+      this.currentSort = value;
+      this.valueDisplay.textContent = text;
+
+      // Update active state
+      this.options.forEach(opt => opt.classList.remove('active'));
+      option.classList.add('active');
+
+      // Close dropdown
+      this.closeDropdown();
+
+      // Apply sort by updating URL with sort_by parameter
+      this.applySort(value);
+
+      // Dispatch sort change event
+      const event = new CustomEvent('sortChange', {
+        detail: { 
+          sort: value,
+          label: text 
+        }
+      });
+      document.dispatchEvent(event);
+    }
+
+    applySort(sortValue) {
+      const url = new URL(window.location.href);
+      
+      // Set sort_by parameter using Shopify standard values
+      url.searchParams.set('sort_by', sortValue);
+
+      // Create separate URL for AJAX with section_id
+      const fetchUrl = new URL(url.toString());
+      const sectionId = document.querySelector('[data-section-id]')?.dataset.sectionId;
+      if (sectionId) {
+        fetchUrl.searchParams.set('section_id', sectionId);
+      }
+
+      // Update browser URL without section_id (for clean URL)
+      window.history.pushState({}, '', url.toString());
+
+      // Fetch and update products using URL with section_id
+      this.fetchSortedProducts(fetchUrl.toString(), sortValue);
+    }
+
+    async fetchSortedProducts(url, sortValue) {
+      try {
+        // Show loading state
+        this.showLoading();
+
+        // Fetch the sorted section
+        const response = await fetch(url);
+        const html = await response.text();
+
+        // Parse the response
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // Update product grid
+        const newProductGrid = doc.querySelector('product-grid');
+        const currentProductGrid = document.querySelector('product-grid');
+        if (newProductGrid && currentProductGrid) {
+          currentProductGrid.innerHTML = newProductGrid.innerHTML;
+        }
+
+        // Update pagination
+        const newPagination = doc.querySelector('.pagination');
+        const currentPagination = document.querySelector('.pagination');
+        if (newPagination && currentPagination) {
+          currentPagination.innerHTML = newPagination.innerHTML;
+        } else if (!newPagination && currentPagination) {
+          currentPagination.remove();
+        }
+
+        // Update results count
+        const newResults = doc.querySelector('.collection-results');
+        const currentResults = document.querySelector('.collection-results');
+        if (newResults && currentResults) {
+          currentResults.innerHTML = newResults.innerHTML;
+        }
+
+        // Hide loading state
+        this.hideLoading();
+
+      } catch (error) {
+        console.error('Error fetching sorted products:', error);
+        this.hideLoading();
+        // Fallback to full page reload on error
+        window.location.href = url;
+      }
+    }
+
+    showLoading() {
+      const productGrid = document.querySelector('product-grid');
+      if (productGrid) {
+        productGrid.style.opacity = '0.5';
+        productGrid.style.pointerEvents = 'none';
+      }
+      
+      // Add loading spinner
+      let loader = document.querySelector('.sort-loading');
+      if (!loader) {
+        loader = document.createElement('div');
+        loader.className = 'sort-loading';
+        loader.innerHTML = '<div class="sort-loading__spinner"></div>';
+        document.querySelector('.collection-content')?.appendChild(loader);
+      }
+    }
+
+    hideLoading() {
+      const productGrid = document.querySelector('product-grid');
+      if (productGrid) {
+        productGrid.style.opacity = '1';
+        productGrid.style.pointerEvents = 'auto';
+      }
+      
+      const loader = document.querySelector('.sort-loading');
+      if (loader) {
+        loader.remove();
+      }
+    }
+  }
+
+  customElements.define('sort-dropdown', SortDropdown);
+{% endjavascript %}
