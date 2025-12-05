@@ -28,7 +28,40 @@
     }
   },
   "collections": {
-    "title": "Collections"
+    "title": "Collections",
+    "filters": {
+      "filters": "Filters",
+      "show_filters": "Show filters",
+      "active_filters": "Active filters",
+      "clear_all": "Clear all",
+      "clear_filters": "Clear filters",
+      "no_filters": "No filters available for this collection.",
+      "price_from": "From",
+      "price_to": "To",
+      "color": "Color",
+      "size": "Size",
+      "type": "Type",
+      "brand": "Brand",
+      "availability": "Availability",
+      "vendor": "Brand"
+    },
+    "sort": {
+      "sort_by": "Sort by:",
+      "featured": "Featured",
+      "best_selling": "Best selling",
+      "alphabetically_a_z": "Alphabetically, A-Z",
+      "alphabetically_z_a": "Alphabetically, Z-A",
+      "price_low_high": "Price, low to high",
+      "price_high_low": "Price, high to low",
+      "date_new_old": "Date, new to old",
+      "date_old_new": "Date, old to new"
+    },
+    "general": {
+      "no_matches": "No products found",
+      "no_matches_description": "Try adjusting your search or filter to find what you're looking for.",
+      "no_products": "No products in this collection",
+      "showing_count": "Showing {{ count }} of {{ total }} products"
+    }
   },
   "gift_card": {
     "add_to_apple_wallet": "Add to Apple Wallet",
@@ -62,6 +95,14 @@
     "out_of_stock": "Out of stock",
     "vendor": "Vendor",
     "categories": "Categories",
-    "tags": "Tags"
+    "tags": "Tags",
+    "quick_view": "Quick view"
+  },
+  "general": {
+    "pagination": {
+      "label": "Pagination",
+      "previous": "Previous",
+      "next": "Next"
+    }
   }
 }

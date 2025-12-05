@@ -1,0 +1,136 @@
+{% doc %}
+  Renders view mode toggle buttons (2 column, 3 column, list view).
+
+  @example
+  {% render 'view-mode-toggle' %}
+{% enddoc %}
+
+<view-mode-toggle class="view-mode-toggle">
+  <button class="view-mode-button button view-icon--list" data-view="list" aria-label="List View">
+    <span></span>
+    <span></span>
+  </button>
+  <button class="view-mode-button button" data-view="2-col" aria-label="2 Column View">
+    <span></span>
+    <span></span>
+  </button>
+  <button class="view-mode-button button" data-view="3-col" aria-label="3 Column View">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <button class="view-mode-button button active" data-view="4-col" aria-label="4 Column View">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+  <button class="view-mode-button button" data-view="5-col" aria-label="5 Column View">
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+</view-mode-toggle>
+
+{% stylesheet %}
+  .view-mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .view-mode-button {
+    padding: .5rem;
+    --color: white;
+    --text-color: hsl(from var(--color-icons) h s 68);
+    gap: 2px;
+  }
+
+  .view-mode-button > span {
+    width: 1rem;
+    height: 2rem;
+    background: currentColor;
+    border-radius: 0.5px;
+  }
+
+  .view-mode-button:hover {
+    --color: white;
+    --text-color: var(--color-icons);
+    --border-color: var(--color-icons);
+    transform: translate(0, -1px);
+  }
+
+  .view-mode-button.active {
+    --color: white;
+    --text-color: var(--color-icons);
+    --border-color: var(--color-icons);
+  }
+
+  /* List view - rotate 90deg */
+  .view-icon--list {
+    flex-direction: column;
+  }
+
+  .view-icon--list > span {
+    width: 2rem;
+    height: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .view-mode-toggle {
+      gap: 4px;
+    }
+
+    .view-mode-button {
+      width: 32px;
+      height: 32px;
+    }
+
+    .view-mode-button > span {
+      width: 2.5px;
+      height: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class ViewModeToggle extends HTMLElement {
+    constructor() {
+      super();
+      this.buttons = this.querySelectorAll('.view-mode-button');
+      this.currentView = '4-col';
+      this.init();
+    }
+
+    init() {
+      this.buttons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.setActiveView(btn.dataset.view);
+        });
+      });
+
+      // Set initial active state
+      this.setActiveView(this.currentView);
+    }
+
+    setActiveView(view) {
+      this.currentView = view;
+      
+      // Update button states
+      this.buttons.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+
+      // Dispatch view change event
+      this.dispatchEvent(new CustomEvent('view-mode:changed', {
+        bubbles: true,
+        detail: { view: this.currentView }
+      }));
+    }
+  }
+
+  customElements.define('view-mode-toggle', ViewModeToggle);
+{% endjavascript %}
