@@ -145,6 +145,9 @@ Button styles
   width: max-content;
   position: relative;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
   gap: .5rem;
   font-size: var(--font-size);
   padding: var(--padding);
