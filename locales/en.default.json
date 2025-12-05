@@ -25,6 +25,12 @@
       "password": "Password",
       "submit": "Sign in",
       "title": "Login"
+    },
+    "account": {
+      "title": "Account"
+    },
+    "order": {
+      "title": "Order"
     }
   },
   "collections": {
@@ -60,7 +66,8 @@
       "no_matches": "No products found",
       "no_matches_description": "Try adjusting your search or filter to find what you're looking for.",
       "no_products": "No products in this collection",
-      "showing_count": "Showing {{ count }} of {{ total }} products"
+      "showing_count": "Showing {{ count }} of {{ total }} products",
+      "title": "Collections"
     }
   },
   "gift_card": {
@@ -103,6 +110,16 @@
       "label": "Pagination",
       "previous": "Previous",
       "next": "Next"
+    },
+    "breadcrumbs": {
+      "home": "Home",
+      "aria_label": "Breadcrumb navigation"
+    },
+    "search": {
+      "title": "Search"
+    },
+    "cart": {
+      "title": "Cart"
     }
   }
 }

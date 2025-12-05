@@ -1,0 +1,309 @@
+{% if template contains 'index' %}
+  {% comment %} No breadcrumbs on the homepage {% endcomment %}
+  {% assign show_breadcrumbs = false %}
+{% else %}
+  {% assign show_breadcrumbs = true %}
+{% endif %}
+
+<div 
+  class="breadcrumbs {{ section.settings.alignment }}" 
+  style="
+    --padding-top: {{ section.settings.padding_top }}px;
+    --padding-bottom: {{ section.settings.padding_bottom }}px;
+    --text-size: {{ section.settings.text_size }}px;
+    --text-color: {{ section.settings.text_color }};
+    --link-color: {{ section.settings.link_color }};
+    --separator-color: {{ section.settings.separator_color }};
+  "
+  {{ section.shopify_attributes }}
+>
+
+  {% if show_breadcrumbs %}
+    <div class="breadcrumbs__container container">
+      <nav class="breadcrumbs__nav" aria-label="{{ 'general.breadcrumbs.aria_label' | t | default: 'Breadcrumb navigation' }}">
+        <ol class="breadcrumbs__list">
+          {% comment %} Home link {% endcomment %}
+          <li class="breadcrumbs__item">
+            <a href="{{ routes.root_url }}" class="breadcrumbs__link">
+              {{ 'general.breadcrumbs.home' | t | default: 'Home' }}
+            </a>
+          </li>
+
+          {% comment %} Handle different page types {% endcomment %}
+          {% case template %}
+            {% when 'collection' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ collection.title }}</span>
+              </li>
+
+            {% when 'product' %}
+              {% if collection %}
+                <li class="breadcrumbs__item">
+                  <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                  <a href="{{ collection.url }}" class="breadcrumbs__link">{{ collection.title }}</a>
+                </li>
+              {% endif %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ product.title }}</span>
+              </li>
+
+            {% when 'blog' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ blog.title }}</span>
+              </li>
+
+            {% when 'article' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <a href="{{ blog.url }}" class="breadcrumbs__link">{{ blog.title }}</a>
+              </li>
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ article.title }}</span>
+              </li>
+
+            {% when 'page' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ page.title }}</span>
+              </li>
+
+            {% when 'search' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ 'general.search.title' | t | default: 'Search' }}</span>
+              </li>
+
+            {% when 'cart' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ 'general.cart.title' | t | default: 'Cart' }}</span>
+              </li>
+
+            {% when 'customers/account' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ 'customers.account.title' | t | default: 'Account' }}</span>
+              </li>
+
+            {% when 'customers/order' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <a href="{{ routes.account_url }}" class="breadcrumbs__link">{{ 'customers.account.title' | t | default: 'Account' }}</a>
+              </li>
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ 'customers.order.title' | t | default: 'Order' }} {{ order.name }}</span>
+              </li>
+
+            {% when 'list-collections' %}
+              <li class="breadcrumbs__item">
+                <span class="breadcrumbs__separator" aria-hidden="true">{{ section.settings.separator_text }}</span>
+                <span class="breadcrumbs__current">{{ 'collections.general.title' | t | default: 'Collections' }}</span>
+              </li>
+
+          {% endcase %}
+        </ol>
+      </nav>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .breadcrumbs {
+    --background-color: #f5f5f5;
+    --margin-block: 0;
+
+    padding: var(--padding-top) 0 var(--padding-bottom);
+    background-color: var(--background-color);
+  }
+
+  .breadcrumbs__container {
+    margin-block: var(--margin-block);
+  }
+
+  .breadcrumbs__nav {
+    width: 100%;
+  }
+
+  .breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--text-size);
+    line-height: 1.4;
+  }
+
+  .breadcrumbs__item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .breadcrumbs__link {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .breadcrumbs__link:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+  }
+
+  .breadcrumbs__separator {
+    color: var(--separator-color);
+    margin: 0 4px;
+  }
+
+  .breadcrumbs__current {
+    color: var(--text-color);
+    font-weight: 500;
+  }
+
+  /* Alignment options */
+  .breadcrumbs--left .breadcrumbs__nav {
+    text-align: left;
+  }
+
+  .breadcrumbs--center .breadcrumbs__nav {
+    text-align: center;
+  }
+
+  .breadcrumbs--center .breadcrumbs__list {
+    justify-content: center;
+  }
+
+  .breadcrumbs--right .breadcrumbs__nav {
+    text-align: right;
+  }
+
+  .breadcrumbs--right .breadcrumbs__list {
+    justify-content: flex-end;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .breadcrumbs__list {
+      font-size: calc(var(--text-size) - 1px);
+    }
+
+    .breadcrumbs__current,
+    .breadcrumbs__link {
+      word-break: break-word;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .breadcrumbs__list {
+      font-size: calc(var(--text-size) - 2px);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.breadcrumbs.name",
+  "class": "section-breadcrumbs",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.breadcrumbs.settings.layout.header"
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "t:sections.breadcrumbs.settings.alignment.label",
+      "options": [
+        {
+          "value": "breadcrumbs--left",
+          "label": "t:sections.breadcrumbs.settings.alignment.options.left"
+        },
+        {
+          "value": "breadcrumbs--center",
+          "label": "t:sections.breadcrumbs.settings.alignment.options.center"
+        },
+        {
+          "value": "breadcrumbs--right",
+          "label": "t:sections.breadcrumbs.settings.alignment.options.right"
+        }
+      ],
+      "default": "breadcrumbs--left"
+    },
+    {
+      "type": "text",
+      "id": "separator_text",
+      "label": "t:sections.breadcrumbs.settings.separator_text.label",
+      "default": "/"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.breadcrumbs.settings.typography.header"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "t:sections.breadcrumbs.settings.text_size.label",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:sections.breadcrumbs.settings.text_color.label",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "link_color",
+      "label": "t:sections.breadcrumbs.settings.link_color.label",
+      "default": "#007bff"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "t:sections.breadcrumbs.settings.separator_color.label",
+      "default": "#999999"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.breadcrumbs.settings.spacing.header"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "t:sections.breadcrumbs.settings.padding_top.label",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "t:sections.breadcrumbs.settings.padding_bottom.label",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 20
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.breadcrumbs.presets.default.name"
+    }
+  ]
+}
+{% endschema %}

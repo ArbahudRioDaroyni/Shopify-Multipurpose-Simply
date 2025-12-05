@@ -19,11 +19,15 @@
     },
     "header": {
       "type": "header"
+    },
+    "header-breadcrumbs": {
+      "type": "header-breadcrumbs"
     }
   },
   "order": [
     "announcement-bar",
     "header-info-bar",
-    "header"
+    "header",
+    "header-breadcrumbs"
   ],
 }
