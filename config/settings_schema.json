@@ -94,28 +94,14 @@
             "type": "color",
             "id": "primary",
             "label": "t:settings.color_schemes.primary",
-            "default": "#000F9F",
-            "alpha": true
-          },
-          {
-            "type": "color",
-            "id": "primary_hover",
-            "label": "t:settings.color_schemes.primary_hover",
-            "default": "#0a2e44",
+            "default": "#6989A3",
             "alpha": true
           },
           {
             "type": "color",
             "id": "secondary",
             "label": "t:settings.color_schemes.secondary",
-            "default": "#000F9F",
-            "alpha": true
-          },
-          {
-            "type": "color",
-            "id": "secondary_hover",
-            "label": "t:settings.color_schemes.secondary_hover",
-            "default": "#0a2e44",
+            "default": "#73a335",
             "alpha": true
           },
           {
@@ -144,6 +130,13 @@
             "id": "shadow",
             "label": "t:settings.color_schemes.shadow",
             "default": "#0000001a",
+            "alpha": true
+          },
+          {
+            "type": "color",
+            "id": "links",
+            "label": "t:settings.color_schemes.links",
+            "default": "#016FD0",
             "alpha": true
           },
           {
@@ -366,7 +359,7 @@
         "role": {
           "text": "text",
           "background": "background",
-          "links": "primary",
+          "links": "links",
           "icons": "icons",
           "primary_button": "primary_button_background",
           "on_primary_button": "primary_button_text",

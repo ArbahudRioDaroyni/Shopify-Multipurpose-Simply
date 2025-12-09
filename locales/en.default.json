@@ -120,6 +120,25 @@
     },
     "cart": {
       "title": "Cart"
+    },
+    "color_scheme": {
+      "toggle": "Toggle theme",
+      "light": "Light mode",
+      "dark": "Dark mode"
+    },
+    "buttons": {
+      "primary": "Primary button",
+      "secondary": "Secondary button"
+    },
+    "forms": {
+      "email": "Email address",
+      "select_option": "Select an option",
+      "message": "Your message"
+    },
+    "accessibility": {
+      "toggle_color_scheme": "Toggle between light and dark mode",
+      "skip_to_content": "Skip to content",
+      "close": "Close"
     }
   }
 }

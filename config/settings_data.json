@@ -13,14 +13,12 @@
       "scheme-1": {
         "settings": {
           "background": "#FFFFFF",
-          "foreground": "#F4F4F4",
+          "foreground": "#EEEEEE",
           "primary": "#6989a3",
-          "primary_hover": "#73a335",
           "secondary": "#071a2d",
-          "secondary_hover": "#0a2e44",
           "text": "#1a1a1a",
           "icons": "#666666",
-          "border": "#e5e5e5",
+          "border": "#E6E6E6",
           "shadow": "#0000001a",
           // Button styles
           "primary_button_background": "#6989a3",
@@ -55,7 +53,22 @@
           "selected_variant_hover_text_color": "#FFFFFF",
           "selected_variant_hover_border_color": "#73a335"
         }
-      }
+      },
+      "scheme-2": {
+        "settings": {
+          "background": "#AF000F",
+          "text": "#FFFFFF",
+          "icons": "#FFFFFF",
+        }
+      },
+      "scheme-3": {
+        "settings": {
+          "background": "#EEEEEE",
+          "text": "#333333",
+          "icons": "#666666",
+          "links": "#016FD0",
+        }
+      },
     }
   }
 }

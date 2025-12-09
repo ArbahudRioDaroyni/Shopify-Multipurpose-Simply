@@ -129,8 +129,23 @@ body {
 } */
 
 /* 
-Button styles
------------------
+  Color scheme utilities
+  -----------------
+ */
+html[data-color-scheme="light"] {
+  color-scheme: light;
+}
+
+html[data-color-scheme="dark"] {
+  color-scheme: dark;
+}
+
+body {
+  color: var(--color-text);
+}
+/* 
+  Button styles
+  -----------------
  */
 
 .button {
