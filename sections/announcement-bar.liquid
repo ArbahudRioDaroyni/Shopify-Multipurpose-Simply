@@ -1,8 +1,7 @@
 <a
   href="{{ section.settings.link_url }}"
   id="announcement-bar-{{ section.id }}"
-  class="announcement-bar"
-  style="--background-color: {{ section.settings.background_color }}; --text-color: {{ section.settings.text_color }};"
+  class="announcement-bar color-{{ section.settings.color_scheme }}"
 >
   <span class="announcement-bar__content">
     <span class="announcement-bar__text--mobile">{{ section.settings.mobile_text }}</span>
@@ -27,11 +26,8 @@
 
 {% stylesheet %}
   .announcement-bar {
-    --background-color: var(--color-primary);
-    --text-color: var(--color-foreground);
-
-    background-color: var(--background-color);
-    color: var(--text-color);
+    background-color: var(--color-background);
+    color: var(--color-text);
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
@@ -45,7 +41,7 @@
   }
 
   .announcement-bar:hover .icon-arrow-right path {
-    stroke: var(--text-color);
+    stroke: var(--color-text);
     transform: translateX(5px);
     transition: transform 0.3s ease;
   }
@@ -76,7 +72,7 @@
   }
   
   .announcement-bar__link {
-    color: var(--text-color);
+    color: var(--color-text);
     font-weight: bold;
     text-decoration: none;
     white-space: nowrap;
@@ -95,6 +91,12 @@
   .icon-arrow-right {
     width: 14px;
     height: 14px;
+  }
+
+  .icon-arrow-right, .icon-arrow-right * {
+    fill: var(--color-icons);
+    stroke: var(--color-icons);
+    color: var(--color-icons);
   }
 
   @media (max-width: 768px) {
@@ -181,22 +183,26 @@
   "name": "t:sections.announcement_bar.title",
   "settings": [
     {
+      "type": "header",
+      "content": "t:sections.announcement_bar.content_header"
+    },
+    {
       "type": "text",
       "id": "mobile_text",
       "label": "t:sections.announcement_bar.mobile_text",
-      "default": "Blue November - Up to 70% off + Free Gifts!"
+      "default": "Blue November - Up to 70% off + Free Gifts!",
+      "info": "t:sections.announcement_bar.mobile_text_info"
     },
     {
       "type": "text",
       "id": "desktop_text",
       "label": "t:sections.announcement_bar.desktop_text",
-      "default": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!"
+      "default": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
+      "info": "t:sections.announcement_bar.desktop_text_info"
     },
     {
-      "type": "text",
-      "id": "link_text",
-      "label": "t:sections.announcement_bar.link_text",
-      "default": "Hurry up!"
+      "type": "header",
+      "content": "t:sections.announcement_bar.link_header"
     },
     {
       "type": "url",
@@ -205,22 +211,21 @@
       "default": "/collections/all"
     },
     {
-      "type": "color",
-      "id": "background_color",
-      "label": "t:sections.announcement_bar.background_color",
-      "default": "#af000f"
+      "type": "text",
+      "id": "link_text",
+      "label": "t:sections.announcement_bar.link_text",
+      "default": "Hurry up!"
     },
     {
-      "type": "color",
-      "id": "text_color",
-      "label": "t:sections.announcement_bar.text_color",
-      "default": "#ffffff"
+      "type": "header",
+      "content": "t:sections.announcement_bar.countdown_header"
     },
     {
       "type": "checkbox",
       "id": "show_countdown",
       "label": "t:sections.announcement_bar.show_countdown",
-      "default": true
+      "default": true,
+      "info": "t:sections.announcement_bar.show_countdown_info"
     },
     {
       "type": "text",
@@ -232,8 +237,19 @@
       "type": "text",
       "id": "end_date_countdown",
       "label": "t:sections.announcement_bar.countdown_end_date",
-      "info": "Format: YYYY-MM-DD HH:MM:SS (e.g., 2025-12-31 23:59:59)",
+      "info": "t:sections.announcement_bar.countdown_end_date_info",
       "default": "2025-12-31 23:59:59"
+    },
+    {
+      "type": "header",
+      "content": "t:sections.announcement_bar.design_header"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.announcement_bar.color_scheme",
+      "default": "scheme-2",
+      "info": "t:sections.announcement_bar.color_scheme_info"
     }
   ],
   "presets": [

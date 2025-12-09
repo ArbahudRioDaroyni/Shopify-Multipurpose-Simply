@@ -10,6 +10,7 @@
     "collection_card": "Collection card",
     "collections_grid": "Collections grid",
     "colors": "Colors",
+    "color_scheme_toggle": "Color scheme toggle",
     "column": "Column",
     "content": "Content",
     "custom_section": "Custom section",
@@ -48,8 +49,12 @@
     "page_margin": "Page margin",
     "page_width": "Page width",
     "show_payment_icons": "Show payment icons",
+    "title": "Title",
+    "description": "Description",
+    "button_style": "Button style",
+    "show_text": "Show text label",
+    "text": "Text content",
     "text_style": "Text style",
-    "text": "Text"
   },
   "options": {
     "alignment": {
@@ -77,30 +82,37 @@
   },
   "settings": {
     "color_schemes": {
-      "background": "Background color",
-      "foreground": "Foreground color",
-      "primary": "Primary color",
-      "primary_hover": "Primary hover color",
-      "secondary": "Secondary color",
-      "secondary_hover": "Secondary hover color",
-      "text": "Text color",
-      "icons": "Icons color",
-      "border": "Border color",
-      "shadow": "Shadow color"
+      "background": "Background",
+      "foreground": "Foreground",
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "text": "Text",
+      "icons": "Icons",
+      "border": "Border",
+      "shadow": "Shadow",
+      "links": "Links",
     }
   },
   "sections": {
     "announcement_bar": {
       "title": "Announcement bar",
+      "content_header": "Content settings",
       "mobile_text": "Mobile text",
-      "desktop_text": "Desktop text",
+      "mobile_text_info": "Text shown on mobile devices (recommended: 50 characters or less)",
+      "desktop_text": "Desktop text", 
+      "desktop_text_info": "Text shown on desktop devices (can be longer and more descriptive)",
+      "link_header": "Call-to-action link",
       "link_text": "Link text",
       "link_url": "Link URL",
-      "background_color": "Background color",
-      "text_color": "Text color",
+      "countdown_header": "Countdown timer",
       "show_countdown": "Show countdown?",
-      "text_countdown": "Text countdown",
-      "countdown_end_date": "Countdown end date"
+      "show_countdown_info": "Display a countdown timer to create urgency",
+      "text_countdown": "Countdown prefix text",
+      "countdown_end_date": "Countdown end date",
+      "countdown_end_date_info": "Format: YYYY-MM-DD HH:MM:SS (e.g., 2025-12-31 23:59:59)",
+      "design_header": "Appearance",
+      "color_scheme": "Color scheme",
+      "color_scheme_info": "Choose colors that match your brand and create good contrast"
     },
     "header_info_bar": {
       "title": "Header info bar",
@@ -125,56 +137,57 @@
         "show_location": "Show location",
         "location_text": "Location text",
         "show_currency_selector": "Show currency selector",
-        "show_language_selector": "Show language selector"
+        "show_language_selector": "Show language selector",
+        "color_scheme": "Color scheme",
+        "color_scheme_info": "Choose colors that match your brand and create good contrast"
       }
     },
     "breadcrumbs": {
       "name": "Breadcrumbs",
       "settings": {
         "layout": {
-          "header": "Layout"
+          "header": "Layout",
+          "alignment": {
+            "label": "Alignment",
+            "options": {
+              "left": "Left",
+              "center": "Center",
+              "right": "Right"
+            }
+          },
+          "separator": {
+            "label": "Separator"
+          },
         },
         "typography": {
-          "header": "Typography"
+          "header": "Typography",
+          "text_size": {
+            "label": "Text size"
+          },
         },
         "spacing": {
-          "header": "Spacing"
-        },
-        "alignment": {
-          "label": "Alignment",
-          "options": {
-            "left": "Left",
-            "center": "Center",
-            "right": "Right"
+          "header": "Spacing",
+          "padding_top": {
+            "label": "Top padding"
+          },
+          "padding_bottom": {
+            "label": "Bottom padding"
           }
         },
-        "separator_text": {
-          "label": "Separator"
-        },
-        "text_size": {
-          "label": "Text size"
-        },
-        "text_color": {
-          "label": "Text color"
-        },
-        "link_color": {
-          "label": "Link color"
-        },
-        "separator_color": {
-          "label": "Separator color"
-        },
-        "padding_top": {
-          "label": "Top padding"
-        },
-        "padding_bottom": {
-          "label": "Bottom padding"
-        }
       },
       "presets": {
         "default": {
           "name": "Breadcrumbs"
         }
       }
+    },
+    "color_scheme_demo": {
+      "name": "Color scheme demo",
+      "buttons": "Buttons",
+      "cards": "Cards",
+      "card_title": "Card title",
+      "card_content": "This is an example card that adapts to the current color scheme. Notice how the colors change smoothly.",
+      "form_elements": "Form elements"
     }
   }
 }

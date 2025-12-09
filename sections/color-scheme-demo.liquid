@@ -1,0 +1,227 @@
+<div class="color-scheme-demo">
+  <div class="color-scheme-demo__container">
+    <div class="color-scheme-demo__header">
+      <h1>{{ section.settings.title }}</h1>
+      <p>{{ section.settings.description }}</p>
+    </div>
+
+    <div class="color-scheme-demo__content">
+      {% content_for 'blocks' %}
+    </div>
+
+    <div class="color-scheme-demo__examples">
+      {%- comment -%} Button Examples {%- endcomment -%}
+      <div class="color-scheme-demo__group">
+        <h3>DEMO</h3>
+        <div class="color-scheme-demo__buttons">
+          <button class="button">Primary</button>
+          <button class="button outline">Secondary</button>
+        </div>
+      </div>
+
+      {%- comment -%} Card Examples {%- endcomment -%}
+      <div class="color-scheme-demo__group">
+        <h3>Cards</h3>
+        <div class="color-scheme-demo__cards">
+          <div class="color-scheme-demo__card">
+            <h4>Card title</h4>
+            <p>This is an example card that adapts to the current color scheme. Notice how the colors change smoothly.</p>
+          </div>
+          <div class="color-scheme-demo__card">
+            <h4>Card title</h4>
+            <p>This is an example card that adapts to the current color scheme. Notice how the colors change smoothly.</p>
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} Form Elements {%- endcomment -%}
+      <div class="color-scheme-demo__group">
+        <h3>Form Elements</h3>
+        <div class="color-scheme-demo__form">
+          <input type="text" placeholder="{{ 'general.forms.email' | t }}">
+          <select>
+            <option>{{ 'general.forms.select_option' | t }}</option>
+            <option>Option 1</option>
+            <option>Option 2</option>
+          </select>
+          <textarea placeholder="{{ 'general.forms.message' | t }}"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .color-scheme-demo {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    padding: 4rem 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .color-scheme-demo__container {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 0 var(--page-margin);
+  }
+
+  .color-scheme-demo__header {
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .color-scheme-demo__header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: var(--color-foreground);
+  }
+
+  .color-scheme-demo__header p {
+    font-size: 1.125rem;
+    color: var(--color-text);
+    opacity: 0.8;
+  }
+
+  .color-scheme-demo__content {
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .color-scheme-demo__examples {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .color-scheme-demo__group {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .color-scheme-demo__group h3 {
+    font-size: 1.5rem;
+    color: var(--color-foreground);
+    margin-bottom: 0.5rem;
+  }
+
+  .color-scheme-demo__buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .color-scheme-demo__cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .color-scheme-demo__card {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--style-border-radius-inputs, 8px);
+    background-color: var(--color-background);
+    transition: all 0.3s ease;
+  }
+
+  .color-scheme-demo__card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-primary);
+  }
+
+  .color-scheme-demo__card h4 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--color-foreground);
+  }
+
+  .color-scheme-demo__card p {
+    color: var(--color-text);
+    opacity: 0.9;
+  }
+
+  .color-scheme-demo__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 500px;
+  }
+
+  .color-scheme-demo__form input,
+  .color-scheme-demo__form select,
+  .color-scheme-demo__form textarea {
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    transition: all 0.3s ease;
+  }
+
+  .color-scheme-demo__form input:focus,
+  .color-scheme-demo__form select:focus,
+  .color-scheme-demo__form textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb, 0, 0, 0), 0.1);
+  }
+
+  .color-scheme-demo__form textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  @media (max-width: 768px) {
+    .color-scheme-demo__header h1 {
+      font-size: 2rem;
+    }
+
+    .color-scheme-demo__buttons {
+      flex-direction: column;
+    }
+
+    .color-scheme-demo__cards {
+      grid-template-columns: 1fr;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:sections.color_scheme_demo.name",
+  "blocks": [
+    {
+      "type": "@theme"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:labels.title",
+      "default": "Color scheme demo"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:labels.description",
+      "default": "Toggle between light and dark modes to see the theme adapt in real-time"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.color_scheme_demo.name",
+      "category": "t:general.theme",
+      "blocks": [
+        {
+          "type": "color-scheme-toggle"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

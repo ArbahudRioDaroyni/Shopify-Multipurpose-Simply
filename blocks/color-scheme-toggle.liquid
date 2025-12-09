@@ -1,0 +1,169 @@
+{% doc %}
+  Renders a toggle button to switch between light and dark color schemes.
+
+  This block provides a user interface to switch between color schemes
+  dynamically. It updates the data-color-scheme attribute on the HTML element
+  and stores the preference in localStorage.
+
+  @example
+  {% content_for 'block', type: 'color-scheme-toggle', id: 'scheme-toggle' %}
+{% enddoc %}
+
+<button
+  type="button"
+  class="color-scheme-toggle {{ block.settings.button_style }}"
+  aria-label="{{ 'general.accessibility.toggle_color_scheme' | t }}"
+  {{ block.shopify_attributes }}
+>
+  <span class="color-scheme-toggle__icon color-scheme-toggle__icon--light">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 3V1M10 19V17M17 10H19M1 10H3M15.657 4.343L17.071 2.929M2.929 17.071L4.343 15.657M15.657 15.657L17.071 17.071M2.929 2.929L4.343 4.343M14 10C14 12.2091 12.2091 14 10 14C7.79086 14 6 12.2091 6 10C6 7.79086 7.79086 6 10 6C12.2091 6 14 7.79086 14 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  <span class="color-scheme-toggle__icon color-scheme-toggle__icon--dark">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.293 13.293C16.2316 13.7581 15.0803 14 13.9167 14C9.03214 14 5.08333 10.0512 5.08333 5.16667C5.08333 4.00304 5.32524 2.85171 5.79032 1.79032C3.3602 3.02019 1.75 5.63134 1.75 8.66667C1.75 12.8088 5.19124 16.25 9.33333 16.25C12.3687 16.25 14.9798 14.6398 16.2097 12.2097L17.293 13.293Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  {% if block.settings.show_text %}
+    <span class="color-scheme-toggle__text">
+      {{ 'general.color_scheme.toggle' | t }}
+    </span>
+  {% endif %}
+</button>
+
+{% stylesheet %}
+  .color-scheme-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--style-border-radius-inputs, 4px);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .color-scheme-toggle:hover {
+    background-color: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+  }
+
+  .color-scheme-toggle__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .color-scheme-toggle__icon--light {
+    display: none;
+  }
+
+  .color-scheme-toggle__icon--dark {
+    display: block;
+  }
+
+  html[data-color-scheme="light"] .color-scheme-toggle__icon--light {
+    display: block;
+  }
+
+  html[data-color-scheme="light"] .color-scheme-toggle__icon--dark {
+    display: none;
+  }
+
+  .color-scheme-toggle__text {
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+
+  .color-scheme-toggle--minimal {
+    padding: 0.375rem;
+    border: none;
+    background-color: transparent;
+  }
+
+  .color-scheme-toggle--minimal:hover {
+    background-color: rgba(var(--color-primary-rgb), 0.1);
+    color: var(--color-primary);
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  document.addEventListener('DOMContentLoaded', function() {
+    const toggle = document.querySelector('.color-scheme-toggle');
+    if (!toggle) return;
+
+    // Get current color scheme from localStorage or default to 'light'
+    const currentScheme = localStorage.getItem('color-scheme') || 'light';
+    document.documentElement.setAttribute('data-color-scheme', currentScheme);
+
+    toggle.addEventListener('click', function() {
+      const html = document.documentElement;
+      const currentScheme = html.getAttribute('data-color-scheme') || 'light';
+      const newScheme = currentScheme === 'light' ? 'dark' : 'light';
+      
+      html.setAttribute('data-color-scheme', newScheme);
+      localStorage.setItem('color-scheme', newScheme);
+
+      // Dispatch custom event for other components to react
+      window.dispatchEvent(new CustomEvent('colorSchemeChange', {
+        detail: { scheme: newScheme }
+      }));
+    });
+
+    // Check for system preference
+    if (window.matchMedia) {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+      
+      // Only use system preference if no user preference is stored
+      if (!localStorage.getItem('color-scheme')) {
+        const scheme = prefersDark.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-color-scheme', scheme);
+      }
+
+      // Listen for system preference changes
+      prefersDark.addEventListener('change', (e) => {
+        // Only apply if user hasn't set a preference
+        if (!localStorage.getItem('color-scheme')) {
+          const scheme = e.matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-color-scheme', scheme);
+        }
+      });
+    }
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:general.color_scheme_toggle",
+  "settings": [
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:labels.button_style",
+      "options": [
+        { "value": "", "label": "t:options.button_style.default" },
+        { "value": "color-scheme-toggle--minimal", "label": "t:options.button_style.minimal" }
+      ],
+      "default": ""
+    },
+    {
+      "type": "checkbox",
+      "id": "show_text",
+      "label": "t:labels.show_text",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:general.color_scheme_toggle",
+      "category": "t:general.theme"
+    }
+  ]
+}
+{% endschema %}

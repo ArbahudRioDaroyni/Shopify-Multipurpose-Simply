@@ -5,15 +5,17 @@
   {% assign show_breadcrumbs = true %}
 {% endif %}
 
-<div 
-  class="breadcrumbs {{ section.settings.alignment }}" 
+<div
+  id="header-breadcrumbs-{{ section.id }}"
+  class="breadcrumbs {{ section.settings.alignment }} color-{{ section.settings.color_scheme }}" 
   style="
+    --background-color: var(--color-background);
     --padding-top: {{ section.settings.padding_top }}px;
     --padding-bottom: {{ section.settings.padding_bottom }}px;
     --text-size: {{ section.settings.text_size }}px;
-    --text-color: {{ section.settings.text_color }};
-    --link-color: {{ section.settings.link_color }};
-    --separator-color: {{ section.settings.separator_color }};
+    --text-color: var(--color-text);
+    --link-color: var(--color-links);
+    --separator-color: var(--color-icons);
   "
   {{ section.shopify_attributes }}
 >
@@ -114,15 +116,12 @@
 
 {% stylesheet %}
   .breadcrumbs {
-    --background-color: #f5f5f5;
-    --margin-block: 0;
-
     padding: var(--padding-top) 0 var(--padding-bottom);
     background-color: var(--background-color);
   }
 
   .breadcrumbs__container {
-    margin-block: var(--margin-block);
+    margin-block: 0;
   }
 
   .breadcrumbs__nav {
@@ -220,19 +219,19 @@
     {
       "type": "select",
       "id": "alignment",
-      "label": "t:sections.breadcrumbs.settings.alignment.label",
+      "label": "t:sections.breadcrumbs.settings.layout.alignment.label",
       "options": [
         {
           "value": "breadcrumbs--left",
-          "label": "t:sections.breadcrumbs.settings.alignment.options.left"
+          "label": "t:sections.breadcrumbs.settings.layout.alignment.options.left"
         },
         {
           "value": "breadcrumbs--center",
-          "label": "t:sections.breadcrumbs.settings.alignment.options.center"
+          "label": "t:sections.breadcrumbs.settings.layout.alignment.options.center"
         },
         {
           "value": "breadcrumbs--right",
-          "label": "t:sections.breadcrumbs.settings.alignment.options.right"
+          "label": "t:sections.breadcrumbs.settings.layout.alignment.options.right"
         }
       ],
       "default": "breadcrumbs--left"
@@ -240,7 +239,7 @@
     {
       "type": "text",
       "id": "separator_text",
-      "label": "t:sections.breadcrumbs.settings.separator_text.label",
+      "label": "t:sections.breadcrumbs.settings.layout.separator.label",
       "default": "/"
     },
     {
@@ -250,30 +249,12 @@
     {
       "type": "range",
       "id": "text_size",
-      "label": "t:sections.breadcrumbs.settings.text_size.label",
+      "label": "t:sections.breadcrumbs.settings.typography.text_size.label",
       "min": 10,
       "max": 24,
       "step": 1,
       "unit": "px",
       "default": 14
-    },
-    {
-      "type": "color",
-      "id": "text_color",
-      "label": "t:sections.breadcrumbs.settings.text_color.label",
-      "default": "#333333"
-    },
-    {
-      "type": "color",
-      "id": "link_color",
-      "label": "t:sections.breadcrumbs.settings.link_color.label",
-      "default": "#007bff"
-    },
-    {
-      "type": "color",
-      "id": "separator_color",
-      "label": "t:sections.breadcrumbs.settings.separator_color.label",
-      "default": "#999999"
     },
     {
       "type": "header",
@@ -282,7 +263,7 @@
     {
       "type": "range",
       "id": "padding_top",
-      "label": "t:sections.breadcrumbs.settings.padding_top.label",
+      "label": "t:sections.breadcrumbs.settings.spacing.padding_top.label",
       "min": 0,
       "max": 100,
       "step": 4,
@@ -292,12 +273,19 @@
     {
       "type": "range",
       "id": "padding_bottom",
-      "label": "t:sections.breadcrumbs.settings.padding_bottom.label",
+      "label": "t:sections.breadcrumbs.settings.spacing.padding_bottom.label",
       "min": 0,
       "max": 100,
       "step": 4,
       "unit": "px",
       "default": 20
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.header_info_bar.settings.color_scheme",
+      "default": "scheme-3",
+      "info": "t:sections.header_info_bar.settings.color_scheme_info"
     }
   ],
   "presets": [
