@@ -449,7 +449,7 @@
       quantitySelectors.forEach(selector => {
         const decreaseBtn = selector.querySelector('[data-action="decrease"]');
         const increaseBtn = selector.querySelector('[data-action="increase"]');
-        const input = selector.querySelector('.quantity-input');
+        const input = selector.querySelector('input');
         
         decreaseBtn?.addEventListener('click', () => {
           const currentValue = parseInt(input.value) || 1;
