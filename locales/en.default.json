@@ -127,7 +127,11 @@
     "vendor": "Vendor",
     "categories": "Categories",
     "tags": "Tags",
-    "quick_view": "Quick view"
+    "quick_view": "Quick view",
+    "general": {
+      "product": "product",
+      "products": "products"
+    }
   },
   "general": {
     "pagination": {

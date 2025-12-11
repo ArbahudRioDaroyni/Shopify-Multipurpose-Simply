@@ -222,6 +222,62 @@
       "card_title": "Card title",
       "card_content": "This is an example card that adapts to the current color scheme. Notice how the colors change smoothly.",
       "form_elements": "Form elements"
+    },
+    "collections": {
+      "settings": {
+        "header_content": {
+          "content": "Content"
+        },
+        "title": {
+          "label": "Page title"
+        },
+        "description": {
+          "label": "Page description"
+        },
+        "header_layout": {
+          "content": "Layout"
+        },
+        "grid_layout": {
+          "label": "Grid layout",
+          "options": {
+            "fixed": "Fixed columns",
+            "auto": "Auto-fit columns"
+          }
+        },
+        "columns_desktop": {
+          "label": "Columns on desktop",
+          "info": "Number of columns on desktop screens"
+        },
+        "columns_tablet": {
+          "label": "Columns on tablet"
+        },
+        "columns_mobile": {
+          "label": "Columns on mobile"
+        },
+        "header_card": {
+          "content": "Collection cards"
+        },
+        "card_style": {
+          "label": "Card style",
+          "options": {
+            "default": "Standard",
+            "overlay": "Overlay on hover"
+          }
+        },
+        "show_overlay": {
+          "label": "Show overlay on hover",
+          "info": "Display collection title and count on image hover"
+        },
+        "show_description": {
+          "label": "Show collection description"
+        },
+        "description_words": {
+          "label": "Description word limit"
+        },
+        "show_product_count": {
+          "label": "Show product count"
+        }
+      }
     }
   }
 }
