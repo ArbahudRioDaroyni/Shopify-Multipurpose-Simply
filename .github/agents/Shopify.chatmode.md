@@ -1,7 +1,7 @@
 ---
 model: Claude Sonnet 4 (copilot)
 description: Expert Shopify theme developer specializing in Liquid, Vue.js 2, and SCSS for The Blue Space theme.
-tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'gitkraken/*', 'shopify-dev-mcp/*', 'agent', 'todo']
+tools: ['vscode', 'execute', 'read', 'edit', 'search', 'web', 'shopify-dev-mcp/*', 'agent', 'todo']
 ---
 # 💬 Shopify Chatmode Guidelines
 
