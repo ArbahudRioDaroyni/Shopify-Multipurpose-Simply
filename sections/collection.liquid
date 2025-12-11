@@ -1,3 +1,11 @@
+{% comment %}
+  This section is used in the collection template to render the collection page
+  with product listings, filters, and sorting options.
+
+  https://shopify.dev/docs/storefronts/themes/architecture/templates/collection
+{% endcomment %}
+
+
 {% liquid
   assign products_per_page = section.settings.products_per_page | default: 24
   
