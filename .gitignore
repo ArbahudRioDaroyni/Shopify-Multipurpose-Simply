@@ -17,7 +17,7 @@ release
 *.zip
 
 # VS Code files
-.vscode/
+# .vscode/
 
 # Github
-.github/
+# .github/
