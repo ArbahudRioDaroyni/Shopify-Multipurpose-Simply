@@ -17,7 +17,31 @@
     "checkout": "Checkout",
     "title": "Cart",
     "update": "Update",
-    "remove": "Remove"
+    "remove": "Remove",
+    "general": {
+      "item_count": {
+        "one": "{{ count }} item",
+        "other": "{{ count }} items"
+      },
+      "savings": "You saved {{ amount }}",
+      "note": "Order notes",
+      "note_placeholder": "Add special instructions for your order...",
+      "empty": "Your cart is empty",
+      "empty_text": "Looks like you haven't added anything to your cart yet.",
+      "continue_shopping": "Continue shopping",
+      "summary": "Order summary",
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "shipping": "Shipping",
+      "shipping_calculated": "Calculated at checkout",
+      "total": "Total",
+      "secure_checkout": "Secure checkout",
+      "free_shipping": "Free shipping"
+    },
+    "item": {
+      "quantity_label": "Quantity for {{ item }}",
+      "remove": "Remove item"
+    }
   },
   "customers": {
     "login": {
@@ -134,6 +158,11 @@
       "email": "Email address",
       "select_option": "Select an option",
       "message": "Your message"
+    },
+    "quantity": {
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "total": "Total"
     },
     "accessibility": {
       "toggle_color_scheme": "Toggle between light and dark mode",
