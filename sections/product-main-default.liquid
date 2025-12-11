@@ -181,41 +181,15 @@
           </button>
 
           <div class="product-form__quantity">
-            <button type="button" class="product-quantity__button product-quantity__minus" aria-label="Decrease quantity">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-            </button>
-            <input
-              type="number"
-              name="quantity"
-              value="1"
-              min="1"
-              class="product-quantity__input"
-              aria-label="Quantity"
-            >
-            <button type="button" class="product-quantity__button product-quantity__plus" aria-label="Increase quantity">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-            </button>
+            {% render 'quantity-selector', 
+              style_variant: 'standard',
+              input_name: 'quantity',
+              initial_value: 1,
+              min_value: 1,
+              max_value: 999,
+              show_total: false,
+              unique_id: 'product-quantity'
+            %}
           </div>
 
           <button type="button" class="product-main__wishlist button outline" aria-label="Add to wishlist">
@@ -633,42 +607,6 @@
   .product-form__quantity {
     display: flex;
     align-items: center;
-    border: 1px solid #ddd;
-    border-radius: var(--style-border-radius-inputs, 4px);
-    overflow: hidden;
-  }
-
-  .product-quantity__button {
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-inline: .875rem;
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text);
-    transition: background 0.3s;
-  }
-
-  .product-quantity__button:hover {
-    background: var(--color-foreground);
-  }
-
-  .product-quantity__input {
-    width: 50px;
-    height: 50px;
-    text-align: center;
-    border: none;
-    font-size: 1.125rem;
-    background: transparent;
-    outline: none;
-  }
-
-  .product-quantity__input::-webkit-outer-spin-button,
-  .product-quantity__input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
   }
 
   .product-main__add-to-cart {
@@ -1323,24 +1261,7 @@
     const variantOptionsWrapper = document.querySelector('.product-form__variant-selector');
     const variantSelector = new VariantSelector(variantOptionsWrapper);
 
-    // Quantity Controls
-    const minusBtn = document.querySelector('.product-quantity__minus');
-    const plusBtn = document.querySelector('.product-quantity__plus');
-    const quantityInput = document.querySelector('.product-quantity__input');
-
-    if (minusBtn && plusBtn && quantityInput) {
-      minusBtn.addEventListener('click', () => {
-        const currentValue = parseInt(quantityInput.value) || 1;
-        if (currentValue > 1) {
-          quantityInput.value = currentValue - 1;
-        }
-      });
-
-      plusBtn.addEventListener('click', () => {
-        const currentValue = parseInt(quantityInput.value) || 1;
-        quantityInput.value = currentValue + 1;
-      });
-    }
+    // Quantity controls are now handled by the quantity-selector block
 
     // Meta Tabs
     const metaTabs = document.querySelectorAll('.meta-tab');

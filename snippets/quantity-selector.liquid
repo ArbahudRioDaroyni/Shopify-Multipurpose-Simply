@@ -1,0 +1,410 @@
+{% doc %}
+  Renders a quantity selector with increase/decrease buttons and input field.
+
+  @param {string} [style_variant] - Style variant: compact, standard, large
+  @param {string} [input_name] - Name attribute for the input field
+  @param {number} [initial_value] - Initial quantity value
+  @param {number} [min_value] - Minimum allowed value
+  @param {number} [max_value] - Maximum allowed value
+  @param {boolean} [show_label] - Whether to show label
+  @param {string} [label_text] - Label text
+  @param {boolean} [show_total] - Whether to show total price
+  @param {number} [price] - Price per item in cents for total calculation
+  @param {string} [unique_id] - Unique identifier for the input
+
+  @example
+  {% render 'quantity-selector', 
+    style_variant: 'compact',
+    input_name: 'updates[]',
+    initial_value: item.quantity,
+    min_value: 0,
+    show_total: true,
+    price: item.final_price,
+    unique_id: item.key
+  %}
+{% enddoc %}
+
+{% liquid
+  assign style_variant = style_variant | default: 'standard'
+  assign input_name = input_name | default: 'quantity'
+  assign initial_value = initial_value | default: 1
+  assign min_value = min_value | default: 0
+  assign max_value = max_value | default: 999
+  assign show_label = show_label | default: false
+  assign label_text = label_text | default: 'Quantity'
+  assign show_total = show_total | default: false
+  assign unique_id = unique_id | default: 'qty-' | append: input_name | handleize
+
+  if style_variant == 'compact'
+    assign input_width = 50
+    assign height = 36
+  elsif style_variant == 'large'
+    assign input_width = 70
+    assign height = 52
+  else
+    assign input_width = 50
+    assign height = 50
+  endif
+%}
+
+<div 
+  class="quantity-selector quantity-selector--{{ style_variant }}"
+  style="
+    --quantity-width: {{ input_width }}px;
+    --quantity-height: {{ height }}px;
+  "
+  data-quantity-selector
+>
+  {% if show_label %}
+    <label class="quantity-selector__label" for="quantity-{{ unique_id }}">
+      {{ label_text }}
+    </label>
+  {% endif %}
+
+  <div class="quantity-selector__controls">
+    <button 
+      type="button" 
+      class="quantity-selector__btn quantity-selector__btn--decrease" 
+      data-action="decrease"
+      aria-label="{{ 'general.quantity.decrease' | t }}"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+
+    <input
+      type="number"
+      id="quantity-{{ unique_id }}"
+      name="{{ input_name }}"
+      value="{{ initial_value }}"
+      min="{{ min_value }}"
+      max="{{ max_value }}"
+      class="quantity-selector__input"
+      data-quantity-input
+    >
+
+    <button 
+      type="button" 
+      class="quantity-selector__btn quantity-selector__btn--increase" 
+      data-action="increase"
+      aria-label="{{ 'general.quantity.increase' | t }}"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+      </svg>
+    </button>
+  </div>
+
+  {% if show_total and price %}
+    <div class="quantity-selector__total">
+      <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
+      <span class="quantity-selector__total-price" data-total-price="{{ price }}">
+        {{ price | times: initial_value | money }}
+      </span>
+    </div>
+  {% endif %}
+</div>
+
+{% stylesheet %}
+  .quantity-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: fit-content;
+  }
+
+  .quantity-selector__label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 4px;
+  }
+
+  .quantity-selector__controls {
+    display: flex;
+    align-items: center;
+    border: 1px solid #e9ecef;
+    border-radius: var(--style-border-radius-inputs, 6px);
+    background: #ffffff;
+    overflow: hidden;
+    height: var(--quantity-height);
+  }
+
+  .quantity-selector__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--quantity-height);
+    height: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6c757d;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .quantity-selector__btn:hover {
+    color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb, 0, 123, 255), 0.05);
+  }
+
+  .quantity-selector__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .quantity-selector__input {
+    width: var(--quantity-width);
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    background: transparent;
+    color: var(--color-text);
+    outline: none;
+  }
+
+  .quantity-selector__input::-webkit-outer-spin-button,
+  .quantity-selector__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .quantity-selector__input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  .quantity-selector__total {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+
+  .quantity-selector__total-label {
+    color: #6c757d;
+  }
+
+  .quantity-selector__total-price {
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  /* Style variants */
+  .quantity-selector--compact {
+    --quantity-width: 50px;
+    --quantity-height: 36px;
+  }
+
+  .quantity-selector--standard {
+    --quantity-width: 50px;
+    --quantity-height: 50px;
+  }
+
+  .quantity-selector--large {
+    --quantity-width: 70px;
+    --quantity-height: 52px;
+  }
+
+  /* Product page specific styles */
+  .product-form__quantity .quantity-selector {
+    border: 1px solid #ddd;
+    border-radius: var(--style-border-radius-inputs, 4px);
+    overflow: hidden;
+    background: transparent;
+  }
+
+  .product-form__quantity .quantity-selector__controls {
+    border: none;
+    background: transparent;
+  }
+
+  .product-form__quantity .quantity-selector__btn {
+    padding-inline: .875rem;
+    background: transparent;
+    color: var(--color-text);
+    transition: background 0.3s;
+  }
+
+  .product-form__quantity .quantity-selector__btn:hover {
+    background: var(--color-foreground);
+    color: var(--color-text);
+  }
+
+  .product-form__quantity .quantity-selector__input {
+    font-size: 1.125rem;
+    background: transparent;
+  }
+
+  /* Focus states */
+  .quantity-selector__controls:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb, 0, 123, 255), 0.1);
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 768px) {
+    .quantity-selector--compact {
+      --quantity-width: 45px;
+      --quantity-height: 32px;
+    }
+
+    .quantity-selector--standard {
+      --quantity-width: 50px;
+      --quantity-height: 40px;
+    }
+
+    .quantity-selector--large {
+      --quantity-width: 60px;
+      --quantity-height: 48px;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class QuantitySelector {
+    constructor(element) {
+      this.element = element;
+      this.input = element.querySelector('.quantity-selector__input');
+      this.decreaseBtn = element.querySelector('.quantity-selector__btn--decrease');
+      this.increaseBtn = element.querySelector('.quantity-selector__btn--increase');
+      this.totalPrice = element.querySelector('.quantity-selector__total-price');
+      
+      this.min = parseInt(this.input.getAttribute('min')) || 0;
+      this.max = parseInt(this.input.getAttribute('max')) || 999;
+      this.price = this.totalPrice ? parseFloat(this.totalPrice.getAttribute('data-total-price')) : 0;
+      
+      this.init();
+    }
+
+    init() {
+      this.decreaseBtn?.addEventListener('click', () => this.decrease());
+      this.increaseBtn?.addEventListener('click', () => this.increase());
+      this.input?.addEventListener('change', () => this.validateInput());
+      this.input?.addEventListener('input', () => this.updateTotal());
+      
+      this.updateButtons();
+      this.updateTotal();
+    }
+
+    decrease() {
+      const currentValue = parseInt(this.input.value) || 0;
+      if (currentValue > this.min) {
+        this.input.value = currentValue - 1;
+        this.input.dispatchEvent(new Event('change', { bubbles: true }));
+        this.updateButtons();
+        this.updateTotal();
+      }
+    }
+
+    increase() {
+      const currentValue = parseInt(this.input.value) || 0;
+      if (currentValue < this.max) {
+        this.input.value = currentValue + 1;
+        this.input.dispatchEvent(new Event('change', { bubbles: true }));
+        this.updateButtons();
+        this.updateTotal();
+      }
+    }
+
+    validateInput() {
+      let value = parseInt(this.input.value);
+      
+      if (isNaN(value) || value < this.min) {
+        value = this.min;
+      } else if (value > this.max) {
+        value = this.max;
+      }
+      
+      this.input.value = value;
+      this.updateButtons();
+      this.updateTotal();
+    }
+
+    updateButtons() {
+      const currentValue = parseInt(this.input.value) || 0;
+      
+      if (this.decreaseBtn) {
+        this.decreaseBtn.disabled = currentValue <= this.min;
+      }
+      
+      if (this.increaseBtn) {
+        this.increaseBtn.disabled = currentValue >= this.max;
+      }
+    }
+
+    updateTotal() {
+      if (this.totalPrice && this.price) {
+        const quantity = parseInt(this.input.value) || 0;
+        const total = this.price * quantity;
+        
+        // Format as money (basic implementation)
+        const formatted = new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD'
+        }).format(total / 100);
+        
+        this.totalPrice.textContent = formatted;
+      }
+    }
+
+    getValue() {
+      return parseInt(this.input.value) || 0;
+    }
+
+    setValue(value) {
+      this.input.value = value;
+      this.validateInput();
+    }
+  }
+
+  // Auto-initialize quantity selectors
+  document.addEventListener('DOMContentLoaded', () => {
+    const selectors = document.querySelectorAll('[data-quantity-selector]');
+    selectors.forEach(selector => {
+      new QuantitySelector(selector);
+    });
+  });
+
+  // Initialize new quantity selectors dynamically
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType === 1) {
+          const selectors = node.hasAttribute?.('data-quantity-selector')
+            ? [node] 
+            : node.querySelectorAll?.('[data-quantity-selector]') || [];
+          
+          selectors.forEach(selector => {
+            if (!selector.hasAttribute('data-quantity-initialized')) {
+              new QuantitySelector(selector);
+              selector.setAttribute('data-quantity-initialized', 'true');
+            }
+          });
+        }
+      });
+    });
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+{% endjavascript %}

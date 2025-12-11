@@ -24,6 +24,7 @@
     "password": "Password",
     "primary": "Primary",
     "product": "Product",
+    "quantity_selector": "Quantity selector",
     "row": "Row",
     "search": "Search",
     "secondary": "Secondary",
@@ -32,7 +33,8 @@
     "sidebar": "Sidebar",
     "text": "Text",
     "theme": "Theme",
-    "typography": "Typography"
+    "typography": "Typography",
+    "form_elements": "Form elements"
   },
   "labels": {
     "alignment": "Alignment",
@@ -72,12 +74,18 @@
     },
     "size": {
       "large": "Large",
-      "small": "Small"
+      "small": "Small",
+      "compact": "Compact",
+      "standard": "Standard"
     },
     "text_style": {
       "title": "Title",
       "subtitle": "Subtitle",
       "normal": "Normal text"
+    },
+    "button_style": {
+      "icon": "Icon",
+      "text": "Text"
     },
   },
   "settings": {
@@ -90,7 +98,33 @@
       "icons": "Icons",
       "border": "Border",
       "shadow": "Shadow",
-      "links": "Links",
+      "links": "Links"
+    },
+    "quantity": {
+      "appearance": "Appearance",
+      "style": "Style",
+      "button_style": "Button style",
+      "input_width": "Input width",
+      "height": "Height",
+      "label": "Label",
+      "show_label": "Show label",
+      "label_text": "Label text",
+      "functionality": "Functionality",
+      "input_name": "Input name",
+      "input_name_info": "Name attribute for the input field",
+      "initial_value": "Initial value",
+      "min_value": "Minimum value",
+      "max_value": "Maximum value",
+      "readonly": "Read only",
+      "readonly_info": "Prevent manual input editing",
+      "buttons": "Buttons",
+      "decrease_text": "Decrease button text",
+      "increase_text": "Increase button text",
+      "total_price": "Total price",
+      "show_total": "Show total price",
+      "show_total_info": "Display calculated total based on quantity",
+      "price_cents": "Price (in cents)",
+      "price_cents_info": "Price per item in cents for total calculation"
     }
   },
   "sections": {
