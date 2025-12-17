@@ -12,7 +12,7 @@
   assign product_gallery_images_wrapper = ''
   for image in product.images
     assign variant = product.variants | where: 'featured_image', image | first
-    assign variant_image = variant.featured_image | default: product.featured_image
+    assign variant_image = variant.featured_image | default: image
     assign is_first = forloop.first
     assign index = forloop.index0
 
