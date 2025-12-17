@@ -1,5 +1,46 @@
 🚨 MANDATORY: YOU MUST CALL "learn_shopify_api" ONCE WHEN WORKING WITH LIQUID THEMES.
 
+## MCP Tools Integration
+
+The workspace is configured with **Shopify Dev MCP Server** via `.vscode/mcp.json` providing access to specialized Shopify development tools:
+
+```json
+{
+  "servers": {
+    "shopify-dev-mcp": {
+      "command": "npx",
+      "args": ["-y", "@shopify/dev-mcp@latest"]
+    }
+  }
+}
+```
+
+### Available MCP Tools
+
+**🔧 Core API Access:**
+- `learn_shopify_api` - **MANDATORY** initialization for Shopify documentation access
+- `search_docs_chunks` - Search Shopify developer documentation
+- `fetch_full_docs` - Retrieve complete documentation pages
+- `introspect_graphql_schema` - Explore GraphQL schema for all Shopify APIs
+
+**✅ Code Validation:**
+- `validate_component_codeblocks` - Validate Shopify UI components (Polaris, POS UI, etc.)
+- `validate_graphql_codeblocks` - Validate GraphQL queries and mutations
+- `validate_theme` - Validate Liquid theme files and supporting assets
+
+**🎯 Usage Workflow:**
+1. **Always start with**: `learn_shopify_api` (liquid themes)
+2. **During development**: Use validation tools for code quality
+3. **For documentation**: Access real-time Shopify docs via MCP tools
+4. **Before deployment**: Validate all components and GraphQL code
+
+**📋 When to Use MCP Tools:**
+- ✅ Creating any Shopify component (sections, blocks, snippets)
+- ✅ Working with GraphQL queries or mutations
+- ✅ Need current Shopify API documentation
+- ✅ Validating theme compliance
+- ✅ Implementing Shopify best practices
+
 ## Git Commit Standards
 
 Follow the [Conventional Commits](https://www.conventionalcommits.org/) specification for all commit messages.
