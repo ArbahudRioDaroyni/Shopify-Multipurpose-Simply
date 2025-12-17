@@ -1,0 +1,520 @@
+{% doc %}
+  Renders a flexible button component with support for various styles, sizes, icons, and states.
+
+  @param {string} [type] - Button type: 'button', 'submit', 'reset' (default: 'button')
+  @param {string} [tag] - HTML tag: 'button', 'a', 'div' (default: 'button')
+  @param {string} [href] - Link URL (required when tag is 'a')
+  @param {string} [style] - Button style: 'primary', 'secondary', 'outline', 'ghost', 'danger' (default: 'primary')
+  @param {string} [size] - Button size: 'xs', 'sm', 'md', 'lg', 'xl' (default: 'md')
+  @param {string} [color] - Custom color override (CSS variable or color value)
+  @param {boolean} [full_width] - Make button full width (default: false)
+  @param {boolean} [disabled] - Disable the button (default: false)
+  @param {boolean} [loading] - Show loading state (default: false)
+  @param {string} [text] - Button text content
+  @param {string} [icon] - Icon name or SVG content
+  @param {string} [icon_position] - Icon position: 'left', 'right', 'only' (default: 'left')
+  @param {string} [icon_size] - Icon size: 'sm', 'md', 'lg' (default: matches button size)
+  @param {string} [class] - Additional CSS classes
+  @param {string} [id] - Button ID attribute
+  @param {string} [data_attributes] - Data attributes as string (data-action="cart")
+  @param {string} [aria_label] - Accessibility label
+  @param {boolean} [new_tab] - Open link in new tab (for 'a' tag, default: false)
+
+  @example
+  Basic button
+  {% render 'button', text: 'Add to Cart' %}
+
+  @example
+  Link button with icon
+  {% render 'button', 
+    tag: 'a',
+    href: '/products',
+    text: 'Shop Now',
+    icon: 'arrow-right',
+    icon_position: 'right',
+    style: 'primary',
+    size: 'lg'
+  %}
+
+  @example
+  Icon only button
+  {% render 'button',
+    icon: 'heart',
+    icon_position: 'only',
+    style: 'ghost',
+    size: 'sm',
+    aria_label: 'Add to Wishlist'
+  %}
+
+  @example
+  Loading button
+  {% render 'button',
+    text: 'Adding...',
+    loading: true,
+    disabled: true,
+    style: 'primary'
+  %}
+
+  @example
+  Full width button
+  {% render 'button',
+    text: 'Checkout',
+    style: 'primary',
+    size: 'lg',
+    full_width: true,
+    type: 'submit'
+  %}
+{% enddoc %}
+
+{% liquid
+  assign btn_type = type | default: 'button'
+  assign btn_tag = tag | default: 'button'
+  assign btn_style = style | default: 'primary'
+  assign btn_size = size | default: 'md'
+  assign btn_text = text | default: ''
+  assign btn_icon = icon | default: ''
+  assign btn_icon_position = icon_position | default: 'left'
+  assign btn_icon_size = icon_size | default: btn_size
+  assign btn_disabled = disabled | default: false
+  assign btn_loading = loading | default: false
+  assign btn_full_width = full_width | default: false
+  assign btn_new_tab = new_tab | default: false
+  assign btn_class = class | default: ''
+  assign btn_id = id | default: ''
+  assign btn_data = data_attributes | default: ''
+  assign btn_aria_label = aria_label | default: ''
+  assign btn_color = color | default: ''
+
+  # Build CSS classes
+  assign css_classes = 'button'
+  assign css_classes = css_classes | append: ' button--' | append: btn_style
+  assign css_classes = css_classes | append: ' button--' | append: btn_size
+  
+  if btn_full_width
+    assign css_classes = css_classes | append: ' button--full-width'
+  endif
+  
+  if btn_loading
+    assign css_classes = css_classes | append: ' button--loading'
+  endif
+  
+  if btn_disabled
+    assign css_classes = css_classes | append: ' button--disabled'
+  endif
+  
+  if btn_icon != blank and btn_icon_position == 'only'
+    assign css_classes = css_classes | append: ' button--icon-only'
+  endif
+  
+  if btn_class != blank
+    assign css_classes = css_classes | append: ' ' | append: btn_class
+  endif
+%}
+
+<{{ btn_tag }}
+  {% if btn_tag == 'button' %}
+    type="{{ btn_type }}"
+  {% endif %}
+  {% if btn_tag == 'a' and href != blank %}
+    href="{{ href }}"
+    {% if btn_new_tab %}
+      target="_blank" rel="noopener noreferrer"
+    {% endif %}
+  {% endif %}
+  {% if btn_id != blank %}
+    id="{{ btn_id }}"
+  {% endif %}
+  class="{{ css_classes }}"
+  {% if btn_disabled %}
+    {% if btn_tag == 'button' %}
+      disabled
+    {% else %}
+      aria-disabled="true" tabindex="-1"
+    {% endif %}
+  {% endif %}
+  {% if btn_aria_label != blank %}
+    aria-label="{{ btn_aria_label }}"
+  {% endif %}
+  {% if btn_data != blank %}
+    {{ btn_data }}
+  {% endif %}
+  {% if btn_color != blank %}
+    style="--color: {{ btn_color }}"
+  {% endif %}
+>
+  {% comment %} Loading spinner {% endcomment %}
+  {% if btn_loading %}
+    <span class="button__spinner" aria-hidden="true">
+      <svg class="button__spinner-icon" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-dasharray="31.416" stroke-dashoffset="31.416">
+          <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+          <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+        </circle>
+      </svg>
+    </span>
+  {% endif %}
+
+  {% comment %} Icon left {% endcomment %}
+  {% if btn_icon != blank and btn_icon_position == 'left' %}
+    <span class="button__icon button__icon--left button__icon--{{ btn_icon_size }}" aria-hidden="true">
+      {% if btn_icon contains '<svg' %}
+        {{ btn_icon }}
+      {% else %}
+        <svg class="button__icon-svg">
+          <use href="#icon-{{ btn_icon }}"></use>
+        </svg>
+      {% endif %}
+    </span>
+  {% endif %}
+
+  {% comment %} Button text {% endcomment %}
+  {% if btn_text != blank and btn_icon_position != 'only' %}
+    <span class="button__text">{{ btn_text }}</span>
+  {% endif %}
+
+  {% comment %} Icon right or only {% endcomment %}
+  {% if btn_icon != blank and btn_icon_position == 'right' or btn_icon_position == 'only' %}
+    <span class="button__icon button__icon--{{ btn_icon_position }} button__icon--{{ btn_icon_size }}" aria-hidden="true">
+      {% if btn_icon contains '<svg' %}
+        {{ btn_icon }}
+      {% else %}
+        <svg class="button__icon-svg">
+          <use href="#icon-{{ btn_icon }}"></use>
+        </svg>
+      {% endif %}
+    </span>
+  {% endif %}
+</{{ btn_tag }}>
+
+{% stylesheet %}
+  /* Button Base Styles */
+  .button {
+    --color: var(--color-primary);
+    --text-color: white;
+    --bg-color: var(--color);
+    --border-color: var(--color);
+    --font-size: 1rem;
+    --padding: 0.75rem 1.125rem;
+    --gap: 0.5rem;
+    --border-radius: var(--style-border-radius-inputs, 0.375rem);
+    --transition: all 0.2s ease-in-out;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --min-height: 2.5rem;
+
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap);
+    min-height: var(--min-height);
+    padding: var(--padding);
+    font-size: var(--font-size);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0.025em;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    user-select: none;
+    overflow: hidden;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+    
+    /* Prevent layout shifts */
+    box-sizing: border-box;
+  }
+
+  .button:hover:not(.button--disabled) {
+    --text-color: var(--color);
+    --bg-color: white;
+    --border-color: var(--color);
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-1px);
+  }
+
+  .button:focus {
+    outline: 2px solid var(--color);
+    outline-offset: 2px;
+  }
+
+  .button:active:not(.button--disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow);
+  }
+
+  /* Button Styles */
+  .button--primary {
+    --text-color: white;
+    --bg-color: var(--color);
+    --border-color: var(--color);
+  }
+
+  .button--primary:hover:not(.button--disabled) {
+    --text-color: var(--color);
+    --bg-color: white;
+    --border-color: var(--color);
+  }
+
+  .button--secondary {
+    --color: var(--color-secondary, #6b7280);
+    --text-color: white;
+    --bg-color: var(--color);
+    --border-color: var(--color);
+  }
+
+  .button--secondary:hover:not(.button--disabled) {
+    --text-color: var(--color);
+    --bg-color: white;
+    --border-color: var(--color);
+  }
+
+  .button--outline {
+    --text-color: var(--color);
+    --bg-color: transparent;
+    --border-color: var(--color);
+  }
+
+  .button--outline:hover:not(.button--disabled) {
+    --text-color: white;
+    --bg-color: var(--color);
+    --border-color: var(--color);
+  }
+
+  .button--ghost {
+    --text-color: var(--color);
+    --bg-color: transparent;
+    --border-color: transparent;
+    --shadow: none;
+  }
+
+  .button--ghost:hover:not(.button--disabled) {
+    --text-color: var(--color);
+    --bg-color: rgba(var(--color-rgb, 59, 130, 246), 0.1);
+    --border-color: transparent;
+  }
+
+  .button--danger {
+    --color: var(--color-error, #ef4444);
+    --text-color: white;
+    --bg-color: var(--color);
+    --border-color: var(--color);
+  }
+
+  .button--danger:hover:not(.button--disabled) {
+    --text-color: var(--color);
+    --bg-color: white;
+    --border-color: var(--color);
+  }
+
+  /* Button Sizes */
+  .button--xs {
+    --font-size: 0.75rem;
+    --padding: 0.375rem 0.75rem;
+    --gap: 0.25rem;
+    --min-height: 1.75rem;
+  }
+
+  .button--sm {
+    --font-size: 0.875rem;
+    --padding: 0.5rem 1rem;
+    --gap: 0.375rem;
+    --min-height: 2rem;
+  }
+
+  .button--md {
+    --font-size: 1rem;
+    --padding: 0.75rem 1.125rem;
+    --gap: 0.5rem;
+    --min-height: 2.5rem;
+  }
+
+  .button--lg {
+    --font-size: 1.125rem;
+    --padding: 1rem 1.5rem;
+    --gap: 0.5rem;
+    --min-height: 3rem;
+  }
+
+  .button--xl {
+    --font-size: 1.25rem;
+    --padding: 1.25rem 2rem;
+    --gap: 0.625rem;
+    --min-height: 3.5rem;
+  }
+
+  /* Full Width */
+  .button--full-width {
+    width: 100%;
+  }
+
+  /* Icon Only */
+  .button--icon-only {
+    padding: var(--padding);
+    aspect-ratio: 1;
+    width: var(--min-height);
+  }
+
+  /* Disabled State */
+  .button--disabled {
+    --text-color: #9ca3af;
+    --bg-color: #f3f4f6;
+    --border-color: #e5e7eb;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .button--disabled:hover {
+    transform: none;
+    box-shadow: var(--shadow);
+  }
+
+  /* Loading State */
+  .button--loading {
+    cursor: wait;
+    position: relative;
+  }
+
+  .button--loading .button__text,
+  .button--loading .button__icon:not(.button__spinner) {
+    opacity: 0.6;
+  }
+
+  /* Button Elements */
+  .button__text {
+    flex: 1;
+    text-align: center;
+  }
+
+  .button__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .button__icon--sm {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .button__icon--md {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .button__icon--lg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .button__icon-svg {
+    width: 100%;
+    height: 100%;
+    fill: currentColor;
+  }
+
+  /* Loading Spinner */
+  .button__spinner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .button__spinner-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Responsive Design */
+  @media (max-width: 640px) {
+    .button--lg {
+      --font-size: 1rem;
+      --padding: 0.875rem 1.25rem;
+      --min-height: 2.75rem;
+    }
+
+    .button--xl {
+      --font-size: 1.125rem;
+      --padding: 1rem 1.5rem;
+      --min-height: 3rem;
+    }
+
+    /* Stack icons vertically on very small screens for better touch targets */
+    .button--xs.button--icon-only,
+    .button--sm.button--icon-only {
+      min-width: 2.5rem;
+      min-height: 2.5rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    /* Ensure minimum touch target size on mobile */
+    .button {
+      min-height: 2.75rem;
+    }
+
+    .button--xs {
+      --min-height: 2.25rem;
+      --padding: 0.5rem 0.875rem;
+    }
+
+    .button--sm {
+      --min-height: 2.5rem;
+      --padding: 0.625rem 1rem;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .button {
+      border-width: 2px;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .button {
+      --transition: none;
+    }
+
+    .button:hover {
+      transform: none;
+    }
+
+    .button__spinner-icon animate {
+      animation-duration: 0.01ms !important;
+    }
+  }
+
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    .button--ghost:hover:not(.button--disabled) {
+      --bg-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .button--disabled {
+      --text-color: #6b7280;
+      --bg-color: #374151;
+      --border-color: #4b5563;
+    }
+  }
+
+  /* Focus-visible for better accessibility */
+  .button:focus-visible {
+    outline: 2px solid var(--color);
+    outline-offset: 2px;
+  }
+
+  .button:focus:not(:focus-visible) {
+    outline: none;
+  }
+{% endstylesheet %}
