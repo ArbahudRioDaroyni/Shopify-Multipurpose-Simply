@@ -19,5 +19,24 @@
     {{ content_for_layout }}
 
     {% sections 'footer-group' %}
+
+    <script>
+      window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+          // Page restored from bfcache
+          
+          // Re-initialize components if necessary
+          document.dispatchEvent(new Event('DOMContentLoaded'));
+        }
+      });
+
+      window.addEventListener('pagehide', (event) => {
+        // Page will be cached
+        if (event.persisted) {
+          // Clean up intensive operations
+          document.dispatchEvent(new Event('cleanup'));
+        }
+      });
+    </script>
   </body>
 </html>
