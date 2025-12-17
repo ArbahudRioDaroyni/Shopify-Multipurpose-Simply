@@ -1,20 +1,20 @@
 {% doc %}
   Renders responsive product grid with different view modes.
 
-  @param {collection} collection - Collection object containing products
+  @param {product[]} [products] - Array of products to display in the grid
   @param {string} [view_mode] - Grid view mode (2-col, 3-col, 4-col, list)
   
   @example
-  {% render 'product-grid', collection: collection, view_mode: '4-col' %}
+  {% render 'product-grid', products: collection.products, view_mode: '4-col' %}
 {% enddoc %}
 
 {% liquid
   assign view_class = view_mode | default: '4-col'
 %}
-
 <product-grid class="product-grid product-grid--{{ view_class }}" data-view="{{ view_class }}">
   <div class="product-grid__container">
-    {% for product in collection.products %}
+    {% for product in products %}
+      
       <div class="product-card">
         <div class="product-card__image-wrapper">
           <a href="{{ product.url }}" class="product-card__image-link">

@@ -88,7 +88,7 @@
       <!-- Products Grid -->
       {% paginate collection.products by products_per_page %}
         {% if collection.products.size > 0 %}
-          {% render 'product-grid', collection: collection, view_mode: '4-col' %}
+          {% render 'product-grid', products: collection.products, view_mode: '4-col' %}
         {% else %}
           <div class="collection-empty">
             <div class="collection-empty__content">
