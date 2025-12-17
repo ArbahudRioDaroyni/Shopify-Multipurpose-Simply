@@ -2,7 +2,7 @@
   Renders a slide-over panel that slides in from the right side of the screen.
   
   @param {string} [id] - Unique identifier for the slide-over
-  @param {string} [size] - Size of the slide-over: 'sm', 'md', 'lg', 'xl' (default: 'md')
+  @param {string} [size] - Size of the slide-over: 'sm', 'md', 'lg', 'xl', 'half', 'full' (default: 'md')
   @param {string} [position] - Position of the slide-over: 'left', 'right', 'top', 'bottom' (default: 'right')
   @param {string} [title] - Title displayed in the header
   @param {string} [description] - Description displayed under the title
@@ -304,6 +304,18 @@
     max-width: 90vw;
   }
 
+  .slide-over--right.slide-over--half .slide-over__panel,
+  .slide-over--left.slide-over--half .slide-over__panel {
+    width: 50vw;
+    max-width: 50vw;
+  }
+
+  .slide-over--right.slide-over--full .slide-over__panel,
+  .slide-over--left.slide-over--full .slide-over__panel {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
   /* Size variants - Top & Bottom positions */
   .slide-over--top.slide-over--sm .slide-over__panel,
   .slide-over--bottom.slide-over--sm .slide-over__panel {
@@ -327,6 +339,18 @@
   .slide-over--bottom.slide-over--xl .slide-over__panel {
     height: 768px;
     max-height: 90vh;
+  }
+
+  .slide-over--top.slide-over--half .slide-over__panel,
+  .slide-over--bottom.slide-over--half .slide-over__panel {
+    height: 50vh;
+    max-height: 50vh;
+  }
+
+  .slide-over--top.slide-over--full .slide-over__panel,
+  .slide-over--bottom.slide-over--full .slide-over__panel {
+    height: 100vh;
+    max-height: 100vh;
   }
 
   /* Header */
@@ -415,6 +439,29 @@
     .slide-over--bottom .slide-over__panel {
       height: 90vh;
       max-height: 90vh;
+    }
+
+    /* Keep half and full sizes on mobile */
+    .slide-over--right.slide-over--half .slide-over__panel,
+    .slide-over--left.slide-over--half .slide-over__panel {
+      width: 50vw;
+      max-width: 50vw;
+    }
+
+    .slide-over--top.slide-over--half .slide-over__panel,
+    .slide-over--bottom.slide-over--half .slide-over__panel {
+      height: 50vh;
+      max-height: 50vh;
+    }
+
+    .slide-over--right.slide-over--full .slide-over__panel,
+    .slide-over--left.slide-over--full .slide-over__panel,
+    .slide-over--top.slide-over--full .slide-over__panel,
+    .slide-over--bottom.slide-over--full .slide-over__panel {
+      width: 100vw;
+      height: 100vh;
+      max-width: 100vw;
+      max-height: 100vh;
     }
 
     .slide-over__header {
