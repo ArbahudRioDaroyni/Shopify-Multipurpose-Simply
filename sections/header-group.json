@@ -18,7 +18,12 @@
       "type": "header-info-bar"
     },
     "header": {
-      "type": "header"
+      "type": "header",
+      "settings": {
+        "logo": "shopify://shop_images/Coloured_Logo_-_HD.avif",
+        "menu": "main-menu",
+        "departments_menu": "main-menu"
+      }
     },
     "header-breadcrumbs": {
       "type": "header-breadcrumbs"
