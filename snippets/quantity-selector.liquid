@@ -300,6 +300,10 @@
       this.input?.addEventListener('change', () => this.validateInput());
       this.input?.addEventListener('input', () => this.updateTotal());
       
+      // Auto-select text when input is clicked or focused
+      this.input?.addEventListener('click', () => this.selectAllText());
+      this.input?.addEventListener('focus', () => this.selectAllText());
+      
       this.updateButtons();
       this.updateTotal();
     }
@@ -372,6 +376,15 @@
     setValue(value) {
       this.input.value = value;
       this.validateInput();
+    }
+
+    selectAllText() {
+      if (this.input && this.input.select) {
+        // Small delay to ensure the input is focused
+        setTimeout(() => {
+          this.input.select();
+        }, 10);
+      }
     }
   }
 

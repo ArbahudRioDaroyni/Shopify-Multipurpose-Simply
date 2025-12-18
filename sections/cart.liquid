@@ -452,29 +452,11 @@
       const quantitySelectors = this.cart.querySelectorAll('.quantity-selector');
       
       quantitySelectors.forEach(selector => {
-        const decreaseBtn = selector.querySelector('[data-action="decrease"]');
-        const increaseBtn = selector.querySelector('[data-action="increase"]');
         const input = selector.querySelector('input');
         
-        decreaseBtn?.addEventListener('click', () => {
-          const currentValue = parseInt(input.value) || 1;
-          if (currentValue > 0) {
-            input.value = currentValue - 1;
-            this.debounceUpdate();
-          }
-        });
+        input?.addEventListener('input', () => this.debounceUpdate());
         
-        increaseBtn?.addEventListener('click', () => {
-          const currentValue = parseInt(input.value) || 0;
-          input.value = currentValue + 1;
-          this.debounceUpdate();
-        });
-        
-        input?.addEventListener('change', () => {
-          const value = parseInt(input.value);
-          if (value < 0) input.value = 0;
-          this.debounceUpdate();
-        });
+        input?.addEventListener('change', () => this.debounceUpdate());
       });
     }
 
