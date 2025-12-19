@@ -19,6 +19,8 @@
     "update": "Update",
     "remove": "Remove",
     "general": {
+      "view_cart": "View cart",
+      "remove_item": "Remove item",
       "item_count": {
         "one": "{{ count }} item",
         "other": "{{ count }} items"

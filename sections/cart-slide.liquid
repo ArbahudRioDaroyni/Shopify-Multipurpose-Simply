@@ -1,0 +1,100 @@
+{% comment %}
+  This section provides a slide-over cart that can be triggered from anywhere
+  in the theme. Similar to collection filters but for cart functionality.
+{% endcomment %}
+
+{% liquid
+  capture cart_content
+    render 'cart-sidebar'
+  endcapture
+%}
+
+<!-- Cart Slide-over -->
+{% render 'slide-over',
+  id: 'cart-drawer',
+  position: 'right',
+  size: 'md',
+  title: 'Shopping Cart',
+  description: 'Review and manage your cart items',
+  content: cart_content
+%}
+
+{% javascript %}
+  class CartSlide {
+    constructor() {
+      this.init();
+    }
+
+    init() {
+      // Listen for cart updates
+      document.addEventListener('cart:updated', (e) => {
+        console.log('Cart updated:', e.detail);
+        this.refreshCartContent();
+      });
+
+      // Listen for add to cart events
+      document.addEventListener('cart:item-added', (e) => {
+        console.log('Item added to cart:', e.detail);
+        this.refreshCartContent();
+        this.openCartDrawer();
+      });
+    }
+
+    refreshCartContent() {
+      // Refresh cart sidebar content
+      fetch('/cart?section_id=cart-slide')
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          const newContent = doc.querySelector('.cart-sidebar-content');
+          const currentContent = document.querySelector('.cart-sidebar-content');
+          
+          if (newContent && currentContent) {
+            currentContent.innerHTML = newContent.innerHTML;
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing cart:', error);
+        });
+    }
+
+    openCartDrawer() {
+      const cartDrawer = document.getElementById('cart-drawer');
+      if (cartDrawer && cartDrawer.open) {
+        cartDrawer.open();
+      }
+    }
+  }
+
+  // Initialize cart slide functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    new CartSlide();
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Cart Slide-over",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Cart slide-over settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_recommendations",
+      "label": "Show product recommendations",
+      "default": true,
+      "info": "Display related products in the cart drawer"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_cart_notes",
+      "label": "Enable cart notes",
+      "default": true,
+      "info": "Allow customers to add notes to their order"
+    }
+  ]
+}
+{% endschema %}

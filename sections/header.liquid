@@ -82,12 +82,23 @@
       </a>
 
       <!-- Cart -->
-      <a href="{{ routes.cart_url }}" class="header__icon header__cart" aria-label="Cart">
+      {% capture icon_cart %}
         {{ 'icon-cart.svg' | inline_asset_content }}
-        {% if cart.item_count > 0 %}
-          <span class="cart__count">{{ cart.item_count }}</span>
-        {% endif %}
-      </a>
+      {% endcapture %}
+      {% assign icon_cart = icon_cart | strip_newlines %}
+      {% render 'button',
+        tag: 'button',
+        style: 'ghost',
+        size: 'md',
+        icon: icon_cart,
+        icon_position: 'only',
+        icon_size: 'lg',
+        badge_text: cart.item_count,
+        badge_style: 'primary',
+        class: 'header__icon header__cart',
+        data_attributes: 'data-slide-over-target="cart-drawer"',
+        aria_label: 'cart.general.view_cart' | t
+      %}
     </div>
   </div>
 </div>

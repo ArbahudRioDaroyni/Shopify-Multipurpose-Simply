@@ -17,9 +17,13 @@
         "menu": "",
         "show_payment_icons": true
       }
+    },
+    "cart-slide": {
+      "type": "cart-slide"
     }
   },
   "order": [
-    "footer"
+    "footer",
+    "cart-slide"
   ]
 }
