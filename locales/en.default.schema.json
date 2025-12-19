@@ -278,6 +278,200 @@
           "label": "Show product count"
         }
       }
+    },
+    "button_showcase": {
+      "name": "Button Showcase",
+      "settings": {
+        "title": {
+          "label": "Section title"
+        },
+        "description": {
+          "label": "Section description"
+        }
+      }
     }
-  }
+  },
+  "blocks": {
+    "button": {
+      "name": "Button",
+      "settings": {
+        "content": {
+          "header": "Content"
+        },
+        "text": {
+          "label": "Button text",
+          "info": "Text displayed on the button"
+        },
+        "tag": {
+          "label": "Button type",
+          "info": "Choose between button or link",
+          "options": {
+            "button": "Button",
+            "link": "Link"
+          }
+        },
+        "type": {
+          "label": "Button action type",
+          "options": {
+            "button": "Button",
+            "submit": "Submit form",
+            "reset": "Reset form"
+          }
+        },
+        "href": {
+          "label": "Link URL",
+          "info": "Where the button should link to"
+        },
+        "new_tab": {
+          "label": "Open in new tab"
+        },
+        "appearance": {
+          "header": "Appearance"
+        },
+        "style": {
+          "label": "Button style",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary", 
+            "outline": "Outline",
+            "ghost": "Ghost",
+            "danger": "Danger"
+          }
+        },
+        "size": {
+          "label": "Button size",
+          "options": {
+            "xs": "Extra small",
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "xl": "Extra large"
+          }
+        },
+        "radius": {
+          "label": "Border radius",
+          "options": {
+            "none": "None",
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large",
+            "xl": "Extra large",
+            "full": "Full (pill)"
+          }
+        },
+        "color": {
+          "label": "Custom color",
+          "info": "Override the default button color"
+        },
+        "full_width": {
+          "label": "Full width button"
+        },
+        "icon": {
+          "header": "Icon",
+          "label": "Icon name",
+          "info": "Name of the icon to display (e.g. cart, heart, arrow-right)"
+        },
+        "icon_position": {
+          "label": "Icon position",
+          "options": {
+            "left": "Left",
+            "right": "Right",
+            "only": "Icon only"
+          }
+        },
+        "icon_size": {
+          "label": "Icon size",
+          "options": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large"
+          }
+        },
+        "badge": {
+          "header": "Badge"
+        },
+        "badge_text": {
+          "label": "Badge text",
+          "info": "Text to show in the badge (e.g. 3, New!, 99+)"
+        },
+        "badge_position": {
+          "label": "Badge position",
+          "options": {
+            "top_right": "Top right",
+            "top_left": "Top left", 
+            "bottom_right": "Bottom right",
+            "bottom_left": "Bottom left"
+          }
+        },
+        "badge_color": {
+          "label": "Badge color",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "success": "Success",
+            "warning": "Warning",
+            "error": "Error",
+            "info": "Info"
+          }
+        },
+        "badge_size": {
+          "label": "Badge size",
+          "options": {
+            "sm": "Small",
+            "md": "Medium",
+            "lg": "Large"
+          }
+        },
+        "advanced": {
+          "header": "Advanced"
+        },
+        "disabled": {
+          "label": "Disabled state",
+          "info": "Make the button non-interactive"
+        },
+        "loading": {
+          "label": "Loading state",
+          "info": "Show loading spinner"
+        },
+        "id": {
+          "label": "HTML ID",
+          "info": "Unique identifier for the button"
+        },
+        "class": {
+          "label": "CSS classes",
+          "info": "Additional CSS classes to apply"
+        },
+        "aria_label": {
+          "label": "Accessibility label",
+          "info": "Screen reader description of the button"
+        },
+        "data_attributes": {
+          "label": "Data attributes",
+          "info": "Custom data attributes (e.g. data-action=\"cart\")"
+        }
+      },
+      "presets": {
+        "primary": {
+          "name": "Primary Button",
+          "category": "Button"
+        },
+        "cta": {
+          "name": "Call to Action",
+          "category": "Button"
+        },
+        "icon": {
+          "name": "Icon Button",
+          "category": "Button"
+        },
+        "cart": {
+          "name": "Cart Button",
+          "category": "Button"
+        },
+        "link": {
+          "name": "Link Button", 
+          "category": "Button"
+        }
+      }
+    }
+  },
 }

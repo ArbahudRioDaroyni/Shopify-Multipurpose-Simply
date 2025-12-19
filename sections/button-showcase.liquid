@@ -1,0 +1,150 @@
+{% comment %}
+  Example section showing how to use button blocks
+  This section demonstrates various button configurations
+{% endcomment %}
+
+<section class="button-showcase">
+  <div class="button-showcase__container">
+    <div class="button-showcase__header">
+      <h2 class="button-showcase__title">{{ section.settings.title }}</h2>
+      {% if section.settings.description != blank %}
+        <p class="button-showcase__description">{{ section.settings.description }}</p>
+      {% endif %}
+    </div>
+
+    <div class="button-showcase__buttons">
+      {% content_for 'blocks' %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .button-showcase {
+    padding: var(--section-padding-y, 3rem) var(--section-padding-x, 1rem);
+    background-color: var(--color-background);
+  }
+
+  .button-showcase__container {
+    max-width: var(--content-max-width, 1200px);
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .button-showcase__header {
+    margin-bottom: 2rem;
+  }
+
+  .button-showcase__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+    margin-bottom: 1rem;
+  }
+
+  .button-showcase__description {
+    font-size: 1.125rem;
+    color: var(--color-foreground-secondary, #6b7280);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .button-showcase__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .button-showcase {
+      padding: 2rem 1rem;
+    }
+
+    .button-showcase__title {
+      font-size: 2rem;
+    }
+
+    .button-showcase__description {
+      font-size: 1rem;
+    }
+
+    .button-showcase__buttons {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .button-showcase__buttons .button-block {
+      width: 100%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Button Showcase",
+  "tag": "section",
+  "blocks": [
+    {
+      "type": "@theme"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:sections.button_showcase.settings.title.label",
+      "default": "Button Showcase"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "t:sections.button_showcase.settings.description.label",
+      "default": "Explore different button styles and configurations"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.button_showcase.name",
+      "blocks": [
+        {
+          "type": "button",
+          "settings": {
+            "text": "Primary Button",
+            "style": "primary",
+            "size": "md"
+          }
+        },
+        {
+          "type": "button", 
+          "settings": {
+            "text": "Secondary Button",
+            "style": "secondary",
+            "size": "md"
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "text": "Outline Button", 
+            "style": "outline",
+            "size": "md"
+          }
+        },
+        {
+          "type": "button",
+          "settings": {
+            "text": "Cart",
+            "icon": "cart",
+            "style": "ghost",
+            "radius": "full",
+            "badge_text": "3",
+            "badge_color": "error"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
