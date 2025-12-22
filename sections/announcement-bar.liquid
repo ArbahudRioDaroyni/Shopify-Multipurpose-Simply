@@ -3,10 +3,7 @@
   id="announcement-bar-{{ section.id }}"
   class="announcement-bar color-{{ section.settings.color_scheme }}"
 >
-  <span class="announcement-bar__content">
-    <span class="announcement-bar__text--mobile">{{ section.settings.mobile_text }}</span>
-    <span class="announcement-bar__text--desktop">{{ section.settings.desktop_text }}</span>
-  </span>
+  {% content_for 'blocks' %}
   <strong class="announcement-bar__count-down">
     {% if section.settings.show_countdown %}
       &nbsp;
@@ -20,8 +17,6 @@
   <span class="announcement-bar__close-button" role="button" tabindex="0" aria-label="Close banner">
     &times;
   </span>
-
-  {{ 'icon-arrow-right.svg' | inline_asset_content }}
 </a>
 
 {% stylesheet %}
@@ -40,7 +35,7 @@
     text-decoration: none;
   }
 
-  .announcement-bar:hover .icon-arrow-right path {
+  .announcement-bar:hover .icon-block__media path {
     stroke: var(--color-text);
     transform: translateX(5px);
     transition: transform 0.3s ease;
@@ -88,12 +83,12 @@
     line-height: 1;
   }
 
-  .icon-arrow-right {
+  .icon-block__media {
     width: 14px;
     height: 14px;
   }
 
-  .icon-arrow-right, .icon-arrow-right * {
+  .icon-block__media, .icon-block__media * {
     fill: var(--color-icons);
     stroke: var(--color-icons);
     color: var(--color-icons);
@@ -181,24 +176,18 @@
 {% schema %}
 {
   "name": "t:sections.announcement_bar.title",
+  "blocks": [
+    {
+      "type": "@theme"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  },
   "settings": [
     {
       "type": "header",
       "content": "t:sections.announcement_bar.content_header"
-    },
-    {
-      "type": "text",
-      "id": "mobile_text",
-      "label": "t:sections.announcement_bar.mobile_text",
-      "default": "Blue November - Up to 70% off + Free Gifts!",
-      "info": "t:sections.announcement_bar.mobile_text_info"
-    },
-    {
-      "type": "text",
-      "id": "desktop_text",
-      "label": "t:sections.announcement_bar.desktop_text",
-      "default": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
-      "info": "t:sections.announcement_bar.desktop_text_info"
     },
     {
       "type": "header",
@@ -255,7 +244,58 @@
   "presets": [
     {
       "name": "t:sections.announcement_bar.title",
-      "category": "Header"
+      "blocks": [
+        {
+          "type": "group",
+          "name": "t:general.row",
+          "settings": {
+            "tag": "div",
+            "layout_direction": "group--horizontal",
+            "alignment": "flex-start",
+            "class": "announcement-bar__content",
+            "attributes": "",
+            "gap": 0,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": [
+            {
+              "type": "text",
+              "name": "Text Mobile",
+              "settings": {
+                "text": "Blue November - Up to 70% off + Free Gifts!",
+                "tag": "span",
+                "class": "announcement-bar__text--mobile",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              }
+            },
+            {
+              "type": "text",
+              "name": "Text Desktop",
+              "settings": {
+                "text": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
+                "tag": "p",
+                "class": "announcement-bar__text--desktop",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }
