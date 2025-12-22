@@ -12,10 +12,81 @@
   "name": "t:general.header",
   "sections": {
     "announcement-bar": {
-      "type": "announcement-bar"
+      "type": "announcement-bar",
+      "blocks": {
+        "group_text": {
+          "type": "group",
+          "name": "t:general.row",
+          "settings": {
+            "tag": "div",
+            "layout_direction": "group--horizontal",
+            "alignment": "flex-start",
+            "class": "announcement-bar__content",
+            "attributes": "",
+            "gap": 0,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": {
+            "text_mobile": {
+              "type": "text",
+              "name": "Text Mobile",
+              "settings": {
+                "text": "Blue November - Up to 70% off + Free Gifts!",
+                "tag": "span",
+                "class": "announcement-bar__text--mobile",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {}
+            },
+            "text_desktop": {
+              "type": "text",
+              "name": "Text Desktop",
+              "settings": {
+                "text": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
+                "tag": "p",
+                "class": "announcement-bar__text--desktop",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "text_mobile",
+            "text_desktop"
+          ]
+        }
+      },
+      "block_order": [
+        "group_text"
+      ],
+      "settings": {
+        "mobile_text": "Blue November - Up to 70% off + Free Gifts!",
+        "desktop_text": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
+        "link_url": "shopify://collections/all",
+        "link_text": "Hurry up!",
+        "show_countdown": true,
+        "text_countdown": "End in",
+        "end_date_countdown": "2025-12-31 23:59:59",
+        "color_scheme": ""
+      }
     },
     "header-info-bar": {
-      "type": "header-info-bar"
+      "type": "header-info-bar",
     },
     "header": {
       "type": "header",
