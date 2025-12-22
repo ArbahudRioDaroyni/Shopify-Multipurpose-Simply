@@ -5,24 +5,32 @@
   {% content_for 'block', type: 'text', id: 'text' %}
 {% enddoc %}
 
-<div
-  class="text {{ block.settings.text_style }}"
-  style="--text-align: {{ block.settings.alignment }}"
+<{{ block.settings.tag | default: 'p' }}
+  class="text-block {{ block.settings.class }}"
+  style="
+    --text-align: {{ block.settings.alignment }};
+    --font-size: {{ block.settings.font_size }}px;
+    --font-weight: {{ block.settings.font_weight }};
+    --color: {{ block.settings.color }};
+    --margin: {{ block.settings.margin }}px;
+    --padding: {{ block.settings.padding }}px;
+    --line-height: {{ block.settings.line_height }};
+  "
+  {{ block.settings.attributes }}
   {{ block.shopify_attributes }}
 >
   {{ block.settings.text }}
-</div>
+</{{ block.settings.tag | default: 'p' }}>
 
 {% stylesheet %}
-  .text {
+  .text-block {
     text-align: var(--text-align);
-  }
-  .text--title {
-    font-size: 2rem;
-    font-weight: 700;
-  }
-  .text--subtitle {
-    font-size: 1.5rem;
+    font-size: var(--font-size);
+    font-weight: var(--font-weight);
+    color: var(--color);
+    margin: var(--margin);
+    padding: var(--padding);
+    line-height: var(--line-height);
   }
 {% endstylesheet %}
 
@@ -31,27 +39,116 @@
   "name": "t:general.text",
   "settings": [
     {
-      "type": "text",
+      "type": "textarea",
       "id": "text",
       "label": "t:labels.text",
-      "default": "Text"
+      "default": "Add your text here"
     },
     {
       "type": "select",
-      "id": "text_style",
-      "label": "t:labels.text_style",
+      "id": "tag",
+      "label": "t:labels.tag",
+      "default": "p",
       "options": [
-        { "value": "text--title", "label": "t:options.text_style.title" },
-        { "value": "text--subtitle", "label": "t:options.text_style.subtitle" },
-        { "value": "text--normal", "label": "t:options.text_style.normal" }
-      ],
-      "default": "text--title"
+        { "value": "p", "label": "Paragraph" },
+        { "value": "h1", "label": "Heading 1" },
+        { "value": "h2", "label": "Heading 2" },
+        { "value": "h3", "label": "Heading 3" },
+        { "value": "h4", "label": "Heading 4" },
+        { "value": "h5", "label": "Heading 5" },
+        { "value": "h6", "label": "Heading 6" },
+        { "value": "span", "label": "Span" },
+        { "value": "div", "label": "Div" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "class",
+      "label": "t:labels.class",
+      "placeholder": "custom-text-class",
+      "info": "Add custom CSS class names"
+    },
+    {
+      "type": "text",
+      "id": "attributes",
+      "label": "t:labels.attributes",
+      "placeholder": "id=\"my-text\" data-custom=\"value\"",
+      "info": "Add custom HTML attributes"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "label": "t:labels.font_size",
+      "default": 12,
+      "min": 8,
+      "max": 72,
+      "step": 4,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "t:labels.font_weight",
+      "default": "400",
+      "options": [
+        { "value": "100", "label": "Thin (100)" },
+        { "value": "200", "label": "Extra Light (200)" },
+        { "value": "300", "label": "Light (300)" },
+        { "value": "400", "label": "Normal (400)" },
+        { "value": "500", "label": "Medium (500)" },
+        { "value": "600", "label": "Semi Bold (600)" },
+        { "value": "700", "label": "Bold (700)" },
+        { "value": "800", "label": "Extra Bold (800)" },
+        { "value": "900", "label": "Black (900)" }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "line_height",
+      "label": "t:labels.line_height",
+      "default": 1.5,
+      "min": 1,
+      "max": 3,
+      "step": 0.1
     },
     {
       "type": "text_alignment",
       "id": "alignment",
       "label": "t:labels.alignment",
       "default": "left"
+    },
+    {
+      "type": "color",
+      "id": "color",
+      "label": "t:labels.color",
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "margin",
+      "label": "t:labels.margin",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "label": "t:labels.padding",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
     }
   ],
   "presets": [{ "name": "t:general.text" }]
