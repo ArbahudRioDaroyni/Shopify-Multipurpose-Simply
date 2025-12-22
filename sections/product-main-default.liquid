@@ -193,11 +193,11 @@
           </div>
 
           <button type="button" class="product-main__wishlist button outline" aria-label="Add to wishlist">
-            {{ 'icon-love.svg' | inline_asset_content }}
+            {% render 'icon-or-image', icon: 'heart', width: 24 %}
           </button>
 
           <button type="button" class="product-main__compare button outline" aria-label="Add to compare" hidden>
-            {{ 'icon-repeat.svg' | inline_asset_content }}
+            {% render 'icon-or-image', icon: 'repeat', width: 24 %}
           </button>
         </div>
 

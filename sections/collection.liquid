@@ -64,9 +64,7 @@
 
         <div class="collection-toolbar__right">
           <button class="button" data-slide-over-target="collection-filters" aria-label="Filters">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"></polygon>
-            </svg>
+            {% render 'icon-or-image', icon: 'filter', width: 24 %}
             Filters
           </button>
           {% render 'view-mode-toggle' %}

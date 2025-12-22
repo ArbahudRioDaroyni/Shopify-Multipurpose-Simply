@@ -5,14 +5,14 @@
   <div class="header-info-bar__left">
     {% if section.settings.show_phone and section.settings.phone != blank %}
       <a href="tel:{{ section.settings.phone }}" class="header-info-bar__item header-info-bar__phone">
-        {{ 'icon-phone.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'phone', width: 14 %}
         <span>{{ section.settings.phone }}</span>
       </a>
     {% endif %}
 
     {% if section.settings.show_email and section.settings.email != blank %}
       <a href="mailto:{{ section.settings.email }}" class="header-info-bar__item header-info-bar__email">
-        {{ 'icon-mailbox.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'mailbox', width: 14 %}
         <span>{{ section.settings.email }}</span>
       </a>
     {% endif %}
@@ -34,7 +34,7 @@
   <div class="header-info-bar__right">
     {% if section.settings.show_location and section.settings.location_text != blank %}
       <div class="header-info-bar__item header-info-bar__location">
-        {{ 'icon-map-point.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'map-point', width: 14 %}
         <span>{{ section.settings.location_text }}</span>
       </div>
     {% endif %}
@@ -59,7 +59,7 @@
 
     {% if section.settings.show_language_selector %}
       {% form 'localization', class: 'header-info-bar__item header-info-bar__language' %}
-        {{ 'icon-globe.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'global', width: 14 %}
         <select name="locale_code" class="header-info-bar__select" onchange="this.form.submit()">
           {% for language in localization.available_languages %}
             <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
