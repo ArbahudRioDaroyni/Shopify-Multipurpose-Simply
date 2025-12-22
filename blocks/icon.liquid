@@ -1,0 +1,151 @@
+{% doc %}
+  @description
+  Renders an icon block that can display either an SVG icon or an uploaded image, with optional linking functionality.
+
+  @example
+  {% schema %}
+    {
+      "name": "t:names.icon",
+      "class": "icon-block",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "t:settings.icon",
+          "options": [ ... ],
+          "default": "caret"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_upload",
+          "label": "t:settings.image_icon"
+        },
+        {
+          "type": "range",
+          "id": "width",
+          "label": "t:settings.width",
+          "min": 12,
+          "max": 200,
+          "step": 2,
+          "unit": "px",
+          "default": 24
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "t:settings.link"
+        },
+        {
+          "type": "checkbox",
+          "id": "open_in_new_tab",
+          "label": "t:settings.open_new_tab",
+          "default": false
+        }
+      ]
+    }
+  {% endschema %}
+
+{% enddoc %}
+
+{% assign block_settings = block.settings %}
+{% assign icon_block_class = 'icon-block__media icon-block-' | append: block.id %}
+
+{% capture icon %}
+  {% render 'icon-or-image',
+    icon: block_settings.icon,
+    image_upload: block_settings.image_upload,
+    width: block_settings.width,
+    class_name: icon_block_class,
+    attributes: block.shopify_attributes
+  %}
+{% endcapture %}
+
+{%- if block_settings.link != blank -%}
+  <a
+    href="{{ block_settings.link }}"
+    class="text-inherit"
+    {% if block_settings.open_in_new_tab %}
+      target="_blank" rel="noopener"
+    {% endif %}
+  >
+    {{ icon }}
+  </a>
+{%- else -%}
+  {{ icon }}
+{%- endif -%}
+
+{% stylesheet %}
+  .icon-block {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .icon-block__media {
+    height: auto;
+  }
+{% endstylesheet %}
+
+{% comment %} "name": "t:names.icon", {% endcomment %}
+{% schema %}
+{
+  "name": "Icon",
+  "class": "icon-block",
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:settings.icon",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:options.icon.none"
+        },
+        {
+          "value": "caret",
+          "label": "t:options.icon.caret"
+        },
+        {
+          "value": "arrow",
+          "label": "t:options.icon.arrow"
+        }
+      ],
+      "default": "caret"
+    },
+    {
+      "type": "image_picker",
+      "id": "image_upload",
+      "label": "t:settings.image_icon"
+    },
+    {
+      "type": "range",
+      "id": "width",
+      "label": "t:settings.width",
+      "min": 12,
+      "max": 200,
+      "step": 2,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:settings.link"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_in_new_tab",
+      "label": "t:settings.open_new_tab",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.icon",
+      "category": "t:categories.basic",
+      "settings": {
+        "icon": "price_tag"
+      }
+    }
+  ]
+}
+{% endschema %}

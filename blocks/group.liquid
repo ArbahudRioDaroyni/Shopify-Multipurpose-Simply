@@ -11,16 +11,19 @@
   {% content_for 'block', type: 'group', id: 'group' %}
 {% enddoc %}
 
-<div
-  class="group {{ block.settings.layout_direction }}"
+<{{ block.settings.tag | default: 'div' }}
+  class="group {{ block.settings.layout_direction }} {{ block.settings.class }}"
   style="
     --padding: {{ block.settings.padding }}px;
+    --gap: {{ block.settings.gap }}px;
+    --margin: {{ block.settings.margin }}px;
     --alignment: {{ block.settings.alignment }};
   "
+  {{ block.settings.attributes }}
   {{ block.shopify_attributes }}
 >
   {% content_for 'blocks' %}
-</div>
+</{{ block.settings.tag | default: 'div' }}>
 
 {% stylesheet %}
   .group {
@@ -28,6 +31,8 @@
     flex-wrap: nowrap;
     overflow: hidden;
     width: 100%;
+    gap: var(--gap);
+    margin: var(--margin);
   }
 
   .group--horizontal {
@@ -51,6 +56,22 @@
   "settings": [
     {
       "type": "select",
+      "id": "tag",
+      "label": "t:labels.tag",
+      "default": "div",
+      "options": [
+        { "value": "div", "label": "Div" },
+        { "value": "section", "label": "Section" },
+        { "value": "article", "label": "Article" },
+        { "value": "aside", "label": "Aside" },
+        { "value": "nav", "label": "Nav" },
+        { "value": "header", "label": "Header" },
+        { "value": "footer", "label": "Footer" },
+        { "value": "main", "label": "Main" }
+      ]
+    },
+    {
+      "type": "select",
       "id": "layout_direction",
       "label": "t:labels.layout_direction",
       "default": "group--vertical",
@@ -72,6 +93,40 @@
       ]
     },
     {
+      "type": "text",
+      "id": "class",
+      "label": "t:labels.class",
+      "placeholder": "custom-class",
+      "info": "Add custom CSS class names"
+    },
+    {
+      "type": "text",
+      "id": "attributes",
+      "label": "t:labels.attributes",
+      "placeholder": "id=\"my-id\" data-custom=\"value\"",
+      "info": "Add custom HTML attributes"
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "t:labels.gap",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "margin",
+      "label": "t:labels.margin",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
       "type": "range",
       "id": "padding",
       "label": "t:labels.padding",
@@ -87,8 +142,11 @@
       "name": "t:general.column",
       "category": "t:general.layout",
       "settings": {
+        "tag": "div",
         "layout_direction": "group--vertical",
         "alignment": "flex-start",
+        "gap": 0,
+        "margin": 0,
         "padding": 0
       }
     },
@@ -96,7 +154,10 @@
       "name": "t:general.row",
       "category": "t:general.layout",
       "settings": {
+        "tag": "div",
         "layout_direction": "group--horizontal",
+        "gap": 0,
+        "margin": 0,
         "padding": 0
       }
     }

@@ -33,9 +33,9 @@
           <!-- Shop by Departments Dropdown -->
           <div class="nav__departments">
             <button class="departments__toggle">
-              {{ 'icon-burger.svg' | inline_asset_content }}
+              {% render 'icon-or-image', icon: 'hamburger', width: 24 %}
               <span>Shop by Departments</span>
-              {{ 'icon-alt-arrow-down-bold.svg' | inline_asset_content }}
+                {% content_for 'block', type: 'icon', id: 'departments-arrow' %}
             </button>
             <div class="departments__dropdown">
               {% if section.settings.departments_menu != blank %}
@@ -66,24 +66,24 @@
     <div class="header__actions">
       <!-- Search Icon -->
       <a href="{{ routes.search_url }}" class="header__icon header__search" aria-label="Search">
-        {{ 'icon-magnifer.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'magnifier', width: 24 %}
       </a>
 
       <!-- Account Icon -->
       {% if shop.customer_accounts_enabled %}
         <a href="{{ routes.account_url }}" class="header__icon header__account" aria-label="Account">
-          {{ 'icon-account.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'user', width: 24 %}
         </a>
       {% endif %}
 
       <!-- Wishlist Icon -->
       <a href="{{ routes.root_url }}pages/wishlist" class="header__icon header__wishlist" aria-label="Wishlist">
-        {{ 'icon-love.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'heart', width: 24 %}
       </a>
 
       <!-- Cart -->
       {% capture icon_cart %}
-        {{ 'icon-cart.svg' | inline_asset_content }}
+        {% render 'icon-or-image', icon: 'cart', width: 24 %}
       {% endcapture %}
       {% assign icon_cart = icon_cart | strip_newlines %}
       {% render 'button',
@@ -605,6 +605,22 @@ document.addEventListener('DOMContentLoaded', function() {
       "id": "departments_menu",
       "label": "Departments menu",
       "default": "main-menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.header.title",
+      "category": "t:categories.header",
+      "blocks": [
+        {
+          "type": "icon",
+          "static": true,
+          "id": "departments-arrow",
+          "settings": {
+            "icon": "caret"
+          }
+        }
+      ]
     }
   ]
 }
