@@ -19,6 +19,9 @@
     --margin: {{ block.settings.margin }}px;
     --alignment: {{ block.settings.alignment }};
   "
+  {% if block.settings.tag == 'a' and block.settings.url != blank %}
+    href="{{ block.settings.url }}"
+  {% endif %}
   {{ block.settings.attributes }}
   {{ block.shopify_attributes }}
 >
@@ -67,8 +70,16 @@
         { "value": "nav", "label": "Nav" },
         { "value": "header", "label": "Header" },
         { "value": "footer", "label": "Footer" },
-        { "value": "main", "label": "Main" }
+        { "value": "main", "label": "Main" },
+        { "value": "a", "label": "Link (A)" }
       ]
+    },
+    {
+      "visible_if": "{{ block.settings.tag == 'a' }}",
+      "type": "url",
+      "id": "url",
+      "label": "t:labels.url",
+      "info": "Link destination (required when using A tag)"
     },
     {
       "type": "select",
@@ -145,7 +156,7 @@
         "tag": "div",
         "layout_direction": "group--vertical",
         "alignment": "flex-start",
-        "gap": 0,
+        "gap": 8,
         "margin": 0,
         "padding": 0
       }
@@ -156,7 +167,19 @@
       "settings": {
         "tag": "div",
         "layout_direction": "group--horizontal",
-        "gap": 0,
+        "gap": 8,
+        "margin": 0,
+        "padding": 0
+      }
+    },
+    {
+      "name": "Link Group",
+      "category": "t:general.layout",
+      "settings": {
+        "tag": "a",
+        "url": "/collections/all",
+        "layout_direction": "group--horizontal",
+        "gap": 10,
         "margin": 0,
         "padding": 0
       }
