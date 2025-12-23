@@ -1245,12 +1245,12 @@
     updateAllOptionsAvailability() {
       this.optionGroups.forEach((group, groupIndex) => {
         group.options.forEach(option => {
-          // Create test selection
-          const testSelection = [...this.currentSelection];
-          testSelection[groupIndex] = option.value;
+          // Create a copy of current selection
+          const optionSelection = [...this.currentSelection];
+          optionSelection[groupIndex] = option.value;
           
           // Check availability
-          const isAvailable = this.checkVariantAvailability(testSelection);
+          const isAvailable = this.checkVariantAvailability(optionSelection);
           
           // Update UI
           option.container.classList.toggle('unavailable', !isAvailable);
