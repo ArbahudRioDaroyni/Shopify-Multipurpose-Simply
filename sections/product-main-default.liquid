@@ -111,7 +111,7 @@
 
       <!-- Product Variant Selector -->
       {% if product.variants.size > 1 %}
-        <div class="product-form__variant-selector">
+        <div class="product-form__variant-selector" data-variant-id={{ product.selected_or_first_available_variant.id }}>
           {% for option in product.options %}
             <div class="product-form__option-group">
               {% assign option_name = 'option' | append: forloop.index %}
@@ -123,11 +123,10 @@
               <div class="product-form__options">
                 {% for value in option_values %}
                   {% assign variant = product.variants | find: option_name, value %}
-                  {% assign availability = variant.available %}
                   {% assign image = variant.featured_image %}
 
-                  <figure class="product-form__option {%- unless availability %} unavailable{%- endunless -%}">
-                    {% assign attr_option = 'fetchpriority="high"' | append: '" data-option-value="' | append: value | append: '"' %}
+                  <figure class="product-form__option">
+                    {% assign attr_option = 'fetchpriority="high"' | append: '" data-option-name="' | append: value | append: '"' %}
                     {% assign class_option = 'product-option__image' %}
                     {% if variant_option_selected == value %}
                       {% assign class_option = class_option | append: ' selected' %}
@@ -383,7 +382,6 @@
   /* Product Main Styles */
   .product-main {
     --border-radius: 4px;
-    padding: 40px 0;
   }
 
   .product-main__container {
@@ -559,12 +557,23 @@
   .product-form__option.unavailable::after {
     content: '';
     position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 80%;
+    top: 8px;
+    left: -8px;
+    width: 100%;
     height: 2px;
     background-color: #dc3545;
-    transform: translate(-50%, -50%) rotate(-45deg);
+    transform: rotate(-45deg) scaleX(0);
+    transform-origin: right center;
+    animation: strikethrough 0.3s ease-out forwards;
+  }
+
+  @keyframes strikethrough {
+    0% {
+      transform: rotate(-45deg) scaleX(0);
+    }
+    100% {
+      transform: rotate(-45deg) scaleX(1);
+    }
   }
 
   .product-form__option .product-form__label {
@@ -895,15 +904,19 @@
 
   @media (max-width: 991px) {
     .product-main__container {
-      grid-template-columns: 1fr;
-      gap: 30px;
+      display: flex;
+      flex-direction: column;
     }
 
     .product-gallery__thumbs {
       flex-direction: row;
       overflow-x: auto;
       max-height: none;
-      max-width: 357px;
+    }
+
+    .product-main__gallery {
+      position: relative;
+      width: 100%;
     }
 
     .product-main__gallery:hover .product-gallery__thumbs {
@@ -931,15 +944,6 @@
   }
 
   @media (max-width: 576px) {
-    .product-main {
-      padding: 20px 0;
-    }
-
-    .product-main__container {
-      padding: 0 15px;
-      gap: 20px;
-    }
-
     .product-form__option .product-form__label {
       font-size: 11px;
     }
@@ -1051,10 +1055,10 @@
       this.imageWrapper = imageWrapperSelector;
       this.currentIndex = 0;
       this.init();
-      this.onVariantChange('variantChange');
     }
-
+    
     init() {
+      this.onVariantChange('product-variant:changed');
       this.thumbs.forEach((thumb, index) => {
         thumb.addEventListener('click', () => this.onThumbClick(index));
       });
@@ -1126,94 +1130,144 @@
   }
 
   class VariantSelector {
-    constructor(variantOptionsWrapper) {
-      this.wrapper = variantOptionsWrapper;
-      this.options = this.wrapper.querySelectorAll('figure');
+    constructor(wrapper) {
+      // Variant selector properties
+      this.wrapper = wrapper;
+      this.options = this.wrapper.querySelectorAll('img');
       this.priceSale = document.querySelector('.product-price__sale');
       this.priceCompare = document.querySelector('.product-price__compare');
       this.priceOff = document.querySelector('.product-price__off');
-      this.productDetails = null;
-      this.variantSelected = null;
+      this.product = null;
+      this.variant = null;
+      
+      // Availability management properties
+      this.optionGroups = [];
+      this.variantMatrix = {};
+      this.currentSelection = [];
+      
       this.init();
     }
 
     async init() {
+      // Initialize product data
+      await this.setProduct()
+
+      // Initialize variant selector
+      this.setVariant();
+
+      // Initialize availability management
+      this.initAvailabilityManager();
+
+      this.options.forEach((option) => {
+        option.addEventListener('click', () => this.onOptionClick(option));
+      });
+    }
+
+    /**
+     * Availability Management Methods
+     */
+    
+    initAvailabilityManager() {
+      this.buildOptionGroups();
+      this.buildVariantMatrix();
+      this.setInitialSelection();
+      this.updateAllOptionsAvailability();
+    }
+    
+    // Build option groups structure
+    buildOptionGroups() {
+      const groups = this.wrapper.querySelectorAll('.product-form__option-group');
+      
+      groups.forEach((group, groupIndex) => {
+        const options = group.querySelectorAll('.product-option__image, .product-option__label');
+        const optionValues = [];
+        
+        options.forEach(option => {
+          optionValues.push({
+            element: option,
+            value: option.dataset.optionName,
+            container: option.closest('.product-form__option')
+          });
+        });
+        
+        this.optionGroups.push({
+          index: groupIndex,
+          element: group,
+          options: optionValues
+        });
+      });
+    }
+    
+    // Build variant lookup matrix
+    buildVariantMatrix() {
+      if (!this.product?.variants) return;
+      
+      this.product.variants.forEach(variant => {
+        const key = variant.options.join('_').toLowerCase().replace(/\s+/g, '-');
+        this.variantMatrix[key] = {
+          available: variant.available
+        };
+      });
+    }
+    
+    // Set initial selection based on selected options
+    setInitialSelection() {
+      this.optionGroups.forEach((group, index) => {
+        const selectedOption = group.options.find(opt => 
+          opt.element.classList.contains('selected')
+        );
+        
+        this.currentSelection[index] = selectedOption ? selectedOption.value : null;
+      });
+    }
+    
+    // Update selection when option is clicked
+    updateAvailabilitySelection(groupIndex, optionValue) {
+      this.currentSelection[groupIndex] = optionValue;
+      this.updateAllOptionsAvailability();
+    }
+    
+    // Check if a combination of options has available variant
+    checkVariantAvailability(optionArray) {
+      const key = optionArray.join('_').toLowerCase().replace(/\s+/g, '-');
+      const variantData = this.variantMatrix[key];
+      return variantData && variantData.available;
+    }
+    
+    // Find variant by option combination
+    findVariantByOptions(optionArray) {
+      const key = optionArray.join('_').toLowerCase().replace(/\s+/g, '-');
+      const variantData = this.variantMatrix[key];
+      return variantData ? variantData.variant : null;
+    }
+    
+    // Main availability update logic
+    updateAllOptionsAvailability() {
+      this.optionGroups.forEach((group, groupIndex) => {
+        group.options.forEach(option => {
+          // Create test selection
+          const testSelection = [...this.currentSelection];
+          testSelection[groupIndex] = option.value;
+          
+          // Check availability
+          const isAvailable = this.checkVariantAvailability(testSelection);
+          
+          // Update UI
+          option.container.classList.toggle('unavailable', !isAvailable);
+        });
+      });
+    }
+    
+    /**
+     * Variant Selector Methods
+     */
+
+    // Fetch product data by handle
+    async getProduct(params) {
       const pathSegments = window.location.pathname.split('/');
-      const handleFromUrl = pathSegments[pathSegments.length - 1];
-      this.productDetails = await this.getProductByHandle(handleFromUrl);
+      const handle = pathSegments[pathSegments.length - 1];
+      if (!handle) return null;
 
-      this.options.forEach((option) => {
-        option.addEventListener('click', () => this.onOptionClick(option.children[0]));
-      });
-    }
-
-    async onOptionClick(option) {
-      this.toggleOptionSelection(option);
-      this.variantSelected = this.getVariantBySelectedOptions(this.getAllSelectedOptions());
-      console.log(this.getAllSelectedOptions());
-      if (this.variantSelected) {
-        this.setUrlParameter('variant', this.variantSelected.id);
-        this.dispatchVariantChangeEvent(this.variantSelected);
-        this.setPrice();
-        this.setOptionLabels();
-      }
-    }
-
-    toggleOptionSelection(option) {
-      const imageGroup = option.closest('.product-form__option-group').querySelectorAll('figure');
-      imageGroup.forEach((option) => option.children[0].classList.remove('selected'));
-      option.classList.add('selected');
-    }
-
-    setUrlParameter(param, value) {
-      const url = new URL(window.location);
-      url.searchParams.set(param, value);
-      window.history.replaceState({}, '', url);
-    }
-
-    setPrice() {
-      const variantPriceSale = this.variantSelected.price;
-      const variantPriceCompare = this.variantSelected.compare_at_price;
-      const offPercentage = this.priceOffPercentage(variantPriceCompare, variantPriceSale);
-      if (this.priceSale && this.priceCompare) {
-        this.priceSale.textContent = this.priceFormatter(variantPriceSale);
-        this.priceCompare.textContent = this.priceFormatter(variantPriceCompare);
-        if (offPercentage > 0) {
-          this.priceOff.textContent = `(${offPercentage}%) off`;
-          this.priceOff.style.display = 'inline';
-        } else {
-          this.priceOff.style.display = 'none';
-        }
-      }
-    }
-
-    setOptionLabels() {
-      this.wrapper.querySelectorAll('.product-form__label strong').forEach((label, index) => {
-        const selectedOption = this.getAllSelectedOptions()[index] || 'Select';
-        label.textContent = selectedOption;
-      });
-    }
-
-    getAllSelectedOptions() {
-      const selectedOptions = [];
-      this.options.forEach((option) => {
-        const optionElement = option.children[0];
-        if (optionElement.classList.contains('selected')) {
-          selectedOptions.push(optionElement.dataset.optionValue);
-        }
-      });
-      return selectedOptions;
-    }
-
-    getVariantBySelectedOptions(selectedOptions) {
-      if (!this.productDetails || !this.productDetails.variants) return null;
-
-      return this.productDetails.variants.find((variant) => {
-        return variant.options.every((option, index) => option === selectedOptions[index]);
-      }) || null;
-    }
-
-    async getProductByHandle(handle) {
       try {
         const response = await fetch(`${window.Shopify.routes.root}products/${handle}.js`);
         if (!response.ok) {
@@ -1232,11 +1286,105 @@
       }
     }
 
+    async setProduct() {
+      this.product = await this.getProduct();
+    }
+
+    // Get currently selected variant based on selected options
+    getVariant() {
+      const selectedOptions = [];
+      this.options.forEach((option) => {
+        if (option.classList.contains('selected')) {
+          selectedOptions.push(option.dataset.optionName);
+        }
+      });
+
+      if (!this.product || !this.product.variants) return null;
+
+      return this.product.variants.find((variant) => {
+        return variant.options.every((option, index) => option === selectedOptions[index]);
+      }) || null;
+    }
+
+    // Set the current variant
+    setVariant() {
+      this.variant = this.getVariant();
+    }
+
+    // Handle option click event
+    onOptionClick(option) {
+      if (option.closest('.product-form__option').classList.contains('unavailable')) {
+        return; // Do nothing if option is unavailable
+      }
+      this.setOptionsSelected(option);
+      
+      // Update availability management selection
+      const groupIndex = this.getOptionGroupIndex(option);
+      const optionValue = option.dataset.optionName;
+      this.updateAvailabilitySelection(groupIndex, optionValue);
+      
+      this.setVariant();
+      if (this.variant) {
+        this.setUrlParameter('variant', this.variant.id);
+        this.setPrice();
+        this.setOptionLabel();
+        this.dispatchVariantChangeEvent(this.variant);
+      }
+    }
+
+    // Get index of the option group
+    getOptionGroupIndex(option) {
+      const optionGroup = option.closest('.product-form__option-group');
+      const allGroups = this.wrapper.querySelectorAll('.product-form__option-group');
+      return Array.from(allGroups).indexOf(optionGroup);
+    }
+
+    // Set selected class on the chosen option
+    setOptionsSelected(option) {
+      const imageGroup = option.closest('.product-form__option-group').querySelectorAll('img, .product-option__label');
+      imageGroup.forEach((opt) => opt.classList.remove('selected'));
+      option.classList.add('selected');
+    }
+
+    // Update URL parameter without reloading the page
+    setUrlParameter(param, value) {
+      const url = new URL(window.location);
+      url.searchParams.set(param, value);
+      window.history.replaceState({}, '', url);
+    }
+
+    // Update price display based on selected variant
+    setPrice() {
+      const variantPriceSale = this.variant.price;
+      const variantPriceCompare = this.variant.compare_at_price;
+      const offPercentage = this.priceOffPercentage(variantPriceCompare, variantPriceSale);
+      if (this.priceSale && this.priceCompare) {
+        this.priceSale.textContent = this.priceFormatter(variantPriceSale);
+        this.priceCompare.textContent = this.priceFormatter(variantPriceCompare);
+        if (offPercentage > 0) {
+          this.priceOff.textContent = `(${offPercentage}%) off`;
+          this.priceOff.style.display = 'inline';
+        } else {
+          this.priceOff.style.display = 'none';
+        }
+      }
+    }
+
+    // Update option labels to show selected values
+    setOptionLabel() {
+      this.wrapper.querySelectorAll('.product-form__label strong').forEach((label, index) => {
+        const selectedOption = this.variant.options[index] || 'Select';
+        label.textContent = selectedOption;
+      });
+    }
+
+    // Calculate percentage off
     priceOffPercentage(originalCents, saleCents) {
       if (!originalCents || originalCents <= saleCents) return 0;
       return Math.round(((originalCents - saleCents) / originalCents) * 100);
     }
 
+    // Format price from cents to currency string
     priceFormatter(cents) {
       const dollars = cents / 100;
       return dollars.toLocaleString('en-US', {
@@ -1245,13 +1393,14 @@
       });
     }
 
+    // Dispatch custom event on variant change
     dispatchVariantChangeEvent(variant) {
-      const event = new CustomEvent('variantChange', { detail: variant });
+      const event = new CustomEvent('product-variant:changed', { detail: variant });
       document.dispatchEvent(event);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', async function () {
     // Image Gallery
     const thumbs = document.querySelectorAll('.product-gallery__thumb');
     const imageWrapper = document.querySelector('.product-gallery__images');
@@ -1262,16 +1411,6 @@
     const variantSelector = new VariantSelector(variantOptionsWrapper);
 
     // Quantity controls are now handled by the quantity-selector block
-
-    // Meta Tabs
-    const metaTabs = document.querySelectorAll('.meta-tab');
-    metaTabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        metaTabs.forEach((t) => t.classList.remove('active'));
-        tab.classList.add('active');
-        // You can add tab content switching logic here
-      });
-    });
   });
 {% endjavascript %}
 
