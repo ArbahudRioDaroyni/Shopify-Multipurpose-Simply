@@ -7,8 +7,6 @@
     "cart": "Cart",
     "collection": "Collection",
     "collections": "Collections",
-    "collection_card": "Collection card",
-    "collections_grid": "Collections grid",
     "colors": "Colors",
     "color_scheme_toggle": "Color scheme toggle",
     "column": "Column",
@@ -85,30 +83,29 @@
       "wide": "Wide"
     },
     "size": {
+      "compact": "Compact",
       "large": "Large",
       "small": "Small",
-      "compact": "Compact",
       "standard": "Standard"
     },
-    "text_style": {
-      "title": "Title",
-      "subtitle": "Subtitle",
-      "normal": "Normal text"
-    },
-    "button_style": {
-      "icon": "Icon",
-      "text": "Text"
-    },
     "icon": {
-      "none": "None",
       "arrow": "Arrow",
+      "none": "None",
       "caret": "Caret",
+      "close": "Close",
+      "global": "Global",
+      "heart": "Heart",
+      "mailbox": "Mailbox",
+      "map_point": "Map point",
+      "phone": "Phone",
       "search": "Search",
       "user": "User",
-      "close": "Close",
-      "menu": "Menu",
-      "heart": "Heart",
     }
+  },
+  "names": {
+    "icon": "Icon",
+    "text": "Text",
+    "group": "Group"
   },
   "settings": {
     "icon": "Icon",

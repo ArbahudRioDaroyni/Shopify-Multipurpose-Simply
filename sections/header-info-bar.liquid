@@ -3,59 +3,32 @@
   class="header-info-bar color-{{ section.settings.color_scheme }}"
 >
   <div class="header-info-bar__left">
-    {% if section.settings.show_phone and section.settings.phone != blank %}
-      <a href="tel:{{ section.settings.phone }}" class="header-info-bar__item header-info-bar__phone">
-        {% render 'icon-or-image', icon: 'phone', width: 14 %}
-        <span>{{ section.settings.phone }}</span>
-      </a>
-    {% endif %}
+    {% content_for 'block', type: 'group', id: 'phone-group' %}
 
-    {% if section.settings.show_email and section.settings.email != blank %}
-      <a href="mailto:{{ section.settings.email }}" class="header-info-bar__item header-info-bar__email">
-        {% render 'icon-or-image', icon: 'mailbox', width: 14 %}
-        <span>{{ section.settings.email }}</span>
-      </a>
-    {% endif %}
+    {% content_for 'block', type: 'group', id: 'email-group' %}
   </div>
 
-  <div class="header-info-bar__middle">
-    {% if section.settings.show_promo_text and section.settings.promo_text != blank %}
-      <div class="header-info-bar__item header-info-bar__promo">
-        <span>{{ section.settings.promo_text }}</span>
-        {% if section.settings.promo_link != blank %}
-          <a href="{{ section.settings.promo_link }}" class="header-info-bar__promo-link">
-            {{ section.settings.promo_link_text }}
-          </a>
-        {% endif %}
-      </div>
-    {% endif %}
+  <div class="header-info-bar__middle slide-text-container">
+    {% content_for 'block', type: 'group', id: 'promotion-group' %}
   </div>
 
   <div class="header-info-bar__right">
-    {% if section.settings.show_location and section.settings.location_text != blank %}
-      <div class="header-info-bar__item header-info-bar__location">
-        {% render 'icon-or-image', icon: 'map-point', width: 14 %}
-        <span>{{ section.settings.location_text }}</span>
-      </div>
-    {% endif %}
+    {% content_for 'block', type: 'group', id: 'map-point-group' %}
 
-    {% comment %} {% if section.settings.show_currency_selector %}
-      {% form 'localization', class: 'header-info-bar__item header-info-bar__currency' %}
-        <svg class="header-info-bar__icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2.4 2.4H13.6L12.8 3.2H3.2L2.4 2.4Z" fill="currentColor"/>
-          <path d="M0.8 5.6H15.2L14.4 6.4H1.6L0.8 5.6Z" fill="currentColor"/>
-          <path d="M0 8.8H16L15.2 9.6H0.8L0 8.8Z" fill="currentColor"/>
-          <path d="M0.8 12H15.2L14.4 12.8H1.6L0.8 12Z" fill="currentColor"/>
-        </svg>
-        <select name="country_code" class="header-info-bar__select" onchange="this.form.submit()">
-          {% for currency in localization.available_currencies %}
-            <option value="{{ currency.iso_code }}" {% if currency.iso_code == localization.currency.iso_code %}selected{% endif %}>
-              {{ currency.iso_code }} {{ currency.symbol }}
+    {% if section.settings.show_currency_selector %}
+      {% form 'currency', class: 'header-info-bar__item header-info-bar__currency' %}
+        <select name="currency_code" class="header-info-bar__select" onchange="this.form.submit()">
+          {% for currency_option in shop.enabled_currencies %}
+            <option value="{{ currency_option.iso_code }}" {% if currency_option.iso_code == shop.currency %}selected{% endif %}>
+              {{ currency_option.iso_code }}
             </option>
           {% endfor %}
         </select>
+        <svg class="header-info-bar__chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       {% endform %}
-    {% endif %} {% endcomment %}
+    {% endif %}
 
     {% if section.settings.show_language_selector %}
       {% form 'localization', class: 'header-info-bar__item header-info-bar__language' %}
@@ -79,8 +52,8 @@
   .header-info-bar {
     background-color: var(--color-background);
     color: var(--color-text);
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     padding: 1rem 2rem;
     font-size: 0.75rem;
@@ -91,11 +64,56 @@
     height: 14px;
   }
 
-  .header-info-bar__left,
+  .header-info-bar__left {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    justify-self: start;
+  }
+
+  .header-info-bar__middle {
+    justify-self: center;
+  }
+
+  /* Slide text animation styles */
+  .slide-text-container {
+    position: relative;
+    height: 1.125rem;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 300px;
+  }
+
+  .slide-text-container .shopify-block .shopify-block {
+    position: absolute;
+    opacity: 0;
+    filter: blur(10px);
+    transition: all 0.3s ease-in-out;
+  }
+
+  .slide-text-container .shopify-block .shopify-block.active {
+    position: relative;
+    opacity: 1;
+    filter: blur(0px);
+  }
+
+  .slide-text-container .shopify-block .shopify-block.slide-out {
+    opacity: 0;
+    filter: blur(15px);
+  }
+
+  .slide-text-container .shopify-block .shopify-block.slide-in {
+    opacity: 0;
+    filter: blur(10px);
+  }
+
   .header-info-bar__right {
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    justify-self: end;
   }
 
   .header-info-bar__item {
@@ -190,17 +208,24 @@
 
   @media (max-width: 768px) {
     .header-info-bar {
-      flex-direction: column;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
       padding: 0.75rem 1rem;
       gap: 0.75rem;
+      text-align: center;
+    }
+
+    .header-info-bar__left,
+    .header-info-bar__middle,
+    .header-info-bar__right {
+      justify-self: center;
     }
 
     .header-info-bar__left,
     .header-info-bar__right {
-      width: 100%;
-      justify-content: center;
       gap: 0.75rem;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .header-info-bar__promo {
@@ -235,41 +260,91 @@
   }
 {% endstylesheet %}
 
+{% javascript %}
+  class SlideTextAnimation {
+    constructor(container) {
+      this.container = container;
+      this.blocks = container.querySelectorAll('.shopify-block .shopify-block');
+      this.currentIndex = 0;
+      this.interval = 3000;
+      this.timer = null;
+      
+      if (this.blocks.length > 1) {
+        this.init();
+      }
+    }
+    
+    init() {
+      this.blocks.forEach((block, index) => {
+        block.classList.toggle('active', index === 0);
+      });
+      this.start();
+      this.addEventListeners();
+    }
+    
+    slideNext() {
+      const current = this.blocks[this.currentIndex];
+      
+      this.currentIndex++;
+      if (this.currentIndex >= this.blocks.length) {
+        this.currentIndex = 0;
+      }
+      
+      const next = this.blocks[this.currentIndex];
+      
+      current.classList.replace('active', 'slide-out');
+      
+      requestAnimationFrame(() => {
+        current.classList.remove('slide-out');
+        next.classList.add('slide-in');
+        
+        requestAnimationFrame(() => {
+          next.classList.replace('slide-in', 'active');
+        });
+      });
+      
+      console.log('Sliding to index:', this.currentIndex);
+    }
+    
+    start() {
+      this.timer = setInterval(() => this.slideNext(), this.interval);
+    }
+    
+    stop() {
+      clearInterval(this.timer);
+    }
+    
+    addEventListeners() {
+      this.container.addEventListener('mouseenter', () => this.stop());
+      this.container.addEventListener('mouseleave', () => this.start());
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const slideContainer = document.querySelector('.slide-text-container');
+    if (slideContainer) {
+      new SlideTextAnimation(slideContainer);
+    }
+  });
+{% endjavascript %}
+
 {% schema %}
 {
   "name": "t:sections.header_info_bar.title",
+  "enabled_on": {
+    "groups": ["header"]
+  },
   "settings": [
     {
       "type": "header",
       "content": "t:sections.header_info_bar.settings.header.general"
     },
     {
-      "type": "header",
-      "content": "t:sections.header_info_bar.settings.header.contact"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_phone",
-      "label": "t:sections.header_info_bar.settings.show_phone",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "phone",
-      "label": "t:sections.header_info_bar.settings.phone",
-      "default": "+0123456789"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_email",
-      "label": "t:sections.header_info_bar.settings.show_email",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "email",
-      "label": "t:sections.header_info_bar.settings.email",
-      "default": "kolles@domain.com"
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "t:sections.header_info_bar.settings.color_scheme",
+      "default": "scheme-3",
+      "info": "t:sections.header_info_bar.settings.color_scheme_info"
     },
     {
       "type": "header",
@@ -300,22 +375,6 @@
     },
     {
       "type": "header",
-      "content": "t:sections.header_info_bar.settings.header.location"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_location",
-      "label": "t:sections.header_info_bar.settings.show_location",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "location_text",
-      "label": "t:sections.header_info_bar.settings.location_text",
-      "default": "Location"
-    },
-    {
-      "type": "header",
       "content": "t:sections.header_info_bar.settings.header.selectors"
     },
     {
@@ -330,18 +389,147 @@
       "label": "t:sections.header_info_bar.settings.show_language_selector",
       "default": true
     },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme",
-      "label": "t:sections.header_info_bar.settings.color_scheme",
-      "default": "scheme-3",
-      "info": "t:sections.header_info_bar.settings.color_scheme_info"
-    }
   ],
   "presets": [
     {
       "name": "t:sections.header_info_bar.title",
-      "category": "Header"
+      "blocks": [
+        {
+          "name": "Phone Group",
+          "type": "group",
+          "static": true,
+          "id": "phone-group",
+          "settings": {
+            "tag": "a",
+            "class": "header-info-bar__item",
+            "layout_direction": "group--horizontal",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0,
+            "url": "tel:+1234567890"
+          },
+          "blocks": [
+            {
+              "type": "icon",
+              "settings": {
+                "icon": "phone",
+                "width": 14
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "+1 (234) 567-890",
+                "tag": "span",
+              }
+            }
+          ]
+        },
+        {
+          "name": "Email Group",
+          "type": "group",
+          "static": true,
+          "id": "email-group",
+          "settings": {
+            "tag": "a",
+            "class": "header-info-bar__item",
+            "layout_direction": "group--horizontal",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0,
+            "url": "mailto:arbahudriodaroyni@gmail.com"
+          },
+          "blocks": [
+            {
+              "type": "icon",
+              "settings": {
+                "icon": "mailbox",
+                "width": 14
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "coffee@domain.com",
+                "tag": "span"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Promotion Group",
+          "type": "group",
+          "static": true,
+          "id": "promotion-group",
+          "settings": {
+            "tag": "div",
+            "class": "header-info-bar__item",
+            "layout_direction": "group--horizontal",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": [
+            {
+              "type": "text",
+              "settings": {
+                "text": "Summer sale discount off 50%!",
+                "tag": "a",
+                "url": "/collections/all",
+                "class": "header-info-bar__promo-link active"
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "Shop Now",
+                "tag": "a",
+                "url": "/collections/all",
+                "class": "header-info-bar__promo-link"
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "Black Friday Deals!",
+                "tag": "a",
+                "url": "/collections/all",
+                "class": "header-info-bar__promo-link"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Location Group",
+          "type": "group",
+          "static": true,
+          "id": "map-point-group",
+          "settings": {
+            "tag": "div",
+            "class": "header-info-bar__item",
+            "layout_direction": "group--horizontal",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": [
+            {
+              "type": "icon",
+              "settings": {
+                "icon": "map_point",
+                "width": 14
+              }
+            },
+            {
+              "type": "text",
+              "settings": {
+                "text": "Location",
+                "tag": "span"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

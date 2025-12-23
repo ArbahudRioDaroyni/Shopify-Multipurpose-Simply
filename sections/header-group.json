@@ -85,8 +85,246 @@
         "color_scheme": ""
       }
     },
-    "header-info-bar": {
+    "header_info_bar": {
       "type": "header-info-bar",
+      "name": "t:sections.header_info_bar.title",
+      "blocks": {
+        "phone-group": {
+          "name": "Phone Group",
+          "type": "group",
+          "static": true,
+          "settings": {
+            "tag": "a",
+            "url": "tel:+1234567890",
+            "layout_direction": "group--horizontal",
+            "alignment": "flex-start",
+            "class": "header-info-bar__item",
+            "attributes": "",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": {
+            "icon_myiXA8": {
+              "type": "icon",
+              "settings": {
+                "icon": "phone",
+                "width": 14,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "text_a7dYfK": {
+              "type": "text",
+              "settings": {
+                "text": "+1 (234) 567-890",
+                "tag": "span",
+                "class": "",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "icon_myiXA8",
+            "text_a7dYfK"
+          ]
+        },
+        "email-group": {
+          "name": "Email Group",
+          "type": "group",
+          "static": true,
+          "settings": {
+            "tag": "a",
+            "url": "mailto:arbahudriodaroyni@gmail.com",
+            "layout_direction": "group--horizontal",
+            "alignment": "flex-start",
+            "class": "header-info-bar__item",
+            "attributes": "",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": {
+            "icon_PAMWwC": {
+              "type": "icon",
+              "settings": {
+                "icon": "mailbox",
+                "width": 14,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "text_PnpWPP": {
+              "type": "text",
+              "settings": {
+                "text": "coffee@domain.com",
+                "tag": "span",
+                "class": "",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "icon_PAMWwC",
+            "text_PnpWPP"
+          ]
+        },
+        "promotion-group": {
+          "name": "Promotion Group",
+          "type": "group",
+          "static": true,
+          "settings": {
+            "tag": "div",
+            "url": "",
+            "layout_direction": "group--vertical",
+            "alignment": "center",
+            "class": "",
+            "attributes": "",
+            "gap": 0,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": {
+            "text_kD96er": {
+              "type": "text",
+              "settings": {
+                "text": "Summer sale discount off 50%!",
+                "tag": "a",
+                "url": "/collections/all",
+                "class": "header-info-bar__promo-link active",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+            },
+            "text_k436er": {
+              "type": "text",
+              "settings": {
+                "text": "Shop Now",
+                "tag": "a",
+                "url": "/collections/all",
+                "class": "header-info-bar__promo-link",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+            },
+            "text_k46er": {
+              "type": "text",
+              "settings": {
+                "text": "Black Friday Deals!",
+                "tag": "a",
+                "url": "/collections/all",
+                "class": "header-info-bar__promo-link",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+            }
+          },
+          "block_order": [
+            "text_kD96er",
+            "text_k436er",
+            "text_k46er"
+          ]
+        },
+        "map-point-group": {
+          "name": "Location Group",
+          "type": "group",
+          "static": true,
+          "settings": {
+            "tag": "a",
+            "url": "",
+            "layout_direction": "group--horizontal",
+            "alignment": "flex-start",
+            "class": "",
+            "attributes": "",
+            "gap": 8,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": {
+            "icon_979kXL": {
+              "type": "icon",
+              "settings": {
+                "icon": "map_point",
+                "width": 14,
+                "link": "",
+                "open_in_new_tab": false
+              },
+              "blocks": {}
+            },
+            "text_kR9Mer": {
+              "type": "text",
+              "settings": {
+                "text": "Location",
+                "tag": "span",
+                "class": "",
+                "attributes": "",
+                "font_size": 12,
+                "font_weight": "400",
+                "line_height": 1.5,
+                "alignment": "left",
+                "color": "",
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {}
+            }
+          },
+          "block_order": [
+            "icon_979kXL",
+            "text_kR9Mer"
+          ]
+        }
+      },
+      "settings": {
+        "show_phone": true,
+        "show_email": true,
+        "email": "kolles@domain.com",
+        "show_promo_text": true,
+        "promo_text": "Summer sale discount off 50%!",
+        "promo_link": "",
+        "promo_link_text": "Shop Now",
+        "show_location": true,
+        "location_text": "Location",
+        "show_currency_selector": true,
+        "show_language_selector": true,
+        "color_scheme": ""
+      }
     },
     "header": {
       "type": "header",
@@ -102,7 +340,7 @@
   },
   "order": [
     "announcement-bar",
-    "header-info-bar",
+    "header_info_bar",
     "header",
     "header-breadcrumbs"
   ],
