@@ -1,42 +1,5 @@
 {% doc %}
   Renders a slide-over panel that slides in from the right side of the screen.
-  
-  @param {string} [id] - Unique identifier for the slide-over
-  @param {string} [size] - Size of the slide-over: 'sm', 'md', 'lg', 'xl', 'half', 'full' (default: 'md')
-  @param {string} [position] - Position of the slide-over: 'left', 'right', 'top', 'bottom' (default: 'right')
-  @param {string} [title] - Title displayed in the header
-  @param {string} [description] - Description displayed under the title
-  @param {boolean} [show_close] - Whether to show the close button (default: true)
-  @param {string} [content] - HTML content to display in the body
-
-  @example
-  {% render 'slide-over', 
-    id: 'my-slideover',
-    title: 'Product Information',
-    description: 'View detailed product specifications',
-    size: 'lg',
-    position: 'right',
-    content: '<div>Product details here...</div>'
-  %}
-
-  @example
-  Right sidebar (default)
-  {% render 'slide-over', id: 'product-details', position: 'right' %}
-
-  Left filter panel
-  {% render 'slide-over', id: 'filters', position: 'left', size: 'md' %}
-
-  Top notification bar
-  {% render 'slide-over', id: 'notifications', position: 'top', size: 'sm' %}
-
-  Bottom sheet
-  {% render 'slide-over', id: 'actions', position: 'bottom', size: 'lg' %}
-
-  @example
-  Trigger from Button
-  <button data-slide-over-target="my-slideover">
-    Open Slide Over
-  </button>
 
   @description
   JavaScript API:
@@ -73,6 +36,41 @@
   slideOver.dispatchEvent(new CustomEvent('slide-over:open'));
   slideOver.dispatchEvent(new CustomEvent('slide-over:close'));
   slideOver.dispatchEvent(new CustomEvent('slide-over:toggle'));
+  
+  @param {string} [id] - Unique identifier for the slide-over
+  @param {string} [size] - Size of the slide-over: 'sm', 'md', 'lg', 'xl', 'half', 'full' (default: 'md')
+  @param {string} [position] - Position of the slide-over: 'left', 'right', 'top', 'bottom' (default: 'right')
+  @param {string} [title] - Title displayed in the header
+  @param {string} [description] - Description displayed under the title
+  @param {boolean} [show_close] - Whether to show the close button (default: true)
+  @param {string} [content] - HTML content to display in the body
+
+  @example
+  {% render 'slide-over', 
+    id: 'my-slideover',
+    title: 'Product Information',
+    description: 'View detailed product specifications',
+    size: 'lg',
+    position: 'right',
+    content: '<div>Product details here...</div>'
+  %}
+
+  Right sidebar (default)
+  {% render 'slide-over', id: 'product-details', position: 'right' %}
+
+  Left filter panel
+  {% render 'slide-over', id: 'filters', position: 'left', size: 'md' %}
+
+  Top notification bar
+  {% render 'slide-over', id: 'notifications', position: 'top', size: 'sm' %}
+
+  Bottom sheet
+  {% render 'slide-over', id: 'actions', position: 'bottom', size: 'lg' %}
+
+  Trigger from Button
+  <button data-slide-over-target="my-slideover">
+    Open Slide Over
+  </button>
 {% enddoc %}
 
 {% liquid

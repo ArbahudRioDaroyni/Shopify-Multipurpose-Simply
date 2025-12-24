@@ -28,11 +28,7 @@
       {% if cart.item_count > 0 %}
         <form action="{{ routes.cart_url }}" method="post" class="cart-form" novalidate>
           <!-- Cart Items List -->
-          <div class="cart-items">
-            {% for item in cart.items %}
-              {% render 'cart-item', item: item, index: forloop.index0 %}
-            {% endfor %}
-          </div>
+          {% render 'cart-item', products: cart.items %}
 
           <!-- Cart Note -->
           {% if section.settings.enable_cart_notes %}
@@ -135,12 +131,6 @@
 </div>
 
 {% stylesheet %}
-  .cart-page {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-
   .cart-header {
     padding: 40px 0;
     border-bottom: 1px solid #f0f0f0;
@@ -180,12 +170,6 @@
 
   .cart-content {
     min-height: 400px;
-  }
-
-  .cart-items {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
   }
 
   .cart-notes {
@@ -388,10 +372,6 @@
   }
 
   @media (max-width: 768px) {
-    .cart-page {
-      padding: 0 15px;
-    }
-
     .cart-header {
       padding: 20px 0;
     }

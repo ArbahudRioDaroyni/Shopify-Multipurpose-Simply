@@ -1,105 +1,114 @@
 {% doc %}
   Renders a single cart item with image, details, quantity controls, and remove button.
 
-  @param {object} item - The cart line item object
-  @param {number} [index] - The item index for form inputs
+  @param {product[]} products - Array of cart products to display in the cart items
 
   @example
-  {% render 'cart-item', item: item, index: forloop.index0 %}
+  {% render 'cart-item', products: products %}
 {% enddoc %}
 
-<div class="cart-item" data-variant-id="{{ item.variant.id }}">
-  <div class="cart-item__image">
-    {% if item.image %}
-      {% render 'image',
-        image: item.image,
-        url: item.product.url,
-        width: 120,
-        height: 120,
-        class: 'cart-item__img'
-      %}
-    {% else %}
-      <div class="cart-item__placeholder">
-        {{ 'image' | placeholder_svg_tag }}
+<div class="cart-items">
+  {% for product in products %}
+    <div class="cart-item" data-variant-id="{{ product.variant.id }}">
+      <div class="cart-item__image">
+        {% if product.image %}
+          {% render 'image',
+            image: product.image,
+            url: product.product.url,
+            width: 120,
+            height: 120,
+            class: 'cart-item__img'
+          %}
+        {% else %}
+          <div class="cart-item__placeholder">
+            {{ 'image' | placeholder_svg_tag }}
+          </div>
+        {% endif %}
       </div>
-    {% endif %}
-  </div>
 
-  <div class="cart-item__details">
-    <div class="cart-item__info">
-      <h3 class="cart-item__title">
-        <a href="{{ item.product.url }}">{{ item.product.title }}</a>
-      </h3>
-      {% if item.variant.title != 'Default Title' %}
-        <p class="cart-item__variant">{{ item.variant.title }}</p>
-      {% endif %}
-      {% if item.selling_plan_allocation %}
-        <p class="cart-item__subscription">
-          {{ item.selling_plan_allocation.selling_plan.name }}
-        </p>
-      {% endif %}
-      {% if item.properties.size > 0 %}
-        <div class="cart-item__properties">
-          {% for property in item.properties %}
-            {% unless property.last == blank %}
-              <div class="cart-item__property">
-                <span class="property-name">{{ property.first }}:</span>
-                <span class="property-value">{{ property.last }}</span>
-              </div>
-            {% endunless %}
-          {% endfor %}
+      <div class="cart-item__details">
+        <div class="cart-item__info">
+          <h3 class="cart-item__title">
+            <a href="{{ product.product.url }}">{{ product.product.title }}</a>
+          </h3>
+          {% if product.variant.title != 'Default Title' %}
+            <p class="cart-item__variant">{{ product.variant.title }}</p>
+          {% endif %}
+          {% if product.selling_plan_allocation %}
+            <p class="cart-item__subscription">
+              {{ product.selling_plan_allocation.selling_plan.name }}
+            </p>
+          {% endif %}
+          {% if product.properties.size > 0 %}
+            <div class="cart-item__properties">
+              {% for property in product.properties %}
+                {% unless property.last == blank %}
+                  <div class="cart-item__property">
+                    <span class="property-name">{{ property.first }}:</span>
+                    <span class="property-value">{{ property.last }}</span>
+                  </div>
+                {% endunless %}
+              {% endfor %}
+            </div>
+          {% endif %}
         </div>
-      {% endif %}
+
+        <div class="cart-item__pricing">
+          {% if product.original_price != product.final_price %}
+            <div class="cart-item__price-wrapper">
+              <span class="cart-item__price cart-item__price--sale">{{ product.final_price | money }}</span>
+              <span class="cart-item__price cart-item__price--original">{{ product.original_price | money }}</span>
+            </div>
+          {% else %}
+            <span class="cart-item__price">{{ product.original_price | money }}</span>
+          {% endif %}
+          {% if product.unit_price_measurement %}
+            <div class="cart-item__unit-price">
+              {{ product.unit_price | money }}/{{ product.unit_price_measurement.reference_unit }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="cart-item__quantity">
+        {% render 'quantity-selector', 
+          style_variant: 'compact',
+          input_name: 'updates[]',
+          initial_value: product.quantity,
+          min_value: 0,
+          max_value: 999,
+          show_total: true,
+          price: product.final_price,
+          unique_id: product.key
+        %}
+      </div>
+
+      <div class="cart-item__actions">
+        <button type="button" class="cart-item__remove" aria-label="{{ 'cart.remove' | t }}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3,6 5,6 21,6"></polyline>
+            <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
+            <line x1="10" y1="11" x2="10" y2="17"></line>
+            <line x1="14" y1="11" x2="14" y2="17"></line>
+          </svg>
+          <span hidden>{{ 'cart.remove' | t }}</span>
+        </button>
+      </div>
     </div>
-
-    <div class="cart-item__pricing">
-      {% if item.original_price != item.final_price %}
-        <div class="cart-item__price-wrapper">
-          <span class="cart-item__price cart-item__price--sale">{{ item.final_price | money }}</span>
-          <span class="cart-item__price cart-item__price--original">{{ item.original_price | money }}</span>
-        </div>
-      {% else %}
-        <span class="cart-item__price">{{ item.original_price | money }}</span>
-      {% endif %}
-      {% if item.unit_price_measurement %}
-        <div class="cart-item__unit-price">
-          {{ item.unit_price | money }}/{{ item.unit_price_measurement.reference_unit }}
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <div class="cart-item__quantity">
-    {% render 'quantity-selector', 
-      style_variant: 'compact',
-      input_name: 'updates[]',
-      initial_value: item.quantity,
-      min_value: 0,
-      max_value: 999,
-      show_total: true,
-      price: item.final_price,
-      unique_id: item.key
-    %}
-  </div>
-
-  <div class="cart-item__actions">
-    <button type="button" class="cart-item__remove" data-remove-item="{{ index | default: item.index }}">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="3,6 5,6 21,6"></polyline>
-        <path d="m19,6v14a2,2 0 0,1 -2,2H7a2,2 0 0,1 -2,-2V6m3,0V4a2,2 0 0,1 2,-2h4a2,2 0 0,1 2,2v2"></path>
-        <line x1="10" y1="11" x2="10" y2="17"></line>
-        <line x1="14" y1="11" x2="14" y2="17"></line>
-      </svg>
-      <span class="visually-hidden">{{ 'cart.remove' | t }}</span>
-    </button>
-  </div>
+  {% endfor %}
 </div>
 
 {% stylesheet %}
+  .cart-items {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
   .cart-item {
     display: grid;
-    grid-template-columns: 120px 1fr auto auto;
-    gap: 20px;
+    grid-template-columns: auto 1fr auto auto;
+    gap: 1.5rem;
     padding: 24px;
     background: #ffffff;
     border: 1px solid #f0f0f0;
@@ -246,17 +255,6 @@
     background: #f8d7da;
   }
 
-  .visually-hidden {
-    position: absolute !important;
-    width: 1px !important;
-    height: 1px !important;
-    padding: 0 !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    clip: rect(0, 0, 0, 0) !important;
-    border: 0 !important;
-  }
-
   /* Mobile responsive */
   @media (max-width: 768px) {
     .cart-item {
@@ -307,3 +305,104 @@
     }
   }
 {% endstylesheet %}
+
+{% javascript %}
+  class CartItem {
+    constructor(element) {
+      this.debug = true;
+      this.element = element;
+      this.debounceTimeout = null;
+      this.init();
+    }
+
+    init() {
+      this._removeButton();
+      this._quantityInputs();
+    }
+
+    // Handle remove item buttons
+    _removeButton() {
+      const button = this.element.querySelector('.cart-item__remove');
+      if (button) {
+        button.addEventListener('click', (e) => {
+          if (this.debug) console.log('Removing item from cart');
+          e.preventDefault();
+          const id = this.element.getAttribute('data-variant-id');
+          this._debounceCartChange(id, 0);
+        });
+      }
+    }
+
+    _quantityInputs() {
+      const quantityInputs = this.element.querySelectorAll('.quantity-selector input');
+      quantityInputs.forEach(input => {
+        input.addEventListener('change', () => {
+          if (this.debug) console.log('Updating item quantity:', input.value);
+          const id = this.element.getAttribute('data-variant-id');
+          this._debounceCartChange(id, parseInt(input.value, 10));
+        });
+      });
+    }
+
+    async _cartChange(keyOrId, quantity) {
+      try {
+        const response = await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id: keyOrId,
+            quantity: quantity
+          })
+        });
+
+        if (response.ok) {
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+        }
+      } catch (error) {
+        if (this.debug) console.error('Error removing item:', error);
+      }
+    }
+
+    _debounceCartChange(keyOrId, quantity) {
+      clearTimeout(this.debounceTimeout);
+      this.debounceTimeout = setTimeout(() => {
+        this._cartChange(keyOrId, quantity);
+      }, 500);
+    }
+
+    async updateCart() {
+      const formData = new FormData();
+      
+      const quantityInputs = this.element.querySelectorAll('.quantity-selector input');
+      quantityInputs.forEach((input, index) => {
+        formData.append(`updates[${index}]`, input.value);
+      });
+
+      try {
+        const response = await fetch('/cart/update.js', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (response.ok) {
+          document.dispatchEvent(new CustomEvent('cart:updated'));
+        }
+      } catch (error) {
+        console.error('Error updating cart:', error);
+      }
+    }
+  }
+
+  window.theme = window.theme || {};
+  window.theme.CartItem = CartItem;
+
+  // Initialize CartItem for each cart item element
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartItems = document.querySelectorAll('.cart-item');
+    cartItems.forEach(cartItem => {
+      new window.theme.CartItem(cartItem);
+    });
+  });
+{% endjavascript %}

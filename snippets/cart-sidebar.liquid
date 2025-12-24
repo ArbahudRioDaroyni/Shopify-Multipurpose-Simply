@@ -12,9 +12,10 @@
 <div class="cart-sidebar-content" data-cart-sidebar>
   {% if cart.item_count > 0 %}
     <!-- Cart Items -->
-    <div class="cart-drawer-items">
-      {% for item in cart.items %}
-        <div class="cart-drawer-item" data-cart-item="{{ item.key }}">
+    {% render 'cart-item', products: cart.items %}
+    {% comment %} <div class="cart-drawer-items"> {% endcomment %}
+      {% comment %} {% for product in cart.items %}
+        <div class="cart-drawer-item" data-cart-item="{{ product.key }}">
           <div class="cart-item__image">
             {% if item.image %}
               <img src="{{ item.image | image_url: width: 100 }}" alt="{{ item.title }}" width="100" height="100" loading="lazy">
@@ -62,8 +63,8 @@
             </div>
           </div>
         </div>
-      {% endfor %}
-    </div>
+      {% endfor %} {% endcomment %}
+    {% comment %} </div> {% endcomment %}
 
     <!-- Cart Summary -->
     <div class="cart-drawer-summary">
@@ -425,7 +426,7 @@
   }
 {% endstylesheet %}
 
-{% javascript %}
+{% comment %} {% javascript %}
   class CartSidebar {
     constructor(element) {
       this.element = element;
@@ -437,6 +438,8 @@
       const removeButtons = this.element.querySelectorAll('[data-remove-item]');
       removeButtons.forEach(button => {
         button.addEventListener('click', (e) => {
+          console.log('Remove item clicked');
+          e.preventDefault();
           const itemKey = button.getAttribute('data-remove-item');
           this.removeItem(itemKey);
         });
@@ -539,4 +542,4 @@
       });
     }, 100);
   });
-{% endjavascript %}
+{% endjavascript %} {% endcomment %}

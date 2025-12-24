@@ -1,0 +1,204 @@
+{% doc %}
+  Critical JavaScript to be loaded inline including reusable window class.
+{% enddoc %}
+
+{% javascript %}
+  // Critical JavaScript to be loaded inline
+  console.log('Critical JavaScript loaded');
+
+  /**
+   * Reusable Loading class for managing loading states
+   * @class Loading
+   * @example
+   * // Basic convenience methods
+   * window.loadingManager.show();
+   * window.loadingManager.hide();
+   * 
+   * // Advanced usage with custom selectors and options
+   * window.loadingManager.loading(true, '#parent', '#child');
+   * window.loadingManager.loading(false, '#parent', '#child');
+   * 
+   * // Custom loading with options
+   * window.loadingManager.loading(true, '.parent', '.child', {
+   *   class: 'custom-loader',
+   *   html: '<div class="custom-spinner"></div>',
+   *   opacity: 0.3
+   * });
+   * 
+   * // Clear all active loaders
+   * window.loadingManager.clearAll();
+   */
+  class Loading {
+    constructor() {
+      this.activeLoaders = new Map();
+      this.initStyles();
+    }
+
+    /**
+     * Initialize default styles for loading spinner
+     * Creates CSS for .loading and .loading__spinner classes
+     */
+    initStyles() {
+      if (!document.querySelector('#loading-styles')) {
+        const style = document.createElement('style');
+        style.id = 'loading-styles';
+        style.textContent = `
+          .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+          }
+          
+          .loading__spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #333;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+          }
+          
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+    }
+
+    /**
+     * Main loading method to show/hide loading states
+     * @param {boolean} show - Whether to show (true) or hide (false) loading
+     * @param {string} parentSelector - CSS selector for parent element to append loader
+     * @param {string} childSelector - CSS selector for child element to apply loading state
+     * @param {Object} options - Additional configuration options
+     * @param {string} options.class - Custom loader class name (default: 'loading')
+     * @param {string} options.html - Custom spinner HTML (default: '<div class="loading__spinner"></div>')
+     * @param {number} options.opacity - Opacity level for loading state (default: 0.5)
+     */
+    loading(show, parentSelector, childSelector, options = {}) {
+      const defaults = {
+        class: 'loading',
+        html: '<div class="loading__spinner"></div>',
+        opacity: 0.5
+      };
+      
+      const config = { ...defaults, ...options };
+      const loaderId = `${parentSelector}-${childSelector}`;
+
+      if (show) {
+        this._show(parentSelector, childSelector, config, loaderId);
+      } else {
+        this._hide(parentSelector, childSelector, loaderId);
+      }
+    }
+
+    /**
+     * Internal method to show loading state
+     */
+    _show(parentSelector, childSelector, config, loaderId) {
+      // Apply loading state to child element
+      const childElement = document.querySelector(childSelector);
+      if (childElement) {
+        childElement.style.overflow = 'hidden';
+        childElement.style.opacity = config.opacity.toString();
+        childElement.style.pointerEvents = 'none';
+      }
+
+      // Add loading spinner to parent
+      const parentElement = document.querySelector(parentSelector);
+      if (parentElement) {
+        // Save original position before changing
+        if (!parentElement.dataset.originalPosition) {
+          parentElement.dataset.originalPosition = parentElement.style.position || '';
+        }
+        parentElement.style.position = 'relative';
+        let loader = parentElement.querySelector(`.${config.class}`);
+        if (!loader) {
+          loader = document.createElement('div');
+          loader.className = config.class;
+          loader.innerHTML = config.html;
+          loader.dataset.loaderId = loaderId;
+          parentElement.appendChild(loader);
+          this.activeLoaders.set(loaderId, loader);
+        }
+      }
+    }
+
+    /**
+     * Internal method to hide loading state
+     */
+    _hide(parentSelector, childSelector, loaderId) {
+      // Restore child element
+      const childElement = document.querySelector(childSelector);
+      if (childElement) {
+        childElement.style.overflow = '';
+        childElement.style.opacity = '1';
+        childElement.style.pointerEvents = 'auto';
+      }
+
+      // Remove loader
+      const loader = this.activeLoaders.get(loaderId);
+      let parentElement = document.querySelector(parentSelector);
+      if (loader) {
+        loader.remove();
+        this.activeLoaders.delete(loaderId);
+        // Restore original position after removing loader
+        if (parentElement && parentElement.dataset.originalPosition !== undefined) {
+          parentElement.style.position = parentElement.dataset.originalPosition;
+          delete parentElement.dataset.originalPosition;
+        }
+      } else {
+        // Fallback: find loader by parent selector
+        if (parentElement) {
+          const existingLoader = parentElement.querySelector(`[data-loader-id="${loaderId}"]`);
+          if (existingLoader) {
+            existingLoader.remove();
+            // Restore original position after removing loader
+            if (parentElement.dataset.originalPosition !== undefined) {
+              parentElement.style.position = parentElement.dataset.originalPosition;
+              delete parentElement.dataset.originalPosition;
+            }
+          }
+        }
+      }
+    }
+
+    /**
+     * Convenience methods for common use cases
+     * show() - Shows loading on body element
+     * hide() - Hides loading on body element
+     */
+    show() {
+      this.loading(true, 'body', 'body');
+    }
+
+    hide() {
+      this.loading(false, 'body', 'body');
+    }
+
+    /**
+     * Clear all active loaders and reset element styles
+     * Removes all loading spinners and restores opacity/pointer-events
+     */
+    clearAll() {
+      this.activeLoaders.forEach(loader => loader.remove());
+      this.activeLoaders.clear();
+
+      // Reset any elements that might still have loading styles
+      document.querySelectorAll('[style*="opacity"]').forEach(el => {
+        if (el.style.opacity !== '1') {
+          el.style.overflow = '';
+          el.style.opacity = '1';
+          el.style.pointerEvents = 'auto';
+        }
+      });
+    }
+  }
+
+  // Create global instance
+  window.loadingManager = new Loading();
+{% endjavascript %}

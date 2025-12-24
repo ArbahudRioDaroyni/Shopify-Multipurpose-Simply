@@ -18,12 +18,12 @@
         "show_payment_icons": true
       }
     },
-    "cart-slide": {
-      "type": "cart-slide"
+    "cart-drawer": {
+      "type": "cart-drawer"
     }
   },
   "order": [
     "footer",
-    "cart-slide"
+    "cart-drawer"
   ]
 }

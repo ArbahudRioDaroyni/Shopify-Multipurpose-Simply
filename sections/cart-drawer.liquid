@@ -1,5 +1,5 @@
 {% comment %}
-  This section provides a slide-over cart that can be triggered from anywhere
+  This section provides a cart drawer that can be triggered from anywhere
   in the theme. Similar to collection filters but for cart functionality.
 {% endcomment %}
 
@@ -9,11 +9,11 @@
   endcapture
 %}
 
-<!-- Cart Slide-over -->
+<!-- Cart Drawer -->
 {% render 'slide-over',
   id: 'cart-drawer',
   position: 'right',
-  size: 'md',
+  size: 'lg',
   title: 'Shopping Cart',
   description: 'Review and manage your cart items',
   content: cart_content
@@ -26,23 +26,12 @@
     }
 
     init() {
-      // Listen for cart updates
-      document.addEventListener('cart:updated', (e) => {
-        console.log('Cart updated:', e.detail);
-        this.refreshCartContent();
-      });
-
-      // Listen for add to cart events
-      document.addEventListener('cart:item-added', (e) => {
-        console.log('Item added to cart:', e.detail);
-        this.refreshCartContent();
-        this.openCartDrawer();
-      });
+      document.addEventListener('cart:updated', () => this.refreshCartContent());
     }
 
     refreshCartContent() {
       // Refresh cart sidebar content
-      fetch('/cart?section_id=cart-slide')
+      fetch('/cart?section_id=cart-drawer')
         .then(response => response.text())
         .then(html => {
           const parser = new DOMParser();
@@ -52,6 +41,15 @@
           
           if (newContent && currentContent) {
             currentContent.innerHTML = newContent.innerHTML;
+
+            if (newContent && currentContent) {
+              currentContent.innerHTML = newContent.innerHTML;
+              // Re-init CartItem for new elements
+              const cartItems = document.querySelectorAll('.cart-item');
+              cartItems.forEach(cartItem => {
+                new window.theme.CartItem(cartItem);
+              });
+            }
           }
         })
         .catch(error => {
@@ -75,11 +73,11 @@
 
 {% schema %}
 {
-  "name": "Cart Slide-over",
+  "name": "Cart Drawer",
   "settings": [
     {
       "type": "header",
-      "content": "Cart slide-over settings"
+      "content": "Cart drawer settings"
     },
     {
       "type": "checkbox",

@@ -20,6 +20,9 @@
 
     {% sections 'footer-group' %}
 
+    {% # Load critical JavaScript inline %}
+    {% render 'critical-js' %}
+
     <script>
       window.addEventListener('pageshow', (event) => {
         if (event.persisted) {
