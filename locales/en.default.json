@@ -110,10 +110,20 @@
   },
   "search": {
     "title": "Search",
-    "placeholder": "Search articles, pages, or products",
+    "placeholder": "Search products, articles, and more...",
     "submit": "Search",
-    "no_results_html": "No results found for {{ terms }}",
-    "results_for_html": "{{ count }} results found for {{ terms }}"
+    "no_results": "No results found",
+    "no_results_html": "No results found for \"{{ terms }}\"",
+    "results_for_html": "{{ count }} results found for \"{{ terms }}\"",
+    "results_count": "Showing {{ count }} results for \"{{ terms }}\"",
+    "browse_all": "Browse all products",
+    "start_searching": "Start searching",
+    "start_searching_description": "Enter a search term to find products, articles, and pages.",
+    "result_type": {
+      "product": "Product",
+      "article": "Article",
+      "page": "Page"
+    }
   },
   "products": {
     "select_option": "Select an option",
