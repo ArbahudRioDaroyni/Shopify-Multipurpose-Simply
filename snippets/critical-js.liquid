@@ -9,24 +9,25 @@
   /**
    * Reusable Loading class for managing loading states
    * @class Loading
+   * 
    * @example
    * // Basic convenience methods
-   * window.loadingManager.show();
-   * window.loadingManager.hide();
+   * window.theme.Loading.show();
+   * window.theme.Loading.hide();
    * 
    * // Advanced usage with custom selectors and options
-   * window.loadingManager.loading(true, '#parent', '#child');
-   * window.loadingManager.loading(false, '#parent', '#child');
+   * window.theme.Loading.loading(true, '#parent', '#child');
+   * window.theme.Loading.loading(false, '#parent', '#child');
    * 
    * // Custom loading with options
-   * window.loadingManager.loading(true, '.parent', '.child', {
+   * window.theme.Loading.loading(true, '.parent', '.child', {
    *   class: 'custom-loader',
    *   html: '<div class="custom-spinner"></div>',
    *   opacity: 0.3
    * });
    * 
    * // Clear all active loaders
-   * window.loadingManager.clearAll();
+   * window.theme.Loading.clearAll();
    */
   class Loading {
     constructor() {
@@ -199,6 +200,95 @@
     }
   }
 
+  /**
+   * Reusable Section class for managing Shopify sections
+   * @class Section
+   * 
+   * @example
+  * // Refresh a section by path, params object, and content selector
+  * window.theme.Section.refresh('/cart', { section_id: 'template--18933041102950__main', foo: 'bar' }, '.cart-sidebar-content');
+  * window.theme.Section.refresh('/collections/all', { section_id: 'collection', sort_by: 'best-selling' }, ['.product-grid', '.collection-filters']);
+  *
+   */
+  class Section {
+    /**
+     * Manages Shopify sections including fetching and updating DOM content
+     * @param {string} path - Path for the section endpoint (e.g. '/collections/all')
+     * @param {Object} params - Query params object (e.g. { section_id: 'collection', sort_by: 'best-selling' })
+     * @param {string} contentSelector - CSS selector for the content to replace (e.g. '.cart-sidebar-content')
+     */
+
+    constructor() {
+      // Initialization if needed
+    }
+
+    /**
+     * Fetches section HTML from a given path and params.
+     * @param {string} path
+     * @param {Object} params
+     * @returns {Promise<string>} HTML string
+     */
+    async fetch(path, params) {
+      let url = path || '/';
+      if (!url.startsWith('/')) url = '/' + url;
+      let query = '';
+      if (params && typeof params === 'object' && Object.keys(params).length > 0) {
+        query = Object.entries(params)
+          .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+          .join('&');
+      }
+      if (query) {
+        url += (url.includes('?') ? '&' : '?') + query;
+      }
+      const response = await fetch(url);
+      return await response.text();
+    }
+
+    /**
+     * Updates DOM content by replacing one or more selectors with new HTML string.
+     * @param {string} html - HTML string to parse
+     * @param {string|string[]} contentSelectors - CSS selector(s) for the content to replace
+     */
+    _updateDomContent(html, contentSelectors) {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        const selectors = Array.isArray(contentSelectors) ? contentSelectors : [contentSelectors];
+        selectors.forEach(selector => {
+          const newContent = doc.querySelector(selector);
+          const currentContent = document.querySelector(selector);
+          if (newContent && currentContent) {
+            currentContent.innerHTML = newContent.innerHTML;
+          }
+        });
+      } catch (error) {
+        console.error(`Error updating DOM content`, error);
+      }
+    }
+
+    /**
+     * Refreshes section HTML and manipulates DOM content.
+     * @param {string} path - Path for the section endpoint (e.g. '/collections/all')
+     * @param {Object} params - Query params object (e.g. { section_id: 'collection', sort_by: 'best-selling' })
+     * @param {string|string[]} contentSelectors- CSS selector(s) for the content to replace (e.g. '.cart-sidebar-content') or (e.g. ['.selector1', '.selector2'])
+     */
+    async refresh(path, params, contentSelectors) {
+      try {
+        const html = await this.fetch(path, params);
+        if (contentSelectors) {
+          this._updateDomContent(html, contentSelectors);
+        }
+        // return html;
+      } catch (error) {
+        console.error(`Error fetching section`, error);
+        return '';
+      }
+    }
+  }
+
   // Create global instance
-  window.loadingManager = new Loading();
+  window.theme = window.theme || {};
+  window.theme.Loading = new Loading();
+  window.theme.Section = new Section();
 {% endjavascript %}

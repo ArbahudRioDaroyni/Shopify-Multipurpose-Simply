@@ -26,36 +26,60 @@
     }
 
     init() {
-      document.addEventListener('cart:updated', () => this.refreshCartContent());
-    }
+      document.addEventListener('cartItemUpdated', async (e) => {
+        // Show loading spinner
+        window.theme.Loading.loading(true, '#cart-drawer .cart-sidebar-content', '#cart-drawer .cart-sidebar-content');
 
-    refreshCartContent() {
-      // Refresh cart sidebar content
-      fetch('/cart?section_id=cart-drawer')
-        .then(response => response.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const newContent = doc.querySelector('.cart-sidebar-content');
-          const currentContent = document.querySelector('.cart-sidebar-content');
-          
-          if (newContent && currentContent) {
-            currentContent.innerHTML = newContent.innerHTML;
+        const { id, quantity } = e.detail;
+        await this._cartChange(id, quantity);
+        await window.theme.Section.refresh('/cart', { section_id: 'cart-drawer' }, '.cart-sidebar-content');
+        this.openCartDrawer();
 
-            if (newContent && currentContent) {
-              currentContent.innerHTML = newContent.innerHTML;
-              // Re-init CartItem for new elements
-              const cartItems = document.querySelectorAll('.cart-item');
-              cartItems.forEach(cartItem => {
-                new window.theme.CartItem(cartItem);
-              });
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Error refreshing cart:', error);
+        // Re-init CartItem for new elements
+        const cartItems = document.querySelectorAll('.cart-item');
+        cartItems.forEach(cartItem => {
+          new window.theme.CartItem(cartItem);
         });
+
+        // Hide loading spinner
+        window.theme.Loading.loading(false, '#cart-drawer .cart-sidebar-content', '#cart-drawer .cart-sidebar-content');
+      });
     }
+
+    async _cartChange(keyOrId, quantity) {
+      try {
+        const response = await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            id: keyOrId,
+            quantity: quantity
+          })
+        });
+      } catch (error) {
+        if (this.debug) console.error('Error removing item:', error);
+      }
+    }
+
+    // async updateCart() {
+    //   const formData = new FormData();
+      
+    //   const quantityInputs = this.element.querySelectorAll('.quantity-selector input');
+    //   quantityInputs.forEach((input, index) => {
+    //     formData.append(`updates[${index}]`, input.value);
+    //   });
+
+    //   try {
+    //     const response = await fetch('/cart/update.js', {
+    //       method: 'POST',
+    //       body: formData
+    //     });
+    //   } catch (error) {
+    //     console.error('Error updating cart:', error);
+    //   }
+    // }
 
     openCartDrawer() {
       const cartDrawer = document.getElementById('cart-drawer');

@@ -483,7 +483,7 @@
     async fetchFilteredProducts(url, activeFilters) {
       try {
         // Show loading state
-        window.loadingManager.loading(true, '.collection-content', 'product-grid');
+        window.theme.Loading.loading(true, '.collection-content', 'product-grid');
 
         // Fetch the filtered section
         const response = await fetch(url);
@@ -520,7 +520,7 @@
         this.updateActiveFiltersDisplay(activeFilters);
 
         // Hide loading state
-        window.loadingManager.loading(false, '.collection-content', 'product-grid');
+        window.theme.Loading.loading(false, '.collection-content', 'product-grid');
 
         // Dispatch event
         const event = new CustomEvent('filter-sidebar:updated', {
@@ -533,7 +533,7 @@
 
       } catch (error) {
         console.error('Error fetching filtered products:', error);
-        window.loadingManager.loading(false, '.collection-content', 'product-grid');
+        window.theme.Loading.loading(false, '.collection-content', 'product-grid');
         // Fallback to full page reload on error
         window.location.href = url;
       }

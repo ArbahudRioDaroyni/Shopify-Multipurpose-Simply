@@ -2,12 +2,13 @@
   Renders a single cart item with image, details, quantity controls, and remove button.
 
   @param {product[]} products - Array of cart products to display in the cart items
+  @param {string} [class] - Additional CSS class for the cart item container
 
   @example
-  {% render 'cart-item', products: products %}
+  {% render 'cart-item', products: products, class: 'custom-class' %}
 {% enddoc %}
 
-<div class="cart-items">
+<div class="cart-items {{ class | default: '' }}">
   {% for product in products %}
     <div class="cart-item" data-variant-id="{{ product.variant.id }}">
       <div class="cart-item__image">
@@ -309,7 +310,6 @@
 {% javascript %}
   class CartItem {
     constructor(element) {
-      this.debug = true;
       this.element = element;
       this.debounceTimeout = null;
       this.init();
@@ -320,78 +320,34 @@
       this._quantityInputs();
     }
 
-    // Handle remove item buttons
     _removeButton() {
       const button = this.element.querySelector('.cart-item__remove');
-      if (button) {
-        button.addEventListener('click', (e) => {
-          if (this.debug) console.log('Removing item from cart');
-          e.preventDefault();
-          const id = this.element.getAttribute('data-variant-id');
-          this._debounceCartChange(id, 0);
-        });
-      }
+      if (!button) return;
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        const id = this.element.getAttribute('data-variant-id');
+        this._debounceCartChange(id, 0);
+      });
     }
 
     _quantityInputs() {
       const quantityInputs = this.element.querySelectorAll('.quantity-selector input');
+      if (!quantityInputs.length) return;
       quantityInputs.forEach(input => {
         input.addEventListener('change', () => {
-          if (this.debug) console.log('Updating item quantity:', input.value);
           const id = this.element.getAttribute('data-variant-id');
           this._debounceCartChange(id, parseInt(input.value, 10));
         });
       });
     }
 
-    async _cartChange(keyOrId, quantity) {
-      try {
-        const response = await fetch('/cart/change.js', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            id: keyOrId,
-            quantity: quantity
-          })
-        });
-
-        if (response.ok) {
-          document.dispatchEvent(new CustomEvent('cart:updated'));
-        }
-      } catch (error) {
-        if (this.debug) console.error('Error removing item:', error);
-      }
-    }
-
-    _debounceCartChange(keyOrId, quantity) {
+    _debounceCartChange(id, quantity) {
       clearTimeout(this.debounceTimeout);
       this.debounceTimeout = setTimeout(() => {
-        this._cartChange(keyOrId, quantity);
-      }, 500);
-    }
-
-    async updateCart() {
-      const formData = new FormData();
-      
-      const quantityInputs = this.element.querySelectorAll('.quantity-selector input');
-      quantityInputs.forEach((input, index) => {
-        formData.append(`updates[${index}]`, input.value);
-      });
-
-      try {
-        const response = await fetch('/cart/update.js', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (response.ok) {
-          document.dispatchEvent(new CustomEvent('cart:updated'));
-        }
-      } catch (error) {
-        console.error('Error updating cart:', error);
-      }
+        document.dispatchEvent(new CustomEvent('cartItemUpdated', {
+          detail: { id, quantity }
+        }));
+      }, 250);
     }
   }
 
