@@ -26,7 +26,7 @@
     }
 
     init() {
-      document.addEventListener('cartItemUpdated', async (e) => {
+      document.addEventListener('cart-item:updated', async (e) => {
         // Show loading spinner
         window.theme.Loading.loading(true, '#cart-drawer .cart-sidebar-content', '#cart-drawer .cart-sidebar-content');
 

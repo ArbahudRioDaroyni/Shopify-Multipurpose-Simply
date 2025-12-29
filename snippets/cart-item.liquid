@@ -344,7 +344,7 @@
     _debounceCartChange(id, quantity) {
       clearTimeout(this.debounceTimeout);
       this.debounceTimeout = setTimeout(() => {
-        document.dispatchEvent(new CustomEvent('cartItemUpdated', {
+        document.dispatchEvent(new CustomEvent('cart-item:updated', {
           detail: { id, quantity }
         }));
       }, 250);

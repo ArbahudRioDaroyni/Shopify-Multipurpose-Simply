@@ -252,7 +252,7 @@
       this.applySort(value);
 
       // Dispatch sort change event
-      const event = new CustomEvent('sortChange', {
+      const event = new CustomEvent('sort:changed', {
         detail: { 
           sort: value,
           label: text 

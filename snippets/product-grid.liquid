@@ -496,7 +496,7 @@
 
     handleQuickView(productId) {
       // Dispatch quick view event
-      const event = new CustomEvent('quickView', {
+      const event = new CustomEvent('quick-view:clicked', {
         detail: { productId: productId }
       });
       document.dispatchEvent(event);
@@ -504,7 +504,7 @@
 
     handleAddToCart(productId) {
       // Dispatch add to cart event
-      const event = new CustomEvent('addToCart', {
+      const event = new CustomEvent('add-to-cart:clicked', {
         detail: { productId: productId }
       });
       document.dispatchEvent(event);

@@ -524,7 +524,7 @@
   });
 
   // Re-initialize after content updates
-  document.addEventListener('cartItemUpdated', () => {
+  document.addEventListener('cart-item:updated', () => {
     setTimeout(() => {
       const cartSidebars = document.querySelectorAll('[data-cart-sidebar]');
       cartSidebars.forEach(sidebar => {
