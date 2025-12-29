@@ -2,12 +2,90 @@
   This section provides a cart drawer that can be triggered from anywhere
   in the theme. Similar to collection filters but for cart functionality.
 {% endcomment %}
+{% assign enable_cart_notes = section.settings.enable_cart_notes %}
 
-{% liquid
-  capture cart_content
-    render 'cart-sidebar'
-  endcapture
-%}
+{% capture cart_content %}
+  <div class="cart-sidebar-content" data-cart-sidebar>
+    {% if cart.item_count > 0 %}
+      <!-- Cart Items -->
+      {% render 'cart-item', products: cart.items, class: 'cart-drawer-items' %}
+    {% else %}
+      <!-- Empty Cart -->
+      <div class="cart-drawer-empty">
+        <div class="cart-empty__content">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+          <h3>{{ 'cart.general.empty' | t }}</h3>
+          <p>{{ 'cart.general.empty_text' | t }}</p>
+          <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">
+            {{ 'cart.general.continue_shopping' | t }}
+          </a>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% endcapture %}
+
+{% capture cart_footer %}
+  <!-- Cart Summary -->
+  <div class="cart-drawer-summary">
+    <div class="cart-summary__line">
+      <span>{{ 'cart.general.subtotal' | t }}</span>
+      <span>{{ cart.total_price | money }}</span>
+    </div>
+
+    {% if cart.total_discount > 0 %}
+      <div class="cart-summary__line cart-summary__line--discount">
+        <span>{{ 'cart.general.discount' | t }}</span>
+        <span>-{{ cart.total_discount | money }}</span>
+      </div>
+    {% endif %}
+
+    <div class="cart-summary__shipping">
+      <span>{{ 'cart.general.shipping' | t }}</span>
+      <span class="shipping-note">{{ 'cart.general.shipping_calculated' | t }}</span>
+    </div>
+
+    <div class="cart-summary__total">
+      <span>{{ 'cart.general.total' | t }}</span>
+      <span class="total-price">{{ cart.total_price | money }}</span>
+    </div>
+  </div>
+
+  <!-- Cart Actions -->
+  <div class="cart-drawer-actions">
+    <a href="{{ routes.cart_url }}" class="btn btn--secondary btn--full-width">
+      {{ 'cart.general.view_cart' | t }}
+    </a>
+    <button type="submit" name="add" value="checkout" class="btn btn--primary btn--full-width" onclick="document.location='/checkout'">
+      {{ 'cart.checkout' | t }}
+    </button>
+    
+    {% if additional_checkout_buttons %}
+      <div class="additional-checkout-buttons">
+        {{ content_for_additional_checkout_buttons }}
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Cart Notes -->
+  {% if enable_cart_notes %}
+    <div class="cart-drawer-notes">
+      <label for="cart-note-drawer" class="cart-notes__label">
+        {{ 'cart.general.note' | t }}
+      </label>
+      <textarea
+        id="cart-note-drawer"
+        name="note"
+        class="cart-notes__textarea"
+        placeholder="{{ 'cart.general.note_placeholder' | t }}"
+      >{{ cart.note }}</textarea>
+    </div>
+  {% endif %}
+{% endcapture %}
 
 <!-- Cart Drawer -->
 {% render 'slide-over',
@@ -16,7 +94,8 @@
   size: 'lg',
   title: 'Shopping Cart',
   description: 'Review and manage your cart items',
-  content: cart_content
+  content: cart_content,
+  footer: cart_footer
 %}
 
 {% javascript %}
@@ -39,7 +118,7 @@
         // Refresh cart drawer content
         const url = new URL('/cart', window.location.origin);
         url.searchParams.set('section_id', 'cart-drawer');
-        await window.theme.Section.refresh(url, '.cart-sidebar-content');
+        await window.theme.Section.refresh(url, ['.slide-over__body', '.slide-over__footer']);
 
         this.openCartDrawer();
 

@@ -44,6 +44,7 @@
   @param {string} [description] - Description displayed under the title
   @param {boolean} [show_close] - Whether to show the close button (default: true)
   @param {string} [content] - HTML content to display in the body
+  @param {string} [footer] - HTML content to display in the footer
 
   @example
   {% render 'slide-over', 
@@ -126,9 +127,12 @@
     </div>
 
     <!-- Footer (optional slot) -->
-    <div class="slide-over__footer" style="display: none;">
-      <!-- Footer content can be added via JavaScript -->
-    </div>
+    {% if footer != blank %}
+      <div class="slide-over__footer">
+        {{ footer }}
+        <!-- Footer content can be added via JavaScript -->
+      </div>
+    {% endif %}
   </div>
 </slide-over>
 
