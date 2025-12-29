@@ -30,9 +30,17 @@
         // Show loading spinner
         window.theme.Loading.loading(true, '#cart-drawer .cart-sidebar-content', '#cart-drawer .cart-sidebar-content');
 
+        // Extract details from event
         const { id, quantity } = e.detail;
+
+        // Update cart item quantity
         await this._cartChange(id, quantity);
-        await window.theme.Section.refresh('/cart', { section_id: 'cart-drawer' }, '.cart-sidebar-content');
+
+        // Refresh cart drawer content
+        const url = new URL('/cart', window.location.origin);
+        url.searchParams.set('section_id', 'cart-drawer');
+        await window.theme.Section.refresh(url, '.cart-sidebar-content');
+
         this.openCartDrawer();
 
         // Re-init CartItem for new elements

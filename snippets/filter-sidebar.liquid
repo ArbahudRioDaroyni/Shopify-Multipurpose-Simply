@@ -477,7 +477,7 @@
       window.history.pushState({}, '', url.toString());
 
       // Fetch and update products using URL with section_id
-      this.fetchFilteredProducts(fetchUrl.toString(), activeFilters);
+      this.fetchFilteredProducts(fetchUrl, activeFilters);
     }
 
     async fetchFilteredProducts(url, activeFilters) {
@@ -485,36 +485,8 @@
         // Show loading state
         window.theme.Loading.loading(true, '.collection-content', 'product-grid');
 
-        // Fetch the filtered section
-        const response = await fetch(url);
-        const html = await response.text();
-
-        // Parse the response
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        // Update product grid
-        const newProductGrid = doc.querySelector('product-grid');
-        const currentProductGrid = document.querySelector('product-grid');
-        if (newProductGrid && currentProductGrid) {
-          currentProductGrid.innerHTML = newProductGrid.innerHTML;
-        }
-
-        // Update pagination
-        const newPagination = doc.querySelector('.pagination');
-        const currentPagination = document.querySelector('.pagination');
-        if (newPagination && currentPagination) {
-          currentPagination.innerHTML = newPagination.innerHTML;
-        } else if (!newPagination && currentPagination) {
-          currentPagination.remove();
-        }
-
-        // Update results count
-        const newResults = doc.querySelector('.collection-results');
-        const currentResults = document.querySelector('.collection-results');
-        if (newResults && currentResults) {
-          currentResults.innerHTML = newResults.innerHTML;
-        }
+        // Refresh the collection section
+        await window.theme.Section.refresh(url, ['.product-grid', '.collection-results', '.pagination']);
 
         // Update active filters display
         this.updateActiveFiltersDisplay(activeFilters);
