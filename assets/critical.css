@@ -149,3 +149,62 @@ body {
   border-radius: var(--style-border-radius-cards);
   overflow: hidden;
 }
+
+.modal {
+  --transition-duration: .5s;
+  --transition-container-delay: .3s;
+  --bg-color-overlay: rgb(0 0 0 / 50%); 
+
+  position: fixed;
+  background-color: var(--bg-color-overlay);
+  /* backdrop-filter: blur(40px); */
+  padding: 0;
+  outline: none;
+  border: none;
+  margin: auto;
+  z-index: 999;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-duration) ease-in-out opacity var(--transition-container-delay),
+              var(--transition-duration) ease-in-out visibility var(--transition-container-delay);
+}
+
+.modal:has(input[type="checkbox"].modal-toggle:checked) {
+  visibility: visible;
+  opacity: 1;
+  transition: var(--transition-duration) ease-in-out opacity 0s,
+              var(--transition-duration) ease-in-out visibility 0s;
+}
+
+.modal:has(input[type="checkbox"].modal-toggle:checked) .modal__overlay {
+  visibility: visible;
+  opacity: 1;
+}
+
+.modal:has(input[type="checkbox"].modal-toggle:checked) .modal__container {
+  transform: scale(1);
+  visibility: visible;
+  opacity: 1;
+  transition: var(--transition-duration) cubic-bezier(0.68, -0.55, 0.27, 1.55) all var(--transition-container-delay);
+}
+
+.modal__overlay {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  cursor: zoom-out;
+}
+  
+.modal__container {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transform: scale(0.2);
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-duration) cubic-bezier(0.68, -0.55, 0.27, 1.55) all 0s;
+}
