@@ -4,49 +4,50 @@
 
 {%- liquid
   assign thumb_size = 86
+  assign variant_image_selected = product.selected_or_first_available_variant.featured_image
+  assign translate = 0
 
-  comment
-    Prepare product gallery thumbnails and main images
-  endcomment
+  # Prepare product gallery thumbnails and main images
   assign product_gallery_thumbs_wrapper = ''
   assign product_gallery_images_wrapper = ''
   for image in product.images
     assign variant = product.variants | where: 'featured_image', image | first
     assign variant_image = variant.featured_image | default: image
-    assign is_first = forloop.first
+    assign is_image_active = false
     assign index = forloop.index0
 
-    comment
-      Product gallery thumbnails
-    endcomment
+    if variant_image_selected == variant_image
+      assign is_image_active = true
+      assign translate = index | times: -100
+    endif
+
+    # Product gallery thumbnails
     capture product_gallery_thumbs
       if variant_image == blank
         continue
       endif
       assign class_gallery_thumb = 'product-gallery__thumb'
-      if is_first
-      assign class_gallery_thumb = class_gallery_thumb | append: ' active'
+      if is_image_active
+        assign class_gallery_thumb = class_gallery_thumb | append: ' active'
       endif
       assign attr_gallery_thumb = 'fetchpriority="high"' | append: 'data-variant-id="' | append: variant.id | append: '" data-index="' | append: index | append: '" fetchpriority="high"'
       render 'image', image: variant_image, class: class_gallery_thumb, width: thumb_size, height: thumb_size, crop: 'center', w_min: thumb_size, w_max: thumb_size, attr: attr_gallery_thumb, wrapper: false
     endcapture
     assign product_gallery_thumbs_wrapper = product_gallery_thumbs_wrapper | append: product_gallery_thumbs
 
-    comment
-      Product gallery main images
-    endcomment
+    # Product gallery main images
     capture product_gallery_images
       assign class_gallery_image = 'product-gallery__image'
       assign attr_gallery_image = 'loading="lazy"'
-      if is_first
+      if is_image_active
         assign class_gallery_image = class_gallery_image | append: ' active'
         assign attr_gallery_image = 'fetchpriority="high"'
       endif
       render 'image', image: variant_image, class: class_gallery_image, width: 582, height: 582, crop: 'center', w_min: 448, w_max: 1206, attr: attr_gallery_image, wrapper: false
     endcapture
-    assign product_gallery_images_wrapper = product_gallery_images_wrapper | append: '<figure class="product-gallery__image ' 
-    if is_first
-      assign product_gallery_images_wrapper = product_gallery_images_wrapper | append: 'active '
+    assign product_gallery_images_wrapper = product_gallery_images_wrapper | append: '<figure class="product-gallery__image' 
+    if is_image_active
+      assign product_gallery_images_wrapper = product_gallery_images_wrapper | append: ' active '
     endif
     assign product_gallery_images_wrapper = product_gallery_images_wrapper | append: '" data-index="' | append: index | append: '">'
     assign product_gallery_images_wrapper = product_gallery_images_wrapper | append: product_gallery_images
@@ -54,327 +55,325 @@
   endfor
 -%}
 
-<div class="product-main">
-  <div class="product-main__container container">
-    <!-- Product Images -->
-    <div class="product-main__gallery">
-      <!-- Thumbnail Images (Left Side) -->
-      <figure class="product-gallery__thumbs">
-        {{ product_gallery_thumbs_wrapper }}
-      </figure>
+<main class="product-main__container container">
+  <!-- Product Images -->
+  <div class="product-main__gallery">
+    <!-- Thumbnail Images (Left Side) -->
+    <figure class="product-gallery__thumbs">
+      {{ product_gallery_thumbs_wrapper }}
+    </figure>
 
-      <!-- Main Image -->
-      <div class="product-gallery__main">
-        <div class="product-gallery__images">
-          {{ product_gallery_images_wrapper }}
-        </div>
-      </div>
-    </div>
-
-    <!-- Product Info -->
-    <div class="product-main__info">
-      <h1 class="product-info__title">{{ product.title }}</h1>
-
-      <div class="product-info__featured-description">
-        Our best selling toilet! All Caroma's best features in one - Comfort height, rimless flush, antimicrobial protection - cleaner, easier, and more hygienic.
-      </div>
-
-      <div class="product-info__price">
-        {% if product.compare_at_price > product.price %}
-          <s class="product-price__compare">{{ product.compare_at_price | money }}</s>
-          <strong class="product-price__sale">{{ product.price | money }}</strong>
-          <span class="product-price__off">
-            {%- liquid
-              comment
-                echo product.compare_at_price | minus: product.price | abs | money
-              endcomment
-              assign discount_percentage = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price | round
-              echo '(' | append: discount_percentage | append: '%) off'
-            -%}
-          </span>
-        {% else %}
-          <span class="price--regular">{{ product.price | money }}</span>
-        {% endif %}
-      </div>
-
-      {% liquid
-        assign collections_title = product.collections | map: 'title' | join: ', '
-        if collections_title contains 'SALE'
-          for collection in product.collections
-            if collection.title == 'SALE'
-              assign description = collection.description | strip_html | strip_newlines
-              render 'upsell-countdown', end_date: "2025-12-08T23:59:59Z", message_before: description, message_after: "The sale has ended.", class: "product-info__countdown"
-            endif
-          endfor
-        endif
-      %}
-
-      <!-- Product Variant Selector -->
-      {% if product.variants.size > 1 %}
-        <div class="product-form__variant-selector" data-variant-id={{ product.selected_or_first_available_variant.id }}>
-          {% for option in product.options %}
-            <div class="product-form__option-group">
-              {% assign option_name = 'option' | append: forloop.index %}
-              {% assign variant_option_selected = product.selected_or_first_available_variant[option_name] %}
-              {% assign option_values = '' %}
-              {% assign option_values = product.variants | map: option_name | uniq %}
-
-              <label class="product-form__label">{{ option }}: <strong>{{ variant_option_selected }}</strong></label>
-              <div class="product-form__options">
-                {% for value in option_values %}
-                  {% assign variant = product.variants | find: option_name, value %}
-                  {% assign image = variant.featured_image %}
-
-                  <figure class="product-form__option">
-                    {% assign attr_option = 'fetchpriority="high"' | append: '" data-option-name="' | append: value | append: '"' %}
-                    {% assign class_option = 'product-option__image' %}
-                    {% if variant_option_selected == value %}
-                      {% assign class_option = class_option | append: ' selected' %}
-                    {% endif %}
-                    {% if image %}
-                      {% render 'image',
-                        image: image,
-                        alt: value,
-                        class: class_option,
-                        width: thumb_size,
-                        height: thumb_size,
-                        crop: 'center',
-                        w_min: thumb_size,
-                        w_max: thumb_size,
-                        attr: attr_option,
-                        wrapper: false
-                      %}
-                    {% else %}
-                      <div class="product-option__label {{ class_option }}" {{ attr_option }}>{{ value }}</div>
-                    {% endif %}
-                    {% comment %} <span class="product-form__label">{{ value }}</span> {% endcomment %}
-                  </figure>
-                {% endfor %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
-      <!-- Product Form -->
-      {% form 'product', product, class: 'product-main__form' %}
-        {% assign current_variant = product.selected_or_first_available_variant %}
-
-        <!-- Hidden input for selected variant -->
-        <input type="hidden" name="id" id="selected-variant-id" value="{{ current_variant.id }}">
-
-        <!-- Quantity & Add to Cart -->
-        <div class="product-form__actions">
-          <button
-            type="submit"
-            class="product-main__add-to-cart button"
-            {% unless current_variant.available %}
-              disabled
-            {% endunless %}
-          >
-            {% if current_variant.available %}
-              {{ 'products.add_to_cart' | t }}
-            {% else %}
-              {{ 'products.sold_out' | t }}
-            {% endif %}
-          </button>
-
-          <div class="product-form__quantity">
-            {% render 'quantity-selector', 
-              style_variant: 'standard',
-              input_name: 'quantity',
-              initial_value: 1,
-              min_value: 1,
-              max_value: 999,
-              show_total: false,
-              unique_id: 'product-quantity'
-            %}
-          </div>
-
-          <button type="button" class="product-main__wishlist button outline" aria-label="Add to wishlist">
-            {% render 'icon-or-image', icon: 'heart', width: 24 %}
-          </button>
-
-          <button type="button" class="product-main__compare button outline" aria-label="Add to compare" hidden>
-            {% render 'icon-or-image', icon: 'repeat', width: 24 %}
-          </button>
-        </div>
-
-        {{ form | payment_button }}
-      {% endform %}
-
-      <!-- Trust Badges -->
-      {% comment %}
-        <div class="product__trust-badges">
-          <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/mcafee-secure.svg" alt="McAfee Secure" loading="lazy">
-          <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/norton-secured.svg" alt="Norton Secured" loading="lazy">
-          <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/verisign.svg" alt="VeriSign" loading="lazy">
-          <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/truste.svg" alt="TRUSTe" loading="lazy">
-        </div>
-      {% endcomment %}
-
-      <!-- Product Meta Tabs -->
-      <div class="product__meta-tabs">
-        <button class="meta-tab active" data-tab="size-guide">{{ 'products.size_guide' | t }}</button>
-        <button class="meta-tab" data-tab="delivery">{{ 'products.delivery_return' | t }}</button>
-        <button class="meta-tab" data-tab="question">{{ 'products.ask_question' | t }}</button>
-      </div>
-
-      <!-- Product Meta -->
-      <div class="product__meta">
-        <div class="product__availability">
-          <strong>{{ 'products.availability' | t }}:</strong>
-          <span class="{% if current_variant.available %}in-stock{% else %}out-of-stock{% endif %}">
-            {% if current_variant.available -%}
-              {{- 'products.in_stock' | t -}}
-            {%- else -%}
-              {{- 'products.out_of_stock' | t -}}
-            {%- endif %}
-          </span>
-        </div>
-
-        {% if product.vendor %}
-          <div class="product__vendor">
-            <strong>{{ 'products.vendor' | t }}:</strong>
-            <span>{{ product.vendor }}</span>
-          </div>
-        {% endif %}
-
-        {% if product.type %}
-          <div class="product__type">
-            <strong>{{ 'products.categories' | t }}:</strong>
-            <span>{{ product.type }}</span>
-          </div>
-        {% endif %}
-
-        {% if product.tags.size > 0 %}
-          <div class="product__tags">
-            <strong>{{ 'products.tags' | t }}:</strong>
-            <span>
-              {% for tag in product.tags limit: 5 %}
-                {{ tag -}}
-                {%- unless forloop.last %}, {% endunless %}
-              {% endfor %}
-            </span>
-          </div>
-        {% endif %}
-      </div>
-
-      <!-- Social Share -->
-      <div class="product-info__share">
-        <a
-          href="https://www.facebook.com/sharer.php?u={{ shop.url }}{{ product.url }}"
-          target="_blank"
-          aria-label="Share on Facebook"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-          </svg>
-        </a>
-        <a
-          href="https://twitter.com/share?url={{ shop.url }}{{ product.url }}&text={{ product.title }}"
-          target="_blank"
-          aria-label="Share on Twitter"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
-          </svg>
-        </a>
-        <a
-          href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | image_url }}&description={{ product.title }}"
-          target="_blank"
-          aria-label="Share on Pinterest"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>
-          </svg>
-        </a>
-        <a
-          href="https://www.tumblr.com/share/link?url={{ shop.url }}{{ product.url }}&name={{ product.title }}"
-          target="_blank"
-          aria-label="Share on Tumblr"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/>
-          </svg>
-        </a>
-        <a
-          href="https://telegram.me/share/url?url={{ shop.url }}{{ product.url }}&text={{ product.title }}"
-          target="_blank"
-          aria-label="Share on Telegram"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-          </svg>
-        </a>
-        <a href="mailto:?subject={{ product.title }}&body={{ shop.url }}{{ product.url }}" aria-label="Share via Email">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-          </svg>
-        </a>
-        <a
-          href="https://api.whatsapp.com/send?text={{ product.title }}%20{{ shop.url }}{{ product.url }}"
-          target="_blank"
-          aria-label="Share on WhatsApp"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-          </svg>
-        </a>
+    <!-- Main Image -->
+    <div class="product-gallery__main">
+      <div class="product-gallery__images" style="transform: translateX({{ translate }}%);">
+        {{ product_gallery_images_wrapper }}
       </div>
     </div>
   </div>
 
-  <div class="product-description">
-    <div class="product-description__wrapper container">
-      <div class="product-description__header">
-        <h2 class="product-description__title">Product Details</h2>
-        <div class="product-description__divider"></div>
-      </div>
-      
-      <div class="product-description__content">
-        {{ product.description }}
-      </div>
-      
-      {% if product.metafields.custom.specifications %}
-        <div class="product-description__specs">
-          <h3 class="specs__title">Specifications</h3>
-          <div class="specs__grid">
-            {% for spec in product.metafields.custom.specifications.value %}
-              <div class="spec__item">
-                <span class="spec__label">{{ spec.name }}</span>
-                <span class="spec__value">{{ spec.value }}</span>
-              </div>
-            {% endfor %}
+  <!-- Product Info -->
+  <div class="product-main__info">
+    <h1 class="product-info__title">{{ product.title }}</h1>
+
+    <div class="product-info__featured-description">
+      Our best selling toilet! All Caroma's best features in one - Comfort height, rimless flush, antimicrobial protection - cleaner, easier, and more hygienic.
+    </div>
+
+    <div class="product-info__price">
+      {% if product.compare_at_price > product.price %}
+        <s class="product-price__compare">{{ product.compare_at_price | money }}</s>
+        <strong class="product-price__sale">{{ product.price | money }}</strong>
+        <span class="product-price__off">
+          {%- liquid
+            comment
+              echo product.compare_at_price | minus: product.price | abs | money
+            endcomment
+            assign discount_percentage = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price | round
+            echo '(' | append: discount_percentage | append: '%) off'
+          -%}
+        </span>
+      {% else %}
+        <span class="price--regular">{{ product.price | money }}</span>
+      {% endif %}
+    </div>
+
+    {% liquid
+      assign collections_title = product.collections | map: 'title' | join: ', '
+      if collections_title contains 'SALE'
+        for collection in product.collections
+          if collection.title == 'SALE'
+            assign description = collection.description | strip_html | strip_newlines
+            render 'upsell-countdown', end_date: "2025-12-08T23:59:59Z", message_before: description, message_after: "The sale has ended.", class: "product-info__countdown"
+          endif
+        endfor
+      endif
+    %}
+
+    <!-- Product Variant Selector -->
+    {% if product.variants.size > 1 %}
+      <div class="product-form__variant-selector" data-variant-id={{ product.selected_or_first_available_variant.id }}>
+        {% for option in product.options %}
+          <div class="product-form__option-group">
+            {% assign option_name = 'option' | append: forloop.index %}
+            {% assign variant_option_selected = product.selected_or_first_available_variant[option_name] %}
+            {% assign option_values = '' %}
+            {% assign option_values = product.variants | map: option_name | uniq %}
+
+            <label class="product-form__label">{{ option }}: <strong>{{ variant_option_selected }}</strong></label>
+            <div class="product-form__options">
+              {% for value in option_values %}
+                {% assign variant = product.variants | find: option_name, value %}
+                {% assign image = variant.featured_image %}
+
+                <figure class="product-form__option">
+                  {% assign attr_option = 'fetchpriority="high"' | append: '" data-option-name="' | append: value | append: '"' %}
+                  {% assign class_option = 'product-option__image' %}
+                  {% if variant_option_selected == value %}
+                    {% assign class_option = class_option | append: ' selected' %}
+                  {% endif %}
+                  {% if image %}
+                    {% render 'image',
+                      image: image,
+                      alt: value,
+                      class: class_option,
+                      width: thumb_size,
+                      height: thumb_size,
+                      crop: 'center',
+                      w_min: thumb_size,
+                      w_max: thumb_size,
+                      attr: attr_option,
+                      wrapper: false
+                    %}
+                  {% else %}
+                    <div class="product-option__label {{ class_option }}" {{ attr_option }}>{{ value }}</div>
+                  {% endif %}
+                  {% comment %} <span class="product-form__label">{{ value }}</span> {% endcomment %}
+                </figure>
+              {% endfor %}
+            </div>
           </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- Product Form -->
+    {% form 'product', product, class: 'product-main__form' %}
+      {% assign current_variant = product.selected_or_first_available_variant %}
+
+      <!-- Hidden input for selected variant -->
+      <input type="hidden" name="id" id="selected-variant-id" value="{{ current_variant.id }}">
+
+      <!-- Quantity & Add to Cart -->
+      <div class="product-form__actions">
+        <button
+          type="submit"
+          class="product-main__add-to-cart button"
+          {% unless current_variant.available %}
+            disabled
+          {% endunless %}
+        >
+          {% if current_variant.available %}
+            {{ 'products.add_to_cart' | t }}
+          {% else %}
+            {{ 'products.sold_out' | t }}
+          {% endif %}
+        </button>
+
+        <div class="product-form__quantity">
+          {% render 'quantity-selector', 
+            style_variant: 'standard',
+            input_name: 'quantity',
+            initial_value: 1,
+            min_value: 1,
+            max_value: 999,
+            show_total: false,
+            unique_id: 'product-quantity'
+          %}
+        </div>
+
+        <button type="button" class="product-main__wishlist button outline" aria-label="Add to wishlist">
+          {% render 'icon-or-image', icon: 'heart', width: 24 %}
+        </button>
+
+        <button type="button" class="product-main__compare button outline" aria-label="Add to compare" hidden>
+          {% render 'icon-or-image', icon: 'repeat', width: 24 %}
+        </button>
+      </div>
+
+      {{ form | payment_button }}
+    {% endform %}
+
+    <!-- Trust Badges -->
+    {% comment %}
+      <div class="product__trust-badges">
+        <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/mcafee-secure.svg" alt="McAfee Secure" loading="lazy">
+        <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/norton-secured.svg" alt="Norton Secured" loading="lazy">
+        <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/verisign.svg" alt="VeriSign" loading="lazy">
+        <img src="https://cdn.shopify.com/s/files/1/0533/2089/files/truste.svg" alt="TRUSTe" loading="lazy">
+      </div>
+    {% endcomment %}
+
+    <!-- Product Meta Tabs -->
+    <div class="product__meta-tabs">
+      <button class="meta-tab active" data-tab="size-guide">{{ 'products.size_guide' | t }}</button>
+      <button class="meta-tab" data-tab="delivery">{{ 'products.delivery_return' | t }}</button>
+      <button class="meta-tab" data-tab="question">{{ 'products.ask_question' | t }}</button>
+    </div>
+
+    <!-- Product Meta -->
+    <div class="product__meta">
+      <div class="product__availability">
+        <strong>{{ 'products.availability' | t }}:</strong>
+        <span class="{% if current_variant.available %}in-stock{% else %}out-of-stock{% endif %}">
+          {% if current_variant.available -%}
+            {{- 'products.in_stock' | t -}}
+          {%- else -%}
+            {{- 'products.out_of_stock' | t -}}
+          {%- endif %}
+        </span>
+      </div>
+
+      {% if product.vendor %}
+        <div class="product__vendor">
+          <strong>{{ 'products.vendor' | t }}:</strong>
+          <span>{{ product.vendor }}</span>
         </div>
       {% endif %}
-      
-      {% if product.metafields.custom.features %}
-        <div class="product-description__features">
-          <h3 class="features__title">Key Features</h3>
-          <ul class="features__list">
-            {% for feature in product.metafields.custom.features.value %}
-              <li class="feature__item">
-                <svg class="feature__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="20,6 9,17 4,12"></polyline>
-                </svg>
-                {{ feature }}
-              </li>
+
+      {% if product.type %}
+        <div class="product__type">
+          <strong>{{ 'products.categories' | t }}:</strong>
+          <span>{{ product.type }}</span>
+        </div>
+      {% endif %}
+
+      {% if product.tags.size > 0 %}
+        <div class="product__tags">
+          <strong>{{ 'products.tags' | t }}:</strong>
+          <span>
+            {% for tag in product.tags limit: 5 %}
+              {{ tag -}}
+              {%- unless forloop.last %}, {% endunless %}
             {% endfor %}
-          </ul>
+          </span>
         </div>
       {% endif %}
     </div>
+
+    <!-- Social Share -->
+    <div class="product-info__share">
+      <a
+        href="https://www.facebook.com/sharer.php?u={{ shop.url }}{{ product.url }}"
+        target="_blank"
+        aria-label="Share on Facebook"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>
+      </a>
+      <a
+        href="https://twitter.com/share?url={{ shop.url }}{{ product.url }}&text={{ product.title }}"
+        target="_blank"
+        aria-label="Share on Twitter"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+        </svg>
+      </a>
+      <a
+        href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | image_url }}&description={{ product.title }}"
+        target="_blank"
+        aria-label="Share on Pinterest"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>
+        </svg>
+      </a>
+      <a
+        href="https://www.tumblr.com/share/link?url={{ shop.url }}{{ product.url }}&name={{ product.title }}"
+        target="_blank"
+        aria-label="Share on Tumblr"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M14.563 24c-5.093 0-7.031-3.756-7.031-6.411V9.747H5.116V6.648c3.63-1.313 4.512-4.596 4.71-6.469C9.84.051 9.941 0 9.999 0h3.517v6.114h4.801v3.633h-4.82v7.47c.016 1.001.375 2.371 2.207 2.371h.09c.631-.02 1.486-.205 1.936-.419l1.156 3.425c-.436.636-2.4 1.374-4.156 1.404h-.178l.011.002z"/>
+        </svg>
+      </a>
+      <a
+        href="https://telegram.me/share/url?url={{ shop.url }}{{ product.url }}&text={{ product.title }}"
+        target="_blank"
+        aria-label="Share on Telegram"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+        </svg>
+      </a>
+      <a href="mailto:?subject={{ product.title }}&body={{ shop.url }}{{ product.url }}" aria-label="Share via Email">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+      </a>
+      <a
+        href="https://api.whatsapp.com/send?text={{ product.title }}%20{{ shop.url }}{{ product.url }}"
+        target="_blank"
+        aria-label="Share on WhatsApp"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</main>
+
+<div class="product-description">
+  <div class="product-description__wrapper container">
+    <div class="product-description__header">
+      <h2 class="product-description__title">Product Details</h2>
+      <div class="product-description__divider"></div>
+    </div>
+    
+    <div class="product-description__content">
+      {{ product.description }}
+    </div>
+    
+    {% if product.metafields.custom.specifications %}
+      <div class="product-description__specs">
+        <h3 class="specs__title">Specifications</h3>
+        <div class="specs__grid">
+          {% for spec in product.metafields.custom.specifications.value %}
+            <div class="spec__item">
+              <span class="spec__label">{{ spec.name }}</span>
+              <span class="spec__value">{{ spec.value }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    
+    {% if product.metafields.custom.features %}
+      <div class="product-description__features">
+        <h3 class="features__title">Key Features</h3>
+        <ul class="features__list">
+          {% for feature in product.metafields.custom.features.value %}
+            <li class="feature__item">
+              <svg class="feature__icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20,6 9,17 4,12"></polyline>
+              </svg>
+              {{ feature }}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
   </div>
 </div>
 
@@ -619,7 +618,7 @@
   }
 
   .product-main__add-to-cart {
-    --color: var(--color-secondary);
+    --color: var(--color-secondary) !important;
 
     flex: 1;
     font-weight: bold;
@@ -1058,10 +1057,45 @@
     }
     
     init() {
-      this.onVariantChange('product-variant:changed');
-      this.thumbs.forEach((thumb, index) => {
-        thumb.addEventListener('click', () => this.onThumbClick(index));
-      });
+        // initialize current active image from server-rendered markup
+        this.setInitialActiveFromMarkup();
+
+        this.onVariantChange('product-variant:changed');
+
+        this.thumbs.forEach((thumb, index) => {
+          thumb.addEventListener('click', () => this.onThumbClick(index));
+        });
+    }
+
+    setInitialActiveFromMarkup() {
+      if (!this.imageWrapper) return;
+
+      // find the main image element that is initially rendered as active
+      const activeImage = this.imageWrapper.querySelector('.product-gallery__image.active');
+
+      if (activeImage) {
+        const dataIndex = activeImage.getAttribute('data-index');
+        const index = dataIndex !== null ? parseInt(dataIndex, 10) : Array.from(this.imageWrapper.children).indexOf(activeImage);
+        if (!Number.isNaN(index)) {
+          this.currentIndex = index;
+          this.imageWrapper.style.transform = `translateX(${ -100 * this.currentIndex }%)`;
+
+          // sync thumbnail active state
+          if (this.thumbs && this.thumbs.length > 0 && this.thumbs[this.currentIndex]) {
+            this.thumbs.forEach(t => t.classList.remove('active'));
+            this.thumbs[this.currentIndex].classList.add('active');
+            // ensure visible in scroll
+            this.scrollToThumb(this.currentIndex);
+          }
+        }
+      } else {
+        // fallback: ensure first image/thumb active
+        this.currentIndex = 0;
+        if (this.thumbs && this.thumbs.length > 0) {
+          this.thumbs.forEach(t => t.classList.remove('active'));
+          this.thumbs[0].classList.add('active');
+        }
+      }
     }
 
     onThumbClick(index) {
@@ -1070,8 +1104,14 @@
       const translateX = -100 * index;
       this.imageWrapper.style.transform = `translateX(${translateX}%)`;
 
+      // toggle active class on main images
+      const images = this.imageWrapper.querySelectorAll('.product-gallery__image');
+      images.forEach(img => img.classList.remove('active'));
+      const activeImg = Array.from(images).find(img => parseInt(img.dataset.index, 10) === index)?.classList.add('active')
+
+      // toggle active class on thumbnails
       this.thumbs.forEach((t) => t.classList.remove('active'));
-      this.thumbs[index].classList.add('active');
+      if (this.thumbs[index]) this.thumbs[index].classList.add('active');
 
       this.currentIndex = index;
       this.scrollToThumb(index);
@@ -1417,6 +1457,7 @@
 {% schema %}
 {
   "name": "t:general.product",
+  "class": "product-main",
   "settings": [],
   "disabled_on": {
     "groups": ["header", "footer"]
