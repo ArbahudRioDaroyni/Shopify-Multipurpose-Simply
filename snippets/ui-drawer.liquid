@@ -1,5 +1,5 @@
 {% doc %}
-  Renders a slide-over panel that slides in from the right side of the screen.
+  Renders a ui-drawer panel that slides in from the right side of the screen.
 
   @description
   JavaScript API:
@@ -25,21 +25,21 @@
   slideOver.hideFooter();
 
   ==> Custom Events
-  slideOver.addEventListener('slide-over:opened', (e) => {
+  slideOver.addEventListener('ui-drawer:opened', (e) => {
     console.log('Opened:', e.detail.slideOver);
   });
-  slideOver.addEventListener('slide-over:closed', (e) => {
+  slideOver.addEventListener('ui-drawer:closed', (e) => {
     console.log('Closed:', e.detail.slideOver);
   });
 
   ==> Dispatch Events
-  slideOver.dispatchEvent(new CustomEvent('slide-over:open'));
-  slideOver.dispatchEvent(new CustomEvent('slide-over:close'));
-  slideOver.dispatchEvent(new CustomEvent('slide-over:toggle'));
+  slideOver.dispatchEvent(new CustomEvent('ui-drawer:open'));
+  slideOver.dispatchEvent(new CustomEvent('ui-drawer:close'));
+  slideOver.dispatchEvent(new CustomEvent('ui-drawer:toggle'));
   
-  @param {string} [id] - Unique identifier for the slide-over
-  @param {string} [size] - Size of the slide-over: 'sm', 'md', 'lg', 'xl', 'half', 'full' (default: 'md')
-  @param {string} [position] - Position of the slide-over: 'left', 'right', 'top', 'bottom' (default: 'right')
+  @param {string} [id] - Unique identifier for the ui-drawer
+  @param {string} [size] - Size of the ui-drawer: 'sm', 'md', 'lg', 'xl', 'half', 'full' (default: 'md')
+  @param {string} [position] - Position of the ui-drawer: 'left', 'right', 'top', 'bottom' (default: 'right')
   @param {string} [title] - Title displayed in the header
   @param {string} [description] - Description displayed under the title
   @param {boolean} [show_close] - Whether to show the close button (default: true)
@@ -47,7 +47,7 @@
   @param {string} [footer] - HTML content to display in the footer
 
   @example
-  {% render 'slide-over', 
+  {% render 'ui-drawer', 
     id: 'my-slideover',
     title: 'Product Information',
     description: 'View detailed product specifications',
@@ -57,25 +57,25 @@
   %}
 
   Right sidebar (default)
-  {% render 'slide-over', id: 'product-details', position: 'right' %}
+  {% render 'ui-drawer', id: 'product-details', position: 'right' %}
 
   Left filter panel
-  {% render 'slide-over', id: 'filters', position: 'left', size: 'md' %}
+  {% render 'ui-drawer', id: 'filters', position: 'left', size: 'md' %}
 
   Top notification bar
-  {% render 'slide-over', id: 'notifications', position: 'top', size: 'sm' %}
+  {% render 'ui-drawer', id: 'notifications', position: 'top', size: 'sm' %}
 
   Bottom sheet
-  {% render 'slide-over', id: 'actions', position: 'bottom', size: 'lg' %}
+  {% render 'ui-drawer', id: 'actions', position: 'bottom', size: 'lg' %}
 
   Trigger from Button
-  <button data-slide-over-target="my-slideover">
-    Open Slide Over
+  <button data-ui-drawer-target="my-slideover">
+    Open Drawer
   </button>
 {% enddoc %}
 
 {% liquid
-  assign slide_id = id | default: 'slide-over'
+  assign slide_id = id | default: 'ui-drawer'
   assign slide_size = size | default: 'md'
   assign slide_position = position | default: 'right'
   assign slide_title = title | default: ''
@@ -84,27 +84,27 @@
   assign slide_content = content | default: ''
 %}
 
-<slide-over id="{{ slide_id }}" class="slide-over slide-over--{{ slide_size }} slide-over--{{ slide_position }}" data-size="{{ slide_size }}" data-position="{{ slide_position }}">
+<ui-drawer id="{{ slide_id }}" class="ui-drawer ui-drawer--{{ slide_size }} ui-drawer--{{ slide_position }}" data-size="{{ slide_size }}" data-position="{{ slide_position }}">
   <!-- Backdrop -->
-  <div class="slide-over__backdrop"></div>
+  <div class="ui-drawer__backdrop"></div>
   
   <!-- Panel -->
-  <div class="slide-over__panel">
+  <div class="ui-drawer__panel">
     <!-- Header -->
     {% if slide_title != blank or show_close_btn %}
-      <div class="slide-over__header">
-        <div class="slide-over__header-content">
+      <div class="ui-drawer__header">
+        <div class="ui-drawer__header-content">
           {% if slide_title != blank %}
-            <div class="slide-over__title-section">
-              <h2 class="slide-over__title">{{ slide_title }}</h2>
+            <div class="ui-drawer__title-section">
+              <h2 class="ui-drawer__title">{{ slide_title }}</h2>
               {% if slide_description != blank %}
-                <p class="slide-over__description">{{ slide_description }}</p>
+                <p class="ui-drawer__description">{{ slide_description }}</p>
               {% endif %}
             </div>
           {% endif %}
           
           {% if show_close_btn %}
-            <button class="slide-over__close" aria-label="Close panel">
+            <button class="ui-drawer__close" aria-label="Close panel">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -116,11 +116,11 @@
     {% endif %}
 
     <!-- Body -->
-    <div class="slide-over__body">
+    <div class="ui-drawer__body">
       {% if slide_content != blank %}
         {{ slide_content }}
       {% else %}
-        <div class="slide-over__content">
+        <div class="ui-drawer__content">
           <!-- Content will be injected here -->
         </div>
       {% endif %}
@@ -128,16 +128,16 @@
 
     <!-- Footer (optional slot) -->
     {% if footer != blank %}
-      <div class="slide-over__footer">
+      <div class="ui-drawer__footer">
         {{ footer }}
         <!-- Footer content can be added via JavaScript -->
       </div>
     {% endif %}
   </div>
-</slide-over>
+</ui-drawer>
 
 {% stylesheet %}
-  .slide-over {
+  .ui-drawer {
     position: fixed;
     top: 0;
     left: 0;
@@ -150,13 +150,13 @@
     pointer-events: none;
   }
 
-  .slide-over.active {
+  .ui-drawer.active {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
   }
 
-  .slide-over__backdrop {
+  .ui-drawer__backdrop {
     position: absolute;
     top: 0;
     left: 0;
@@ -168,12 +168,12 @@
     transition: opacity 0.3s ease;
   }
 
-  .slide-over.active .slide-over__backdrop {
+  .ui-drawer.active .ui-drawer__backdrop {
     opacity: 1;
   }
 
   /* Custom mouse cursor for backdrop */
-  .slide-over__backdrop::after {
+  .ui-drawer__backdrop::after {
     content: '';
     position: fixed;
     width: 32px;
@@ -192,11 +192,11 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 
-  .slide-over__backdrop.show-cursor::after {
+  .ui-drawer__backdrop.show-cursor::after {
     opacity: 1;
   }
 
-  .slide-over__backdrop::before {
+  .ui-drawer__backdrop::before {
     content: '×';
     position: fixed;
     width: 32px;
@@ -216,11 +216,11 @@
     transition: opacity 0.2s ease;
   }
 
-  .slide-over__backdrop.show-cursor::before {
+  .ui-drawer__backdrop.show-cursor::before {
     opacity: 1;
   }
 
-  .slide-over__panel {
+  .ui-drawer__panel {
     position: absolute;
     background: white;
     display: flex;
@@ -230,7 +230,7 @@
   }
 
   /* Position variants - Right (default) */
-  .slide-over--right .slide-over__panel {
+  .ui-drawer--right .ui-drawer__panel {
     top: 0;
     right: 0;
     height: 100%;
@@ -238,12 +238,12 @@
     transform: translateX(100%);
   }
 
-  .slide-over--right.active .slide-over__panel {
+  .ui-drawer--right.active .ui-drawer__panel {
     transform: translateX(0);
   }
 
   /* Position variants - Left */
-  .slide-over--left .slide-over__panel {
+  .ui-drawer--left .ui-drawer__panel {
     top: 0;
     left: 0;
     height: 100%;
@@ -251,12 +251,12 @@
     transform: translateX(-100%);
   }
 
-  .slide-over--left.active .slide-over__panel {
+  .ui-drawer--left.active .ui-drawer__panel {
     transform: translateX(0);
   }
 
   /* Position variants - Top */
-  .slide-over--top .slide-over__panel {
+  .ui-drawer--top .ui-drawer__panel {
     top: 0;
     left: 0;
     width: 100%;
@@ -264,12 +264,12 @@
     transform: translateY(-100%);
   }
 
-  .slide-over--top.active .slide-over__panel {
+  .ui-drawer--top.active .ui-drawer__panel {
     transform: translateY(0);
   }
 
   /* Position variants - Bottom */
-  .slide-over--bottom .slide-over__panel {
+  .ui-drawer--bottom .ui-drawer__panel {
     bottom: 0;
     left: 0;
     width: 100%;
@@ -277,105 +277,105 @@
     transform: translateY(100%);
   }
 
-  .slide-over--bottom.active .slide-over__panel {
+  .ui-drawer--bottom.active .ui-drawer__panel {
     transform: translateY(0);
   }
 
   /* Size variants - Left & Right positions */
-  .slide-over--right.slide-over--sm .slide-over__panel,
-  .slide-over--left.slide-over--sm .slide-over__panel {
+  .ui-drawer--right.ui-drawer--sm .ui-drawer__panel,
+  .ui-drawer--left.ui-drawer--sm .ui-drawer__panel {
     width: 320px;
     max-width: 90vw;
   }
 
-  .slide-over--right.slide-over--md .slide-over__panel,
-  .slide-over--left.slide-over--md .slide-over__panel {
+  .ui-drawer--right.ui-drawer--md .ui-drawer__panel,
+  .ui-drawer--left.ui-drawer--md .ui-drawer__panel {
     width: 448px;
     max-width: 90vw;
   }
 
-  .slide-over--right.slide-over--lg .slide-over__panel,
-  .slide-over--left.slide-over--lg .slide-over__panel {
+  .ui-drawer--right.ui-drawer--lg .ui-drawer__panel,
+  .ui-drawer--left.ui-drawer--lg .ui-drawer__panel {
     width: 640px;
     max-width: 90vw;
   }
 
-  .slide-over--right.slide-over--xl .slide-over__panel,
-  .slide-over--left.slide-over--xl .slide-over__panel {
+  .ui-drawer--right.ui-drawer--xl .ui-drawer__panel,
+  .ui-drawer--left.ui-drawer--xl .ui-drawer__panel {
     width: 768px;
     max-width: 90vw;
   }
 
-  .slide-over--right.slide-over--half .slide-over__panel,
-  .slide-over--left.slide-over--half .slide-over__panel {
+  .ui-drawer--right.ui-drawer--half .ui-drawer__panel,
+  .ui-drawer--left.ui-drawer--half .ui-drawer__panel {
     width: 50vw;
     max-width: 50vw;
   }
 
-  .slide-over--right.slide-over--full .slide-over__panel,
-  .slide-over--left.slide-over--full .slide-over__panel {
+  .ui-drawer--right.ui-drawer--full .ui-drawer__panel,
+  .ui-drawer--left.ui-drawer--full .ui-drawer__panel {
     width: 100vw;
     max-width: 100vw;
   }
 
   /* Size variants - Top & Bottom positions */
-  .slide-over--top.slide-over--sm .slide-over__panel,
-  .slide-over--bottom.slide-over--sm .slide-over__panel {
+  .ui-drawer--top.ui-drawer--sm .ui-drawer__panel,
+  .ui-drawer--bottom.ui-drawer--sm .ui-drawer__panel {
     height: 320px;
     max-height: 90vh;
   }
 
-  .slide-over--top.slide-over--md .slide-over__panel,
-  .slide-over--bottom.slide-over--md .slide-over__panel {
+  .ui-drawer--top.ui-drawer--md .ui-drawer__panel,
+  .ui-drawer--bottom.ui-drawer--md .ui-drawer__panel {
     height: 448px;
     max-height: 90vh;
   }
 
-  .slide-over--top.slide-over--lg .slide-over__panel,
-  .slide-over--bottom.slide-over--lg .slide-over__panel {
+  .ui-drawer--top.ui-drawer--lg .ui-drawer__panel,
+  .ui-drawer--bottom.ui-drawer--lg .ui-drawer__panel {
     height: 640px;
     max-height: 90vh;
   }
 
-  .slide-over--top.slide-over--xl .slide-over__panel,
-  .slide-over--bottom.slide-over--xl .slide-over__panel {
+  .ui-drawer--top.ui-drawer--xl .ui-drawer__panel,
+  .ui-drawer--bottom.ui-drawer--xl .ui-drawer__panel {
     height: 768px;
     max-height: 90vh;
   }
 
-  .slide-over--top.slide-over--half .slide-over__panel,
-  .slide-over--bottom.slide-over--half .slide-over__panel {
+  .ui-drawer--top.ui-drawer--half .ui-drawer__panel,
+  .ui-drawer--bottom.ui-drawer--half .ui-drawer__panel {
     height: 50vh;
     max-height: 50vh;
   }
 
-  .slide-over--top.slide-over--full .slide-over__panel,
-  .slide-over--bottom.slide-over--full .slide-over__panel {
+  .ui-drawer--top.ui-drawer--full .ui-drawer__panel,
+  .ui-drawer--bottom.ui-drawer--full .ui-drawer__panel {
     height: 100vh;
     max-height: 100vh;
   }
 
   /* Header */
-  .slide-over__header {
+  .ui-drawer__header {
     flex-shrink: 0;
     border-bottom: 1px solid #e5e7eb;
     padding: 24px;
     background: white;
   }
 
-  .slide-over__header-content {
+  .ui-drawer__header-content {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: 16px;
   }
 
-  .slide-over__title-section {
+  .ui-drawer__title-section {
     flex: 1;
     min-width: 0;
   }
 
-  .slide-over__title {
+  .ui-drawer__title {
     font-size: 18px;
     font-weight: 600;
     line-height: 1.4;
@@ -383,14 +383,14 @@
     color: #111827;
   }
 
-  .slide-over__description {
+  .ui-drawer__description {
     font-size: 14px;
     color: #6b7280;
     margin: 0;
     line-height: 1.5;
   }
 
-  .slide-over__close {
+  .ui-drawer__close {
     flex-shrink: 0;
     background: none;
     border: none;
@@ -404,25 +404,25 @@
     justify-content: center;
   }
 
-  .slide-over__close:hover {
+  .ui-drawer__close:hover {
     background: #f3f4f6;
     color: #111827;
   }
 
   /* Body */
-  .slide-over__body {
+  .ui-drawer__body {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
     background: white;
   }
 
-  .slide-over__content {
+  .ui-drawer__content {
     min-height: 100%;
   }
 
   /* Footer */
-  .slide-over__footer {
+  .ui-drawer__footer {
     flex-shrink: 0;
     border-top: 1px solid #e5e7eb;
     padding: 16px 24px;
@@ -431,91 +431,91 @@
 
   /* Mobile responsive */
   @media (max-width: 640px) {
-    .slide-over--right .slide-over__panel,
-    .slide-over--left .slide-over__panel {
+    .ui-drawer--right .ui-drawer__panel,
+    .ui-drawer--left .ui-drawer__panel {
       width: 100%;
       max-width: 100vw;
     }
 
-    .slide-over--top .slide-over__panel,
-    .slide-over--bottom .slide-over__panel {
+    .ui-drawer--top .ui-drawer__panel,
+    .ui-drawer--bottom .ui-drawer__panel {
       height: 90vh;
       max-height: 90vh;
     }
 
     /* Keep half and full sizes on mobile */
-    .slide-over--right.slide-over--half .slide-over__panel,
-    .slide-over--left.slide-over--half .slide-over__panel {
+    .ui-drawer--right.ui-drawer--half .ui-drawer__panel,
+    .ui-drawer--left.ui-drawer--half .ui-drawer__panel {
       width: 50vw;
       max-width: 50vw;
     }
 
-    .slide-over--top.slide-over--half .slide-over__panel,
-    .slide-over--bottom.slide-over--half .slide-over__panel {
+    .ui-drawer--top.ui-drawer--half .ui-drawer__panel,
+    .ui-drawer--bottom.ui-drawer--half .ui-drawer__panel {
       height: 50vh;
       max-height: 50vh;
     }
 
-    .slide-over--right.slide-over--full .slide-over__panel,
-    .slide-over--left.slide-over--full .slide-over__panel,
-    .slide-over--top.slide-over--full .slide-over__panel,
-    .slide-over--bottom.slide-over--full .slide-over__panel {
+    .ui-drawer--right.ui-drawer--full .ui-drawer__panel,
+    .ui-drawer--left.ui-drawer--full .ui-drawer__panel,
+    .ui-drawer--top.ui-drawer--full .ui-drawer__panel,
+    .ui-drawer--bottom.ui-drawer--full .ui-drawer__panel {
       width: 100vw;
       height: 100vh;
       max-width: 100vw;
       max-height: 100vh;
     }
 
-    .slide-over__header {
+    .ui-drawer__header {
       padding: 20px;
     }
 
-    .slide-over__body {
+    .ui-drawer__body {
       padding: 20px;
     }
 
-    .slide-over__footer {
+    .ui-drawer__footer {
       padding: 16px 20px;
     }
 
-    .slide-over__title {
+    .ui-drawer__title {
       font-size: 16px;
     }
   }
 
   /* Scroll lock for better mobile support */
-  html.slide-over-open {
+  html.ui-drawer-open {
     overflow: hidden;
     touch-action: none;
     -webkit-overflow-scrolling: touch;
   }
 
-  html.slide-over-open body {
+  html.ui-drawer-open body {
     overflow: hidden;
     touch-action: none;
   }
 
   /* Prevent iOS bounce scroll */
-  .slide-over.active {
+  .ui-drawer.active {
     -webkit-overflow-scrolling: auto;
   }
 
   /* Accessibility and animations */
   @media (prefers-reduced-motion: reduce) {
-    .slide-over,
-    .slide-over__backdrop,
-    .slide-over__panel,
-    .slide-over__close {
+    .ui-drawer,
+    .ui-drawer__backdrop,
+    .ui-drawer__panel,
+    .ui-drawer__close {
       transition: none;
     }
   }
 
   /* Focus management */
-  .slide-over:focus-within .slide-over__panel {
+  .ui-drawer:focus-within .ui-drawer__panel {
     outline: none;
   }
 
-  .slide-over__close:focus {
+  .ui-drawer__close:focus {
     outline: 2px solid #2563eb;
     outline-offset: 2px;
   }
@@ -525,9 +525,9 @@
   class SlideOver extends HTMLElement {
     constructor() {
       super();
-      this.backdrop = this.querySelector('.slide-over__backdrop');
-      this.panel = this.querySelector('.slide-over__panel');
-      this.closeBtn = this.querySelector('.slide-over__close');
+      this.backdrop = this.querySelector('.ui-drawer__backdrop');
+      this.panel = this.querySelector('.ui-drawer__panel');
+      this.closeBtn = this.querySelector('.ui-drawer__close');
       this.isOpen = false;
       this.previousFocus = null;
       
@@ -578,7 +578,7 @@
 
         this.panel.addEventListener('touchmove', (e) => {
           const panel = e.currentTarget;
-          const scrollableArea = panel.querySelector('.slide-over__body');
+          const scrollableArea = panel.querySelector('.ui-drawer__body');
           
           if (!scrollableArea) return;
           
@@ -605,7 +605,7 @@
 
       // Listen for external triggers
       document.addEventListener('click', (e) => {
-        const trigger = e.target.closest(`[data-slide-over-target="${this.id}"]`);
+        const trigger = e.target.closest(`[data-ui-drawer-target="${this.id}"]`);
         if (trigger) {
           e.preventDefault();
           this.open();
@@ -613,9 +613,9 @@
       });
 
       // Custom events
-      this.addEventListener('slide-over:open', () => this.open());
-      this.addEventListener('slide-over:close', () => this.close());
-      this.addEventListener('slide-over:toggle', () => this.toggle());
+      this.addEventListener('ui-drawer:open', () => this.open());
+      this.addEventListener('ui-drawer:close', () => this.close());
+      this.addEventListener('ui-drawer:toggle', () => this.toggle());
     }
 
     open() {
@@ -637,7 +637,7 @@
       document.body.style.overflow = 'hidden';
       
       // Add scroll lock class
-      document.documentElement.classList.add('slide-over-open');
+      document.documentElement.classList.add('ui-drawer-open');
       
       // Focus management
       requestAnimationFrame(() => {
@@ -650,7 +650,7 @@
       });
 
       // Dispatch event
-      this.dispatchEvent(new CustomEvent('slide-over:opened', {
+      this.dispatchEvent(new CustomEvent('ui-drawer:opened', {
         bubbles: true,
         detail: { slideOver: this }
       }));
@@ -671,7 +671,7 @@
       document.body.style.overflow = '';
       
       // Remove scroll lock class
-      document.documentElement.classList.remove('slide-over-open');
+      document.documentElement.classList.remove('ui-drawer-open');
       
       // Restore scroll position
       if (this.scrollY !== undefined) {
@@ -686,7 +686,7 @@
       }
 
       // Dispatch event
-      this.dispatchEvent(new CustomEvent('slide-over:closed', {
+      this.dispatchEvent(new CustomEvent('ui-drawer:closed', {
         bubbles: true,
         detail: { slideOver: this }
       }));
@@ -702,28 +702,28 @@
 
     // Public methods
     setTitle(title) {
-      const titleElement = this.querySelector('.slide-over__title');
+      const titleElement = this.querySelector('.ui-drawer__title');
       if (titleElement) {
         titleElement.textContent = title;
       }
     }
 
     setDescription(description) {
-      const descElement = this.querySelector('.slide-over__description');
+      const descElement = this.querySelector('.ui-drawer__description');
       if (descElement) {
         descElement.textContent = description;
       }
     }
 
     setContent(content) {
-      const contentElement = this.querySelector('.slide-over__content') || this.querySelector('.slide-over__body');
+      const contentElement = this.querySelector('.ui-drawer__content') || this.querySelector('.ui-drawer__body');
       if (contentElement) {
         contentElement.innerHTML = content;
       }
     }
 
     setFooter(footerContent) {
-      const footerElement = this.querySelector('.slide-over__footer');
+      const footerElement = this.querySelector('.ui-drawer__footer');
       if (footerElement) {
         footerElement.innerHTML = footerContent;
         footerElement.style.display = footerContent ? 'block' : 'none';
@@ -732,14 +732,14 @@
 
     // Utility methods
     showFooter() {
-      const footerElement = this.querySelector('.slide-over__footer');
+      const footerElement = this.querySelector('.ui-drawer__footer');
       if (footerElement) {
         footerElement.style.display = 'block';
       }
     }
 
     hideFooter() {
-      const footerElement = this.querySelector('.slide-over__footer');
+      const footerElement = this.querySelector('.ui-drawer__footer');
       if (footerElement) {
         footerElement.style.display = 'none';
       }
@@ -747,8 +747,8 @@
   }
 
   // Register custom element
-  if (!customElements.get('slide-over')) {
-    customElements.define('slide-over', SlideOver);
+  if (!customElements.get('ui-drawer')) {
+    customElements.define('ui-drawer', SlideOver);
   }
 
   // Global utilities
@@ -769,7 +769,7 @@
     },
 
     closeAll: () => {
-      document.querySelectorAll('slide-over.active').forEach(slideOver => {
+      document.querySelectorAll('ui-drawer.active').forEach(slideOver => {
         slideOver.close();
       });
     }

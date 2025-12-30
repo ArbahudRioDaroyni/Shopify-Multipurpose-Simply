@@ -88,7 +88,7 @@
 {% endcapture %}
 
 <!-- Cart Drawer -->
-{% render 'slide-over',
+{% render 'ui-drawer',
   id: 'cart-drawer',
   position: 'right',
   size: 'lg',
@@ -118,7 +118,7 @@
         // Refresh cart drawer content
         const url = new URL('/cart', window.location.origin);
         url.searchParams.set('section_id', 'cart-drawer');
-        await window.theme.Section.refresh(url, ['.slide-over__body', '.slide-over__footer']);
+        await window.theme.Section.refresh(url, ['.ui-drawer__body', '.ui-drawer__footer']);
 
         this.openCartDrawer();
 
