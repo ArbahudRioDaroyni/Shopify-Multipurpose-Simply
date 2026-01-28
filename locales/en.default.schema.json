@@ -55,6 +55,20 @@
     "line_height": "Line height",
     "margin": "Margin",
     "menu": "Menu",
+    "address": "Address",
+    "categories_menu": "Categories menu",
+    "company_information": "Company information",
+    "email": "Email",
+    "information_menu": "Information menu",
+    "logo": "Logo",
+    "navigation_menus": "Navigation menus", 
+    "payment_options": "Payment options",
+    "phone": "Phone",
+    "show_social_icons": "Show social icons",
+    "social_link": "Social link",
+    "social_platform": "Social platform",
+    "url": "URL",
+    "useful_links_menu": "Useful links menu",
     "padding": "Padding",
     "page_margin": "Page margin",
     "page_width": "Page width",
@@ -307,6 +321,27 @@
         },
         "description": {
           "label": "Section description"
+        }
+      }
+    },
+    "recently_viewed": {
+      "name": "Recently viewed products",
+      "settings": {
+        "title": {
+          "label": "Section title"
+        },
+        "limit": {
+          "label": "Number of products to show",
+          "info": "Maximum number of recently viewed products to display"
+        },
+        "columns_desktop": {
+          "label": "Columns on desktop"
+        },
+        "columns_tablet": {
+          "label": "Columns on tablet"
+        },
+        "columns_mobile": {
+          "label": "Columns on mobile"
         }
       }
     }
