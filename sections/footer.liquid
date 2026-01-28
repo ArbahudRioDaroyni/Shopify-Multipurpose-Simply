@@ -13,21 +13,18 @@
       <div class="footer__company-info">
         {% if section.settings.address %}
           <div class="footer__address">
-            {% render 'icon', name: 'location' %}
             <span>{{ section.settings.address }}</span>
           </div>
         {% endif %}
         
         {% if section.settings.email %}
           <div class="footer__contact-item">
-            {% render 'icon', name: 'email' %}
             <a href="mailto:{{ section.settings.email }}">{{ section.settings.email }}</a>
           </div>
         {% endif %}
         
         {% if section.settings.phone %}
           <div class="footer__contact-item">
-            {% render 'icon', name: 'phone' %}
             <a href="tel:{{ section.settings.phone }}">{{ section.settings.phone }}</a>
           </div>
         {% endif %}
@@ -38,7 +35,7 @@
           {% for block in section.blocks %}
             {% if block.type == 'social_link' and block.settings.url != blank %}
               <a href="{{ block.settings.url }}" class="footer__social-link" target="_blank" rel="noopener noreferrer" aria-label="{{ block.settings.platform | capitalize }}">
-                {% render 'icon', name: block.settings.platform %}
+                {{ block.settings.platform | capitalize | slice: 0, 1 }}
               </a>
             {% endif %}
           {% endfor %}
@@ -110,19 +107,26 @@
 
 {% stylesheet %}
   .footer {
-    background-color: var(--color-background-secondary, #f8f9fa);
-    padding: 4rem 0 1rem;
-    margin-top: 4rem;
-    border-top: 1px solid var(--color-border, #e9ecef);
+    background-color: var(--color-background, #fff);
+    padding: 3rem 0 1rem;
+    margin-top: 3rem;
+    color: var(--color-foreground, #333);
   }
   
   .footer__container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 2rem;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .footer__container {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr;
+      gap: 2rem;
+    }
   }
   
   .footer__column {
@@ -131,50 +135,36 @@
     gap: 1rem;
   }
   
-  .footer__column--company {
-    grid-column: span 1;
-  }
-  
-  @media (min-width: 768px) {
-    .footer__container {
-      grid-template-columns: 2fr 1fr 1fr 1fr 1.5fr;
-      gap: 3rem;
-    }
-    
-    .footer__column--company {
-      grid-column: span 1;
-    }
+  .footer__logo-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    color: var(--color-foreground);
+    text-transform: lowercase;
   }
   
   .footer__logo-image {
-    max-width: 150px;
+    max-width: 120px;
     height: auto;
-  }
-  
-  .footer__logo-text {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--color-foreground);
+    margin-bottom: 1rem;
   }
   
   .footer__company-info {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
     font-size: 0.9rem;
-    color: var(--color-foreground-subtle, #6c757d);
+    color: #999;
+    margin-bottom: 1rem;
   }
   
   .footer__address,
   .footer__contact-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem;
+    line-height: 1.4;
   }
   
   .footer__contact-item a {
-    color: inherit;
+    color: #999;
     text-decoration: none;
   }
   
@@ -184,36 +174,33 @@
   
   .footer__social {
     display: flex;
-    gap: 0.75rem;
-    margin-top: 0.5rem;
+    gap: 0.5rem;
   }
   
   .footer__social-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
-    background-color: var(--color-foreground-subtle, #e9ecef);
+    width: 30px;
+    height: 30px;
+    background-color: #f0f0f0;
     color: var(--color-foreground);
-    border-radius: 50%;
     text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
     transition: all 0.2s ease;
   }
   
   .footer__social-link:hover {
     background-color: var(--color-foreground);
     color: var(--color-background);
-    transform: translateY(-2px);
   }
   
   .footer__heading {
     font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
+    font-weight: 500;
+    margin: 0 0 0.5rem 0;
     color: var(--color-foreground);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
   }
   
   .footer__links {
@@ -222,7 +209,7 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.3rem;
   }
   
   .footer__links li {
@@ -230,7 +217,7 @@
   }
   
   .footer__links a {
-    color: var(--color-foreground-subtle, #6c757d);
+    color: #999;
     text-decoration: none;
     font-size: 0.9rem;
     line-height: 1.4;
@@ -241,32 +228,28 @@
     color: var(--color-foreground);
   }
   
-  .footer__column--newsletter {
-    max-width: 300px;
-  }
-  
   .footer__newsletter-text {
     font-size: 0.9rem;
-    color: var(--color-foreground-subtle, #6c757d);
+    color: #999;
     line-height: 1.4;
-    margin: 0;
+    margin: 0 0 1rem 0;
   }
   
   .footer__newsletter-form {
-    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
   
   .footer__newsletter-input-wrapper {
     display: flex;
+    border: 1px solid #ddd;
     border-radius: 25px;
     overflow: hidden;
-    border: 1px solid var(--color-border, #e9ecef);
     background-color: var(--color-background);
   }
   
   .footer__newsletter-input {
     flex: 1;
-    padding: 0.75rem 1rem;
+    padding: 0.7rem 1rem;
     border: none;
     background: transparent;
     color: var(--color-foreground);
@@ -274,7 +257,7 @@
   }
   
   .footer__newsletter-input::placeholder {
-    color: var(--color-foreground-subtle, #6c757d);
+    color: #999;
   }
   
   .footer__newsletter-input:focus {
@@ -282,48 +265,42 @@
   }
   
   .footer__newsletter-button {
-    padding: 0.75rem 1.5rem;
-    background-color: var(--color-foreground);
-    color: var(--color-background);
+    padding: 0.7rem 1.5rem;
+    background-color: var(--color-foreground, #000);
+    color: var(--color-background, #fff);
     border: none;
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
   
   .footer__newsletter-button:hover {
-    background-color: var(--color-foreground-hover, #343a40);
+    opacity: 0.9;
   }
   
   .footer__payment {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 1rem;
   }
   
   .footer__payment-icon {
-    width: 40px;
-    height: 25px;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-  }
-  
-  .footer__payment-icon:hover {
-    opacity: 1;
+    width: 35px;
+    height: 22px;
+    opacity: 0.6;
   }
   
   .footer__bottom {
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--color-border, #e9ecef);
+    border-top: 1px solid #eee;
     text-align: center;
   }
   
   .footer__copyright {
     font-size: 0.85rem;
-    color: var(--color-foreground-subtle, #6c757d);
+    color: #999;
   }
   
   .footer__copyright a {
