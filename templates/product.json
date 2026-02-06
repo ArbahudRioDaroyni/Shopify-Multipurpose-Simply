@@ -16,9 +16,13 @@
     //   "type": "product",
     //   "settings": {}
     // }
+    "recently-viewed": {
+      "type": "recently-viewed"
+    }
   },
   "order": [
     "default",
     // "main",
+    "recently-viewed"
   ]
 }
