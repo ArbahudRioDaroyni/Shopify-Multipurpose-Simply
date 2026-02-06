@@ -31,15 +31,15 @@
         "label": "t:labels.page_width",
         "options": [
           {
-            "value": "70vw",
+            "value": "1024px",
             "label": "t:options.page_width.narrow"
           },
           {
-            "value": "85vw",
+            "value": "1440px",
             "label": "t:options.page_width.wide"
           }
         ],
-        "default": "85vw"
+        "default": "1440px"
       },
       {
         "type": "range",
