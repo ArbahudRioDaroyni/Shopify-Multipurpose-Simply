@@ -1,0 +1,549 @@
+{% doc %}
+  Renders a product card with flexible styling and content options.
+
+  @param {product} product - The product object to display
+  @param {string} [style] - Card style: 'default', 'minimal', 'bordered', 'shadow', 'overlay' (default: 'default')
+  @param {string} [image_ratio] - Image aspect ratio: 'natural', 'square', 'portrait', 'landscape' (default: 'square')
+  @param {boolean} [show_vendor] - Whether to show product vendor (default: false)
+  @param {boolean} [show_rating] - Whether to show product rating (default: false)
+  @param {boolean} [show_price] - Whether to show product price (default: true)
+  @param {boolean} [show_compare_price] - Whether to show compare at price (default: true)
+  @param {boolean} [show_badge] - Whether to show sale/new badges (default: true)
+  @param {boolean} [enable_quick_view] - Whether to enable quick view functionality (default: false)
+  @param {string} [button_text] - Custom button text
+  @param {string} [button_style] - Button style: 'primary', 'secondary', 'outline', 'ghost' (default: 'primary')
+  @param {string} [class] - Additional CSS classes
+
+  @example
+  {% render 'card', product: product %}
+  
+  {% render 'card', 
+    product: product, 
+    style: 'shadow',
+    image_ratio: 'portrait',
+    show_vendor: true,
+    button_text: 'Add to Cart'
+  %}
+{% enddoc %}
+
+{% liquid
+  unless product
+    assign product = all_products.first
+  endunless
+  
+  assign card_style = style | default: 'default'
+  assign card_image_ratio = image_ratio | default: 'square'
+  assign card_show_vendor = show_vendor | default: false
+  assign card_show_rating = show_rating | default: false
+  assign card_show_price = show_price | default: true
+  assign card_show_compare_price = show_compare_price | default: true
+  assign card_show_badge = show_badge | default: true
+  assign card_enable_quick_view = enable_quick_view | default: false
+  assign card_button_text = button_text | default: ''
+  assign card_button_style = button_style | default: 'primary'
+  assign card_class = class | default: ''
+  
+  # Calculate pricing
+  assign on_sale = false
+  assign sale_percentage = 0
+  if product.compare_at_price > product.price
+    assign on_sale = true
+    assign sale_percentage = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price
+  endif
+  
+  # Check if product is new (within last 30 days)
+  assign is_new = false
+  assign thirty_days_ago = 'now' | date: '%s' | minus: 2592000
+  assign product_created = product.created_at | date: '%s'
+  if product_created >= thirty_days_ago
+    assign is_new = true
+  endif
+%}
+
+<div class="card card--{{ card_style }} {{ card_class }}" 
+     data-product-id="{{ product.id }}"
+     data-product-handle="{{ product.handle }}">
+  
+  <!-- Image Section -->
+  <div class="card__image card__image--{{ card_image_ratio }}">
+    <a href="{{ product.url }}" class="card__image-link {{ card_button_style }}" aria-label="{{ product.title }}">
+      {% if product.featured_media %}
+        {% render 'image',
+          image: product.featured_media,
+          width: 400,
+          height: 400,
+          class: 'card__image-primary'
+        %}
+        
+        {% comment %} Hover image {% endcomment %}
+        {% if product.media.size > 1 %}
+          {% assign second_image = product.media[1] %}
+          {% render 'image',
+            image: second_image,
+            width: 400,
+            height: 400,
+            class: 'card__image-hover'
+          %}
+        {% endif %}
+      {% comment %} {% else %}
+        <div class="card__image-placeholder">
+          {% render 'icon', name: 'placeholder-image' %}
+        </div> {% endcomment %}
+      {% endif %}
+    </a>
+    
+    <!-- Badges -->
+    {% if card_show_badge %}
+      {% if on_sale or is_new or product.available == false %}
+        <div class="card__badges">
+          {% if product.available == false %}
+            <span class="card__badge card__badge--sold-out">{{ 'products.product.sold_out' | t }}</span>
+          {% elsif on_sale %}
+            <span class="card__badge card__badge--sale">{{ sale_percentage }}% {{ 'products.product.on_sale' | t }}</span>
+          {% elsif is_new %}
+            <span class="card__badge card__badge--new">{{ 'products.product.new' | t }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endif %}
+    
+    <!-- Quick Actions -->
+    {% if card_enable_quick_view or card_button_text != blank %}
+      <div class="card__actions">
+        {% if card_enable_quick_view %}
+          <button class="card__quick-view" 
+                  data-product-handle="{{ product.handle }}"
+                  aria-label="{{ 'products.product.quick_view' | t }}: {{ product.title }}">
+            {% render 'icon', icon: 'phone' %}
+          </button>
+        {% endif %}
+        
+        {% if card_button_text != blank %}
+          {% render 'button',
+            text: card_button_text,
+            style: card_button_style,
+            size: 'sm',
+            data_attributes: 'data-product-id="' | append: product.id | append: '"',
+            class: 'card__action-button'
+          %}
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+  
+  <!-- Content Section -->
+  <div class="card__content">
+    <!-- Vendor -->
+    {% if card_show_vendor and product.vendor != blank %}
+      <div class="card__vendor">{{ product.vendor }}</div>
+    {% endif %}
+    
+    <!-- Title -->
+    <h3 class="card__title">
+      <a href="{{ product.url }}">{{ product.title }}</a>
+    </h3>
+    
+    <!-- Rating -->
+    {% if card_show_rating %}
+      <div class="card__rating">
+        {% comment %} Placeholder for rating system {% endcomment %}
+        <div class="rating">
+          {% for i in (1..5) %}
+            <span class="rating__star">★</span>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    
+    <!-- Price -->
+    {% if card_show_price %}
+      <div class="card__price">
+        {% if on_sale and card_show_compare_price %}
+          <span class="card__price--compare">{{ product.compare_at_price | money }}</span>
+        {% endif %}
+        <span class="card__price--current{% if on_sale %} card__price--sale{% endif %}">
+          {% if product.price_varies %}
+            {{ 'products.product.from_text_html' | t: price: product.price_min | money }}
+          {% else %}
+            {{ product.price | money }}
+          {% endif %}
+        </span>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: white;
+    border-radius: 8px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    overflow: hidden;
+  }
+  
+  .card:hover {
+    transform: translateY(-2px);
+  }
+  
+  /* Card Styles */
+  .card--default {
+    border: 1px solid #e5e7eb;
+  }
+  
+  .card--minimal {
+    border: none;
+    background: transparent;
+  }
+  
+  .card--bordered {
+    border: 2px solid #d1d5db;
+  }
+  
+  .card--shadow {
+    border: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card--shadow:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card--overlay .card__content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+    color: white;
+  }
+  
+  /* Image Section */
+  .card__image {
+    position: relative;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  
+  .card__image--natural {
+    aspect-ratio: auto;
+  }
+  
+  .card__image--square {
+    aspect-ratio: 1 / 1;
+  }
+  
+  .card__image--portrait {
+    aspect-ratio: 3 / 4;
+  }
+  
+  .card__image--landscape {
+    aspect-ratio: 4 / 3;
+  }
+  
+  .card__image-link {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .card__image-primary {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+  }
+  
+  .card__image-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .card:hover .card__image-hover {
+    opacity: 1;
+  }
+  
+  .card__image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #f3f4f6;
+    color: #9ca3af;
+  }
+  
+  /* Badges */
+  .card__badges {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .card__badge {
+    display: inline-block;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    border-radius: 4px;
+    color: white;
+  }
+  
+  .card__badge--sale {
+    background: #ef4444;
+  }
+  
+  .card__badge--new {
+    background: #10b981;
+  }
+  
+  .card__badge--sold-out {
+    background: #6b7280;
+  }
+  
+  /* Quick Actions */
+  .card__actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  
+  .card:hover .card__actions {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  .card__quick-view {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .card__quick-view:hover {
+    background: white;
+  }
+  
+  .card__action-button {
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+  }
+  
+  /* Content Section */
+  .card__content {
+    flex: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .card--overlay .card__content {
+    padding: 20px 16px 16px;
+  }
+  
+  .card__vendor {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .card__title {
+    flex: 1;
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  
+  .card__title a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .card__title a:hover {
+    color: #2563eb;
+  }
+  
+  .card--overlay .card__title a {
+    color: white;
+  }
+  
+  .card--overlay .card__title a:hover {
+    color: #dbeafe;
+  }
+  
+  /* Rating */
+  .card__rating {
+    margin: 4px 0;
+  }
+  
+  .rating {
+    display: flex;
+    gap: 2px;
+  }
+  
+  .rating__star {
+    font-size: 14px;
+    color: #fbbf24;
+  }
+  
+  /* Price */
+  .card__price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  
+  .card__price--compare {
+    font-size: 14px;
+    color: #6b7280;
+    text-decoration: line-through;
+  }
+  
+  .card__price--current {
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+  }
+  
+  .card__price--sale {
+    color: #ef4444;
+  }
+  
+  .card--overlay .card__price--current {
+    color: white;
+  }
+  
+  /* Mobile Responsive */
+  @media (max-width: 640px) {
+    .card__content {
+      padding: 12px;
+    }
+    
+    .card__title {
+      font-size: 13px;
+    }
+    
+    .card__price--current {
+      font-size: 14px;
+    }
+    
+    .card__actions {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* High contrast mode */
+  @media (prefers-contrast: high) {
+    .card {
+      border: 2px solid currentColor;
+    }
+    
+    .card__badge {
+      border: 1px solid white;
+    }
+  }
+  
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .card,
+    .card__image-primary,
+    .card__image-hover,
+    .card__actions,
+    .card__title a,
+    .card__quick-view {
+      transition: none;
+    }
+    
+    .card:hover {
+      transform: none;
+    }
+  }
+  {% endstylesheet %}
+
+  {% javascript %}
+  // Card functionality
+  // document.addEventListener('DOMContentLoaded', () => {
+  //   // Track product view for recently viewed
+  //   const currentProduct = document.querySelector('[data-product-id]');
+  //   if (currentProduct && window.RecentlyViewedUtils) {
+  //     const productId = currentProduct.dataset.productId;
+  //     const productHandle = currentProduct.dataset.productHandle;
+  //     
+  //     // Add to recently viewed when card is in viewport
+  //     const observer = new IntersectionObserver((entries) => {
+  //       entries.forEach(entry => {
+  //         if (entry.isIntersecting) {
+  //           // Get product data from page or fetch it
+  //           const productData = {
+  //             title: entry.target.querySelector('.card__title a')?.textContent?.trim(),
+  //             price: entry.target.querySelector('.card__price--current')?.textContent?.trim(),
+  //             image: entry.target.querySelector('.card__image-primary')?.src,
+  //             url: entry.target.querySelector('.card__title a')?.href
+  //           };
+  //           
+  //           if (productHandle && productData.title) {
+  //             window.RecentlyViewedUtils.add(productHandle, productData);
+  //           }
+  //           
+  //           observer.unobserve(entry.target);
+  //         }
+  //       });
+  //     }, {
+  //       threshold: 0.5,
+  //       rootMargin: '0px 0px -50px 0px'
+  //     });
+  //     
+  //     observer.observe(currentProduct);
+  //   }
+  //   
+  //   // Quick view functionality
+  //   document.addEventListener('click', (e) => {
+  //     const quickViewBtn = e.target.closest('.card__quick-view');
+  //     if (quickViewBtn) {
+  //       e.preventDefault();
+  //       const productHandle = quickViewBtn.dataset.productHandle;
+  //       
+  //       if (productHandle && window.QuickViewUtils) {
+  //         window.QuickViewUtils.open(productHandle);
+  //       } else {
+  //         // Fallback: redirect to product page
+  //         window.location.href = `/products/${productHandle}`;
+  //       }
+  //     }
+  //   });
+  // });
+  {% endjavascript %}
