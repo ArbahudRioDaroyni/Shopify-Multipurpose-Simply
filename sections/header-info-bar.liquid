@@ -1,55 +1,54 @@
-<div
-  id="header-info-bar-{{ section.id }}"
-  class="header-info-bar color-{{ section.settings.color_scheme }}"
->
-  <div class="header-info-bar__left">
-    {% content_for 'block', type: 'group', id: 'phone-group' %}
+<div id="header-info-bar-{{ section.id }}" class="header-info-bar color-{{ section.settings.color_scheme }}">
+  <div class="header-info-bar__container container">
+    <div class="header-info-bar__left">
+      {% content_for 'block', type: 'group', id: 'phone-group' %}
 
-    {% content_for 'block', type: 'group', id: 'email-group' %}
-  </div>
+      {% content_for 'block', type: 'group', id: 'email-group' %}
+    </div>
 
-  <div class="header-info-bar__middle slide-text-container">
-    {% content_for 'block', type: 'group', id: 'promotion-group' %}
-  </div>
+    <div class="header-info-bar__middle slide-text-container">
+      {% content_for 'block', type: 'group', id: 'promotion-group' %}
+    </div>
 
-  <div class="header-info-bar__right">
-    {% content_for 'block', type: 'group', id: 'map-point-group' %}
+    <div class="header-info-bar__right">
+      {% content_for 'block', type: 'group', id: 'map-point-group' %}
 
-    {% if section.settings.show_currency_selector %}
-      {% form 'currency', class: 'header-info-bar__item header-info-bar__currency' %}
-        <select name="currency_code" class="header-info-bar__select" onchange="this.form.submit()">
-          {% for currency_option in shop.enabled_currencies %}
-            <option value="{{ currency_option.iso_code }}" {% if currency_option.iso_code == shop.currency %}selected{% endif %}>
-              {{ currency_option.iso_code }}
+      {% if section.settings.show_currency_selector %}
+        {% form 'currency', class: 'header-info-bar__item header-info-bar__currency' %}
+          <select name="currency_code" class="header-info-bar__select" onchange="this.form.submit()">
+            {% for currency_option in shop.enabled_currencies %}
+              <option value="{{ currency_option.iso_code }}" {% if currency_option.iso_code == shop.currency %}selected{% endif %}>
+                {{ currency_option.iso_code }}
+              </option>
+            {% endfor %}
+          </select>
+          <svg class="header-info-bar__chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {% endform %}
+      {% endif %}
+
+      {% if section.settings.show_language_selector %}
+        {% form 'localization', class: 'header-info-bar__item header-info-bar__language' %}
+          {% render 'icon-or-image', icon: 'global', width: 14 %}
+          <select name="locale_code" class="header-info-bar__select" onchange="this.form.submit()">
+            <option value="{{ localization.language.iso_code }}" lang="{{ localization.language.iso_code }}" selected>
+              {{ localization.language.endonym_name | capitalize }}
             </option>
-          {% endfor %}
-        </select>
-        <svg class="header-info-bar__chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      {% endform %}
-    {% endif %}
-
-    {% if section.settings.show_language_selector %}
-      {% form 'localization', class: 'header-info-bar__item header-info-bar__language' %}
-        {% render 'icon-or-image', icon: 'global', width: 14 %}
-        <select name="locale_code" class="header-info-bar__select" onchange="this.form.submit()">
-          <option value="{{ localization.language.iso_code }}" lang="{{ localization.language.iso_code }}" selected>
-            {{ localization.language.endonym_name | capitalize }}
-          </option>
-          {{ country_option_tags }}
-          {% comment %} {{ all_country_option_tags }} {% endcomment %}
-          {% comment %} {% for language in localization.available_languages %}
-            <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
-              {{ language.endonym_name | capitalize }}
-            </option>
-          {% endfor %} {% endcomment %}
-        </select>
-        <svg class="header-info-bar__chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      {% endform %}
-    {% endif %}
+            {{ country_option_tags }}
+            {% comment %} {{ all_country_option_tags }} {% endcomment %}
+            {% comment %} {% for language in localization.available_languages %}
+              <option value="{{ language.iso_code }}" lang="{{ language.iso_code }}" {% if language.iso_code == localization.language.iso_code %}selected{% endif %}>
+                {{ language.endonym_name | capitalize }}
+              </option>
+            {% endfor %} {% endcomment %}
+          </select>
+          <svg class="header-info-bar__chevron" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        {% endform %}
+      {% endif %}
+    </div>
   </div>
 </div>
 
@@ -57,16 +56,19 @@
   .header-info-bar {
     background-color: var(--color-background);
     color: var(--color-text);
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    padding: 1rem 2rem;
-    font-size: 0.75rem;
   }
 
   .header-info-bar svg {
     width: 14px;
     height: 14px;
+  }
+
+  .header-info-bar__container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 1rem 0;
+    font-size: 0.75rem;
   }
 
   .header-info-bar__left {

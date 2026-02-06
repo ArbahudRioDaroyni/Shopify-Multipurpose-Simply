@@ -81,7 +81,7 @@
         "link_text": "Hurry up!",
         "show_countdown": true,
         "text_countdown": "End in",
-        "end_date_countdown": "2025-12-31 23:59:59",
+        "end_date_countdown": "2026-01-25 23:59:59",
         "color_scheme": ""
       }
     },
@@ -167,7 +167,7 @@
             "text_PnpWPP": {
               "type": "text",
               "settings": {
-                "text": "coffee@domain.com",
+                "text": "arbahudriodaroyni@gmail.com",
                 "tag": "span",
                 "class": "",
                 "attributes": "",
@@ -335,7 +335,7 @@
       }
     },
     "header-breadcrumbs": {
-      "type": "header-breadcrumbs"
+      "type": "header-breadcrumbs",
     }
   },
   "order": [
