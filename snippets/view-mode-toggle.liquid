@@ -55,17 +55,12 @@
     border-radius: 0.5px;
   }
 
-  .view-mode-button:hover {
-    --color: white;
-    --text-color: var(--color-icons);
-    --border-color: var(--color-icons);
-    transform: translate(0, -1px);
-  }
-
+  .view-mode-button:hover,
   .view-mode-button.active {
-    --color: white;
-    --text-color: var(--color-icons);
-    --border-color: var(--color-icons);
+    --color: white !important;
+    --text-color: var(--color-icons) !important;
+    --border-color: var(--color-icons) !important;
+    transform: translate(0, -1px) !important;
   }
 
   /* List view - rotate 90deg */

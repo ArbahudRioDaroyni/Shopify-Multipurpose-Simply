@@ -103,7 +103,7 @@
         for collection in product.collections
           if collection.title == 'SALE'
             assign description = collection.description | strip_html | strip_newlines
-            render 'upsell-countdown', end_date: "2025-12-08T23:59:59Z", message_before: description, message_after: "The sale has ended.", class: "product-info__countdown"
+            render 'upsell-countdown', end_date: "2026-12-28T23:59:59Z", message_before: description, message_after: "The sale has ended.", class: "product-info__countdown"
           endif
         endfor
       endif
@@ -387,6 +387,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 3rem;
+    margin-top: 2rem;
   }
 
   /* Product Gallery Styles */
@@ -541,6 +542,7 @@
   .product-form__option:has(.selected) {
     border-color: var(--color-primary);
     background-color: rgba(var(--color-primary), 0.05);
+    transition: all 0.3s ease;
   }
 
   .product-form__option:has(.selected) .product-form__label {
@@ -1453,6 +1455,50 @@
     // Quantity controls are now handled by the quantity-selector block
   });
 {% endjavascript %}
+
+<script>
+  // Track current product view
+  function trackProductView() {
+    // Wait for RecentlyViewedUtils to be available
+    const waitForRecentlyViewed = () => {
+      if (window.RecentlyViewedUtils) {
+        const product = {
+          handle: '{{ product.handle | escape }}',
+          title: '{{ product.title | escape }}',
+          price: '{{ product.price | money_without_trailing_zeros | escape }}',
+          compare_at_price: '{{ product.compare_at_price | money_without_trailing_zeros | escape }}',
+          image: {% if product.featured_media %}'{{ product.featured_media | image_url: width: 300 }}'{% else %}null{% endif %},
+          url: '{{ product.url | escape }}'
+        };
+        
+        // Add current product to recently viewed
+        window.RecentlyViewedUtils.add(product.handle, product);
+        
+        // Verify localStorage immediately
+        setTimeout(() => {
+          const stored = localStorage.getItem('shopify_recently_viewed');
+          
+          // Dispatch custom event to notify recently viewed section
+          document.dispatchEvent(new CustomEvent('product:tracked', { 
+            detail: { handle: product.handle, product: product }
+          }));
+        }, 50);
+        
+      } else {
+        console.log('RecentlyViewedUtils not ready, retrying...');
+        // Retry after 100ms if RecentlyViewedUtils not ready yet
+        setTimeout(waitForRecentlyViewed, 100);
+      }
+    };
+    
+    waitForRecentlyViewed();
+  }
+
+  document.addEventListener('recently-viewed:utils-loaded', () => {
+    // Track product view after a delay to ensure everything is loaded
+    trackProductView();
+  });
+</script>
 
 {% schema %}
 {

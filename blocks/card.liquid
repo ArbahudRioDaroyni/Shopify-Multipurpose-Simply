@@ -1,0 +1,225 @@
+{% doc %}
+  Renders a product card block component with theme editor customization support.
+  
+  This block version provides merchant-friendly settings through the Shopify theme editor,
+  allowing merchants to customize product cards without touching code.
+
+  @example
+  {% content_for 'block', type: 'card', id: 'product-card' %}
+{% enddoc %}
+
+{% liquid
+  # Get settings from block
+  assign card_product = block.settings.product
+  assign card_style = block.settings.style | default: 'default'
+  assign card_image_ratio = block.settings.image_ratio | default: 'square'
+  assign card_show_vendor = block.settings.show_vendor | default: false
+  assign card_show_rating = block.settings.show_rating | default: false
+  assign card_show_price = block.settings.show_price | default: true
+  assign card_show_compare_price = block.settings.show_compare_price | default: true
+  assign card_show_badge = block.settings.show_badge | default: true
+  assign card_enable_quick_view = block.settings.enable_quick_view | default: false
+  assign card_button_text = block.settings.button_text | default: ''
+  assign card_button_style = block.settings.button_style | default: 'primary'
+  assign card_custom_class = block.settings.class | default: ''
+%}
+
+<div class="card-block {{ card_custom_class }}" {{ block.shopify_attributes }}>
+  {% render 'card',
+    product: card_product,
+    style: card_style,
+    image_ratio: card_image_ratio,
+    show_vendor: card_show_vendor,
+    show_rating: card_show_rating,
+    show_price: card_show_price,
+    show_compare_price: card_show_compare_price,
+    show_badge: card_show_badge,
+    enable_quick_view: card_enable_quick_view,
+    button_text: card_button_text,
+    button_style: card_button_style
+  %}
+</div>
+
+{% stylesheet %}
+  .card-block {
+    display: block;
+    width: 100%;
+  }
+
+  .card-block .card {
+    height: 100%;
+  }
+
+  /* Card spacing in grid contexts */
+  .card-block + .card-block {
+    margin-top: 24px;
+  }
+
+  /* Responsive adjustments for block */
+  @media (max-width: 640px) {
+    .card-block + .card-block {
+      margin-top: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Card",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:blocks.card.settings.product.header"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:blocks.card.settings.product.label",
+      "info": "t:blocks.card.settings.product.info"
+    },
+    {
+      "type": "header",
+      "content": "t:blocks.card.settings.appearance.header"
+    },
+    {
+      "type": "select",
+      "id": "style",
+      "label": "t:blocks.card.settings.style.label",
+      "default": "default",
+      "options": [
+        { "value": "default", "label": "t:blocks.card.settings.style.options.default" },
+        { "value": "minimal", "label": "t:blocks.card.settings.style.options.minimal" },
+        { "value": "bordered", "label": "t:blocks.card.settings.style.options.bordered" },
+        { "value": "shadow", "label": "t:blocks.card.settings.style.options.shadow" },
+        { "value": "overlay", "label": "t:blocks.card.settings.style.options.overlay" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "t:blocks.card.settings.image_ratio.label",
+      "default": "square",
+      "options": [
+        { "value": "natural", "label": "t:blocks.card.settings.image_ratio.options.natural" },
+        { "value": "square", "label": "t:blocks.card.settings.image_ratio.options.square" },
+        { "value": "portrait", "label": "t:blocks.card.settings.image_ratio.options.portrait" },
+        { "value": "landscape", "label": "t:blocks.card.settings.image_ratio.options.landscape" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "t:blocks.card.settings.content.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:blocks.card.settings.show_vendor.label",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "t:blocks.card.settings.show_rating.label",
+      "default": false,
+      "info": "t:blocks.card.settings.show_rating.info"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "t:blocks.card.settings.show_price.label",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_compare_price",
+      "label": "t:blocks.card.settings.show_compare_price.label",
+      "default": true,
+      "visible_if": "{{ block.settings.show_price }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "t:blocks.card.settings.show_badge.label",
+      "default": true,
+      "info": "t:blocks.card.settings.show_badge.info"
+    },
+    {
+      "type": "header",
+      "content": "t:blocks.card.settings.actions.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_quick_view",
+      "label": "t:blocks.card.settings.enable_quick_view.label",
+      "default": false,
+      "info": "t:blocks.card.settings.enable_quick_view.info"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "t:blocks.card.settings.button_text.label",
+      "info": "t:blocks.card.settings.button_text.info",
+      "placeholder": "Add to Cart, Quick View, View Product"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "t:blocks.card.settings.button_style.label",
+      "default": "primary",
+      "options": [
+        { "value": "primary", "label": "t:blocks.card.settings.button_style.options.primary" },
+        { "value": "secondary", "label": "t:blocks.card.settings.button_style.options.secondary" },
+        { "value": "outline", "label": "t:blocks.card.settings.button_style.options.outline" },
+        { "value": "ghost", "label": "t:blocks.card.settings.button_style.options.ghost" }
+      ],
+      "visible_if": "{{ block.settings.button_text != blank }}"
+    },
+    {
+      "type": "header",
+      "content": "t:blocks.card.settings.advanced.header"
+    },
+    {
+      "type": "text",
+      "id": "class",
+      "label": "t:blocks.card.settings.class.label",
+      "info": "t:blocks.card.settings.class.info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.card.presets.default.name",
+      "category": "t:blocks.card.presets.default.category",
+      "settings": {
+        "style": "default",
+        "image_ratio": "square",
+        "show_price": true,
+        "show_badge": true
+      }
+    },
+    {
+      "name": "t:blocks.card.presets.minimal.name",
+      "category": "t:blocks.card.presets.minimal.category",
+      "settings": {
+        "style": "minimal",
+        "image_ratio": "natural",
+        "show_price": true,
+        "show_vendor": false,
+        "show_badge": false
+      }
+    },
+    {
+      "name": "t:blocks.card.presets.featured.name",
+      "category": "t:blocks.card.presets.featured.category",
+      "settings": {
+        "style": "shadow",
+        "image_ratio": "portrait",
+        "show_price": true,
+        "show_vendor": true,
+        "show_badge": true,
+        "button_text": "Add to Cart",
+        "button_style": "primary"
+      }
+    }
+  ]
+}
+{% endschema %}

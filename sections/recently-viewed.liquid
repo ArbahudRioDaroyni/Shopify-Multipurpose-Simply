@@ -1,0 +1,342 @@
+{% comment %} {% doc %}
+  Renders a recently viewed products section with dynamic content from localStorage.
+  
+  This section displays up to 6 recently viewed products retrieved from browser localStorage.
+  The section includes a customizable header and product cards that are populated via JavaScript.
+  
+  @description
+  JavaScript API:
+  
+  ==> Recently Viewed Management
+  RecentlyViewedUtils.add(productHandle, productData);
+  RecentlyViewedUtils.remove(productHandle);
+  RecentlyViewedUtils.clear();
+  RecentlyViewedUtils.get();
+  RecentlyViewedUtils.load(); // Load and render products
+  
+  ==> Storage Format
+  {
+    "recentlyViewed": [
+      {
+        "handle": "product-handle",
+        "title": "Product Title",
+        "price": "$99.00",
+        "image": "image-url",
+        "url": "/products/product-handle",
+        "timestamp": 1641234567890
+      }
+    ]
+  }
+  
+  @example
+  {% section 'recently-viewed' %}
+{% enddoc %} {% endcomment %}
+
+<section class="recently-viewed product-grid product-grid--4-col" data-section-id="{{ section.id }}" data-section-type="recently-viewed">
+  <div class="recently-viewed__container">
+    <!-- Header -->
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'text' %}
+            {% if block.settings.text != blank %}
+              <div class="recently-viewed__header" {{ block.shopify_attributes }}>
+                <{{ block.settings.tag | default: 'h2' }}
+                  class="text-block {{ block.settings.class }}"
+                  style="
+                    --text-align: {{ block.settings.alignment }};
+                    --font-size: {{ block.settings.font_size }}px;
+                    --font-weight: {{ block.settings.font_weight }};
+                    --color: {{ block.settings.color }};
+                    --margin: {{ block.settings.margin }}px;
+                    --padding: {{ block.settings.padding }}px;
+                    --line-height: {{ block.settings.line_height }};
+                  "
+                >
+                  {{ block.settings.text }}
+                </{{ block.settings.tag | default: 'h2' }}>
+              </div>
+            {% endif %}
+        {% endcase %}
+      {% endfor %}
+    {% endif %}
+    
+    <!-- Products Grid -->
+    <div class="recently-viewed__grid product-grid__container" id="recently-viewed-grid">
+      <!-- Cards will be populated by JavaScript -->
+      <div class="recently-viewed__empty" id="recently-viewed-empty">
+        <p class="recently-viewed__empty-text">{{ 'sections.recently_viewed.empty' | t }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% javascript %}
+  class RecentlyViewed {
+    constructor() {
+      this.storageKey = 'shopify_recently_viewed';
+      this.maxItems = 6;
+      this.container = document.getElementById('recently-viewed-grid');
+      this.emptyState = document.getElementById('recently-viewed-empty');
+      this.section = document.querySelector('[data-section-type="recently-viewed"]');
+      this.isLoading = false;
+      this.loadTimeout = null;
+      this.init();
+    }
+    
+    init() {
+      this.loadProducts();
+      window.addEventListener('storage', (e) => {
+        if (e.key === this.storageKey) this.loadProducts();
+      });
+    }
+    
+    add(handle, data) {
+      if (!handle || !data) return;
+      let items = this.get().filter(item => item.handle !== handle);
+      items.unshift({
+        handle, title: data.title, price: data.price, 
+        compare_at_price: data.compare_at_price, image: data.image, 
+        url: data.url, timestamp: Date.now()
+      });
+      this.save(items.slice(0, this.maxItems));
+      if (this.container) this.loadProducts();
+    }
+    
+    remove(handle) {
+      if (!handle) return;
+      this.save(this.get().filter(item => item.handle !== handle));
+      this.loadProducts();
+    }
+    
+    clear() {
+      localStorage.removeItem(this.storageKey);
+      this.loadProducts();
+    }
+    
+    get() {
+      try {
+        return JSON.parse(localStorage.getItem(this.storageKey) || '[]');
+      } catch { return []; }
+    }
+    
+    save(data) {
+      try {
+        localStorage.setItem(this.storageKey, JSON.stringify(data));
+      } catch (e) {
+        console.error('Failed to save recently viewed:', e);
+      }
+    }
+    
+    loadProducts() {
+      if (this.isLoading) return;
+      clearTimeout(this.loadTimeout);
+      this.loadTimeout = setTimeout(() => this.render(), 50);
+    }
+    
+    render() {
+      if (!this.container) return;
+      
+      this.isLoading = true;
+      const items = this.get();
+      
+      this.container.innerHTML = '';
+      
+      if (items.length === 0) {
+        this.container.appendChild(this.emptyState);
+        this.emptyState.style.display = 'block';
+        this.section?.classList.add('recently-viewed--hidden');
+      } else {
+        this.emptyState.style.display = 'none';
+        this.section?.classList.remove('recently-viewed--hidden');
+        
+        items.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'recently-viewed__card';
+          card.setAttribute('data-product-handle', item.handle);
+          card.innerHTML = this.getCardHTML(item);
+          this.container.appendChild(card);
+        });
+      }
+      
+      this.isLoading = false;
+    }
+    
+    getCardHTML(item) {
+      const price = item.price || '0.00';
+      const comparePrice = item.compare_at_price;
+      const url = item.url || `/products/${item.handle}`;
+      const showCompare = comparePrice && parseFloat(comparePrice.replace('$', '')) > parseFloat(price.replace('$', ''));
+      
+      return `
+        <div class="product-card">
+          <div class="product-card__image-wrapper">
+            <a href="${url}" class="product-card__image-link">
+              ${item.image ? `<img src="${item.image}" alt="${item.title}" loading="lazy" class="product-card__image">` : '<div class="product-card__no-image">No Image</div>'}
+            </a>
+          </div>
+          <div class="product-card__content">
+            <h3 class="product-card__title">
+              <a href="${url}">${item.title}</a>
+            </h3>
+            <div class="product-card__price">
+              <span class="product-card__price-regular">${price}</span>
+              <span class="product-card__price-compare">${comparePrice}</span>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+  
+  // Initialize
+  document.addEventListener('DOMContentLoaded', () => {
+    window.recentlyViewedInstance = new RecentlyViewed();
+    
+    // Global utilities
+    window.RecentlyViewedUtils = {
+      add: (handle, data) => window.recentlyViewedInstance?.add(handle, data),
+      remove: (handle) => window.recentlyViewedInstance?.remove(handle),
+      clear: () => window.recentlyViewedInstance?.clear(),
+      get: () => window.recentlyViewedInstance?.get() || [],
+      refresh: () => window.recentlyViewedInstance?.loadProducts()
+    };
+    
+    document.dispatchEvent(new Event('recently-viewed:utils-loaded'));
+  });
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:sections.recently_viewed.name",
+  "tag": "section",
+  "class": "container",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:sections.recently_viewed.settings.header"
+    },
+    {
+      "type": "paragraph",
+      "content": "t:sections.recently_viewed.settings.info"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "t:blocks.text.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "t:labels.text",
+          "default": "Recently Viewed"
+        },
+        {
+          "type": "select",
+          "id": "tag",
+          "label": "t:labels.tag",
+          "default": "h2",
+          "options": [
+            { "value": "h1", "label": "Heading 1" },
+            { "value": "h2", "label": "Heading 2" },
+            { "value": "h3", "label": "Heading 3" },
+            { "value": "h4", "label": "Heading 4" },
+            { "value": "p", "label": "Paragraph" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "font_size",
+          "label": "t:labels.font_size",
+          "default": 32,
+          "min": 16,
+          "max": 64,
+          "step": 2,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "font_weight",
+          "label": "t:labels.font_weight",
+          "default": "700",
+          "options": [
+            { "value": "300", "label": "Light (300)" },
+            { "value": "400", "label": "Normal (400)" },
+            { "value": "500", "label": "Medium (500)" },
+            { "value": "600", "label": "Semi Bold (600)" },
+            { "value": "700", "label": "Bold (700)" },
+            { "value": "800", "label": "Extra Bold (800)" }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "line_height",
+          "label": "t:labels.line_height",
+          "default": 1.2,
+          "min": 1,
+          "max": 2,
+          "step": 0.1
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:labels.alignment",
+          "default": "center"
+        },
+        {
+          "type": "color",
+          "id": "color",
+          "label": "t:labels.color"
+        },
+        {
+          "type": "range",
+          "id": "margin",
+          "label": "t:labels.margin",
+          "default": 0,
+          "min": 0,
+          "max": 100,
+          "step": 4,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding",
+          "label": "t:labels.padding",
+          "default": 0,
+          "min": 0,
+          "max": 100,
+          "step": 4,
+          "unit": "px"
+        },
+        {
+          "type": "text",
+          "id": "class",
+          "label": "t:labels.class",
+          "placeholder": "custom-header-class",
+          "info": "Add custom CSS class names"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:sections.recently_viewed.presets.default.name",
+      "blocks": [
+        {
+          "type": "text",
+          "settings": {
+            "text": "Recently Viewed",
+            "tag": "h2",
+            "font_size": 32,
+            "font_weight": "700",
+            "line_height": 1.2,
+            "alignment": "center"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
