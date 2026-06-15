@@ -1,105 +1,139 @@
 <div class="header__top">
-  <div class="header__top-wrapper">
-    <!-- Logo -->
-    <div class="header__logo">
-      <!-- Mobile Toggle -->
-      <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a href="{{ routes.root_url }}" class="logo">
-        {% if section.settings.logo %}
-          <img src="{{ section.settings.logo | image_url: width: 200 }}" alt="{{ shop.name }}" loading="lazy" width="200" height="200">
-        {% else %}
-          <span class="logo__text">
-            <span class="logo__left">TheBlue</span><span class="logo__right">Space</span>
-          </span>
-          <span class="logo__subtitle">Bathroom Online</span>
-        {% endif %}
-      </a>
-    </div>
-    
-    <nav class="navigation" role="navigation">
-      <!-- Navigation Menu -->
-      <div class="navigation__wrapper">
-        <div class="navigation__header">
-          <button type="button" class="navbar-close" aria-label="Close menu">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
-            </svg>
-          </button>
-        </div>
-
-        <div class="navigation__content">
-          <!-- Shop by Departments Dropdown -->
-          <div class="nav__departments">
-            <button class="departments__toggle">
-              {% render 'icon-or-image', icon: 'hamburger', width: 24 %}
-              <span>Shop by Departments</span>
-                {% content_for 'block', type: 'icon', id: 'departments-arrow' %}
-            </button>
-            <div class="departments__dropdown">
-              {% if section.settings.departments_menu != blank %}
-                <ul class="departments__list">
-                  {% for link in section.settings.departments_menu.links %}
-                    <li class="departments__item">
-                      <a href="{{ link.url }}">{{ link.title }}</a>
-                    </li>
-                  {% endfor %}
-                </ul>
-              {% endif %}
-            </div>
-          </div>
-
-          <!-- Main Menu -->
-          <ul class="nav__menu">
-            {% for link in section.settings.menu.links %}
-              <li class="nav__item">
-                <a href="{{ link.url }}" class="nav__link">{{ link.title }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-    </nav>
-
-    <!-- Right Icons -->
-    <div class="header__actions">
-      <!-- Search Icon -->
-      <a href="{{ routes.search_url }}" class="header__icon header__search" aria-label="Search">
-        {% render 'icon-or-image', icon: 'magnifier', width: 24 %}
-      </a>
-
-      <!-- Account Icon -->
-      {% if shop.customer_accounts_enabled %}
-        <a href="{{ routes.account_url }}" class="header__icon header__account" aria-label="Account">
-        {% render 'icon-or-image', icon: 'user', width: 24 %}
-        </a>
+  <!-- Logo -->
+  <div class="header__logo">
+    <!-- Mobile Toggle -->
+    <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <a href="{{ routes.root_url }}" class="logo">
+      {% if section.settings.logo %}
+        {{ section.settings.logo | image_url: width: 200 | image_tag: alt: shop.name, loading: 'lazy', width: 200, height: 68, fetchpriority: 'high', decoding: 'async', referrerpolicy: 'no-referrer' }}
+      {% else %}
+        <span class="logo__text">
+          <span class="logo__left">TheBlue</span><span class="logo__right">Space</span>
+        </span>
+        <span class="logo__subtitle">Bathroom Online</span>
       {% endif %}
+    </a>
+  </div>
+  
+  <nav class="navigation" role="navigation">
+    <!-- Navigation Menu -->
+    <div class="navigation__wrapper">
+      <div class="navigation__header">
+        <button type="button" class="navbar-close" aria-label="Close menu">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+          </svg>
+        </button>
+      </div>
 
-      <!-- Wishlist Icon -->
-      <a href="{{ routes.root_url }}pages/wishlist" class="header__icon header__wishlist" aria-label="Wishlist">
-        {% render 'icon-or-image', icon: 'heart', width: 24 %}
-      </a>
+      <div class="navigation__content">
+        <!-- Shop by Departments Dropdown -->
+        <div class="nav__departments">
+          <button class="departments__toggle">
+            {% render 'icon-or-image', icon: 'hamburger', width: 24 %}
+            <span>Shop by Departments</span>
+              {% content_for 'block', type: 'icon', id: 'departments-arrow' %}
+          </button>
+          <div class="departments__dropdown">
+            {% if section.settings.departments_menu != blank %}
+              <ul class="departments__list">
+                {% for link in section.settings.departments_menu.links %}
+                  <li class="departments__item">
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
 
-      <!-- Cart -->
-      {% capture icon_cart %}
-        {% render 'icon-or-image', icon: 'cart', width: 24 %}
-      {% endcapture %}
-      {% assign icon_cart = icon_cart | strip_newlines %}
+        <!-- Main Menu -->
+        <ul class="nav__menu">
+          {% for link in section.settings.menu.links %}
+            <li class="nav__item">
+              <a href="{{ link.url }}" class="nav__link">{{ link.title }}</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Right Icons -->
+  <div class="header__actions">
+    <!-- Search Icon -->
+    {% capture icon_search %}
+      {% render 'icon-or-image', icon: 'magnifier', width: 24 %}
+    {% endcapture %}
+    {% assign icon_search = icon_search | strip_newlines %}
       {% render 'button',
-        tag: 'button',
+        tag: 'a',
+        href: routes.search_url,
         style: 'ghost',
         size: 'md',
-        icon: icon_cart,
+        icon: icon_search,
         icon_position: 'only',
         icon_size: 'lg',
-        badge_text: cart.item_count,
-        badge_style: 'primary',
-        class: 'header__icon header__cart',
-        data_attributes: 'data-slide-over-target="cart-drawer"',
-        aria_label: 'cart.general.view_cart' | t
+        class: 'header__icon header__search',
+        aria_label: 'Search'
       %}
-    </div>
+
+    <!-- Account Icon -->
+    {% if shop.customer_accounts_enabled %}
+      {% capture icon_user %}
+        {% render 'icon-or-image', icon: 'user', width: 24 %}
+      {% endcapture %}
+      {% assign icon_user = icon_user | strip_newlines %}
+      {% render 'button',
+        tag: 'a',
+        href: routes.account_url,
+        style: 'ghost',
+        size: 'md',
+        icon: icon_user,
+        icon_position: 'only',
+        icon_size: 'lg',
+        class: 'header__icon header__account',
+        aria_label: 'account.general.view_account' | t
+      %}
+    {% endif %}
+
+    <!-- Wishlist Icon -->
+    {% capture icon_heart %}
+      {% render 'icon-or-image', icon: 'heart', width: 24 %}
+    {% endcapture %}
+    {% assign icon_heart = icon_heart | strip_newlines %}
+    {% render 'button',
+      tag: 'a',
+      href: routes.root_url | append: 'pages/wishlist',
+      style: 'ghost',
+      size: 'md',
+      icon: icon_heart,
+      icon_position: 'only',
+      icon_size: 'lg',
+      class: 'header__icon header__wishlist',
+      aria_label: 'wishlist.general.view_wishlist' | t
+    %}
+
+    <!-- Cart -->
+    {% capture icon_cart %}
+      {% render 'icon-or-image', icon: 'cart', width: 24 %}
+    {% endcapture %}
+    {% assign icon_cart = icon_cart | strip_newlines %}
+    {% render 'button',
+      tag: 'button',
+      style: 'ghost',
+      size: 'md',
+      icon: icon_cart,
+      icon_position: 'only',
+      icon_size: 'lg',
+      badge_text: cart.item_count,
+      badge_style: 'primary',
+      class: 'header__icon header__cart',
+      data_attributes: 'data-slide-over-target="cart-drawer"',
+      aria_label: 'cart.general.view_cart' | t
+    %}
   </div>
 </div>
 
@@ -121,15 +155,12 @@
 }
 
 .header__top {
-  padding: 1rem 2rem;
-  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
-}
-
-.header__top-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 3rem;
+  padding: 1rem 2rem;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
 }
 
 /* Logo */
@@ -339,7 +370,7 @@
 .header__actions {
   display: flex;
   align-items: center;
-  gap: 1.75rem;
+  gap: .5rem;
 }
 
 .header__icon:hover {
@@ -374,9 +405,6 @@
 @media (max-width: 991px) {
   .header__top {
     padding: 1rem;
-  }
-
-  .header__top-wrapper {
     gap: 1rem;
   }
 
@@ -398,10 +426,6 @@
   .header__actions {
     order: 1;
     gap: 0.75rem;
-  }
-
-  .navigation {
-    order: 2;
   }
 
   .navigation__wrapper {
