@@ -111,7 +111,7 @@
       localStorage.setItem('color-scheme', newScheme);
 
       // Dispatch custom event for other components to react
-      window.dispatchEvent(new CustomEvent('colorSchemeChange', {
+      window.dispatchEvent(new CustomEvent('color-scheme:changed', {
         detail: { scheme: newScheme }
       }));
     });

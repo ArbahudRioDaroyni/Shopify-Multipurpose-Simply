@@ -8,8 +8,9 @@
   @param {number} [max_value] - Maximum allowed value
   @param {boolean} [show_label] - Whether to show label
   @param {string} [label_text] - Label text
-  @param {boolean} [show_total] - Whether to show total price
   @param {number} [price] - Price per item in cents for total calculation
+  @param {boolean} [show_price] - Whether to show price per item
+  @param {boolean} [show_total] - Whether to show total price
   @param {string} [unique_id] - Unique identifier for the input
 
   @example
@@ -33,6 +34,9 @@
   assign show_label = show_label | default: false
   assign label_text = label_text | default: 'Quantity'
   assign show_total = show_total | default: false
+  assign price = price | default: 0
+  assign total = total
+  assign show_price = show_price | default: false
   assign unique_id = unique_id | default: 'qty-' | append: input_name | handleize
 
   if style_variant == 'compact'
@@ -97,11 +101,22 @@
     </button>
   </div>
 
-  {% if show_total and price %}
+  {% if show_price and price %}
+    <div class="quantity-selector__price-row">
+      <span class="quantity-selector__price" data-price-per-item="{{ price }}">{{ price | money }}</span>
+    </div>
+  {% endif %}
+
+  {% if show_total %}
+    {% if price %}
+      {% assign total_value = price | times: initial_value %}
+    {% else %}
+      {% assign total_value = 0 %}
+    {% endif %}
     <div class="quantity-selector__total">
       <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
-      <span class="quantity-selector__total-price" data-total-price="{{ price }}">
-        {{ price | times: initial_value | money }}
+      <span class="quantity-selector__total-price" data-total-price="{{ total_value }}">
+        {{ total_value | money }}
       </span>
     </div>
   {% endif %}
@@ -110,9 +125,10 @@
 {% stylesheet %}
   .quantity-selector {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
     width: fit-content;
+    align-items: center;
   }
 
   .quantity-selector__label {
@@ -286,10 +302,23 @@
       this.decreaseBtn = element.querySelector('.quantity-selector__btn--decrease');
       this.increaseBtn = element.querySelector('.quantity-selector__btn--increase');
       this.totalPrice = element.querySelector('.quantity-selector__total-price');
-      
+      this.priceEl = element.querySelector('.quantity-selector__price');
+
       this.min = parseInt(this.input.getAttribute('min')) || 0;
       this.max = parseInt(this.input.getAttribute('max')) || 999;
-      this.price = this.totalPrice ? parseFloat(this.totalPrice.getAttribute('data-total-price')) : 0;
+
+      // Determine price per item. Priority:
+      // 1. data-price-per-item (show_price)
+      // 2. derive from data-total-price / current quantity (if total provided)
+      // 3. 0
+      this.pricePerItem = 0;
+      if (this.priceEl) {
+        this.pricePerItem = parseFloat(this.priceEl.getAttribute('data-price-per-item')) || 0;
+      } else if (this.totalPrice) {
+        const qty = parseInt(this.input.value) || 1;
+        const totalVal = parseFloat(this.totalPrice.getAttribute('data-total-price')) || 0;
+        this.pricePerItem = qty ? (totalVal / qty) : 0;
+      }
       
       this.init();
     }
@@ -355,16 +384,16 @@
     }
 
     updateTotal() {
-      if (this.totalPrice && this.price) {
+      if (this.totalPrice) {
         const quantity = parseInt(this.input.value) || 0;
-        const total = this.price * quantity;
-        
+        const total = (this.pricePerItem || 0) * quantity;
+
         // Format as money (basic implementation)
         const formatted = new Intl.NumberFormat('en-US', {
           style: 'currency',
           currency: 'USD'
         }).format(total / 100);
-        
+
         this.totalPrice.textContent = formatted;
       }
     }

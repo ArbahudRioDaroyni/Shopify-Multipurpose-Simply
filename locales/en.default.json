@@ -140,9 +140,28 @@
     "categories": "Categories",
     "tags": "Tags",
     "quick_view": "Quick view",
+    "price": "Price",
     "general": {
       "product": "product",
       "products": "products"
+    },
+    "product": {
+      "added_to_cart": "Added to cart",
+      "view_cart": "View cart",
+      "continue_shopping": "Continue shopping",
+      "unavailable": "This product is unavailable",
+      "quantity": "Quantity",
+      "description": "Description",
+      "from_text_html": "From {{ price }}",
+      "additional_information": "Additional information",
+      "reviews": "Reviews",
+      "write_a_review": "Write a review",
+      "on_sale": "On sale",
+      "new": "New",
+      "no_reviews": "There are no reviews yet.",
+      "related_products": "Related Products",
+      "quick_view": "Quick View",
+      "sold_out": "Sold out"
     }
   },
   "general": {
@@ -184,6 +203,136 @@
       "toggle_color_scheme": "Toggle between light and dark mode",
       "skip_to_content": "Skip to content",
       "close": "Close"
+    }
+  },
+  "sections": {
+    "recently_viewed": {
+      "name": "Recently Viewed",
+      "empty": "No recently viewed products",
+      "settings": {
+        "header": "Recently Viewed Settings",
+        "info": "This section shows products that customers have recently viewed. Products are automatically added when viewing product pages."
+      },
+      "presets": {
+        "default": {
+          "name": "Recently Viewed Products"
+        }
+      }
+    }
+  },
+  "blocks": {
+    "card": {
+      "name": "Product Card",
+      "settings": {
+        "product": {
+          "header": "Product",
+          "label": "Product",
+          "info": "Select a product to display in this card"
+        },
+        "appearance": {
+          "header": "Appearance"
+        },
+        "style": {
+          "label": "Card style",
+          "options": {
+            "default": "Default",
+            "minimal": "Minimal",
+            "bordered": "Bordered",
+            "shadow": "Shadow",
+            "overlay": "Overlay"
+          }
+        },
+        "image_ratio": {
+          "label": "Image ratio",
+          "options": {
+            "natural": "Natural",
+            "square": "Square (1:1)",
+            "portrait": "Portrait (3:4)",
+            "landscape": "Landscape (4:3)"
+          }
+        },
+        "content": {
+          "header": "Content"
+        },
+        "show_vendor": {
+          "label": "Show vendor"
+        },
+        "show_rating": {
+          "label": "Show product rating",
+          "info": "Requires a product rating app"
+        },
+        "show_price": {
+          "label": "Show price"
+        },
+        "show_compare_price": {
+          "label": "Show compare at price"
+        },
+        "show_badge": {
+          "label": "Show badges",
+          "info": "Shows sale, new, and sold out badges"
+        },
+        "actions": {
+          "header": "Actions"
+        },
+        "enable_quick_view": {
+          "label": "Enable quick view",
+          "info": "Requires quick view functionality"
+        },
+        "button_text": {
+          "label": "Button text",
+          "info": "Leave empty to hide button"
+        },
+        "button_style": {
+          "label": "Button style",
+          "options": {
+            "primary": "Primary",
+            "secondary": "Secondary",
+            "outline": "Outline",
+            "ghost": "Ghost"
+          }
+        },
+        "advanced": {
+          "header": "Advanced"
+        },
+        "class": {
+          "label": "CSS class",
+          "info": "Add custom CSS classes separated by spaces"
+        }
+      },
+      "presets": {
+        "default": {
+          "name": "Product Card",
+          "category": "Product"
+        },
+        "minimal": {
+          "name": "Minimal Card",
+          "category": "Product"
+        },
+        "featured": {
+          "name": "Featured Card",
+          "category": "Product"
+        }
+      }
+    }
+  },
+  "footer": {
+    "categories": {
+      "title": "Categories"
+    },
+    "information": {
+      "title": "Information"
+    },
+    "useful_links": {
+      "title": "Useful links"
+    },
+    "newsletter": {
+      "title": "Newsletter signup",
+      "description": "Subscribe to our newsletter and get 10% off your first purchase",
+      "email_placeholder": "Enter email address...",
+      "subscribe": "Subscribe"
+    },
+    "copyright": {
+      "rights_reserved": "All rights reserved."
     }
   }
 }

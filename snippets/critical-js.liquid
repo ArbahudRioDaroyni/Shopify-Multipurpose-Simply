@@ -205,10 +205,9 @@
    * @class Section
    * 
    * @example
-  * // Refresh a section by path, params object, and content selector
-  * window.theme.Section.refresh('/cart', { section_id: 'template--18933041102950__main', foo: 'bar' }, '.cart-sidebar-content');
-  * window.theme.Section.refresh('/collections/all', { section_id: 'collection', sort_by: 'best-selling' }, ['.product-grid', '.collection-filters']);
-  *
+   * Refresh a section by path, params object, and content selector
+   * window.theme.Section.refresh(new URL('/cart', window.location.origin).searchParams.set('section_id', 'cart-drawer'), '.product-grid');
+   * window.theme.Section.refresh(new URL('/collections/all', window.location.origin).searchParams.set('section_id', 'collection'), ['.product-grid', '.collection-filters']);
    */
   class Section {
     /**
@@ -224,21 +223,12 @@
 
     /**
      * Fetches section HTML from a given path and params.
-     * @param {string} path
-     * @param {Object} params
-     * @returns {Promise<string>} HTML string
+     * @param {URL|string} url - URL or string path to fetch
+     * @returns {Promise<string>} - Resolves to HTML string
      */
-    async fetch(path, params) {
-      let url = path || '/';
-      if (!url.startsWith('/')) url = '/' + url;
-      let query = '';
-      if (params && typeof params === 'object' && Object.keys(params).length > 0) {
-        query = Object.entries(params)
-          .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
-          .join('&');
-      }
-      if (query) {
-        url += (url.includes('?') ? '&' : '?') + query;
+    async fetch(url) {
+      if (typeof url === 'object' && url instanceof URL) {
+        url = url.toString();
       }
       const response = await fetch(url);
       return await response.text();
@@ -260,6 +250,8 @@
           const currentContent = document.querySelector(selector);
           if (newContent && currentContent) {
             currentContent.innerHTML = newContent.innerHTML;
+          } else if (!newContent && currentContent) {
+            currentContent.remove();
           }
         });
       } catch (error) {
@@ -269,13 +261,13 @@
 
     /**
      * Refreshes section HTML and manipulates DOM content.
-     * @param {string} path - Path for the section endpoint (e.g. '/collections/all')
-     * @param {Object} params - Query params object (e.g. { section_id: 'collection', sort_by: 'best-selling' })
-     * @param {string|string[]} contentSelectors- CSS selector(s) for the content to replace (e.g. '.cart-sidebar-content') or (e.g. ['.selector1', '.selector2'])
+     * @param {string|URL} url - URL or string path to fetch
+     * @param {string|string[]} contentSelectors - CSS selector(s) for the content to replace
+     * @returns {Promise<void>}
      */
-    async refresh(path, params, contentSelectors) {
+    async refresh(url, contentSelectors) {
       try {
-        const html = await this.fetch(path, params);
+        const html = await this.fetch(url);
         if (contentSelectors) {
           this._updateDomContent(html, contentSelectors);
         }

@@ -1,32 +1,33 @@
-<div class="header__top">
-  <!-- Logo -->
-  <div class="header__logo">
-    <!-- Mobile Toggle -->
-    <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <a href="{{ routes.root_url }}" class="logo">
-      {% if section.settings.logo %}
-        {{ section.settings.logo | image_url: width: 200 | image_tag: alt: shop.name, loading: 'lazy', width: 200, height: 68, fetchpriority: 'high', decoding: 'async', referrerpolicy: 'no-referrer' }}
-      {% else %}
-        <span class="logo__text">
-          <span class="logo__left">TheBlue</span><span class="logo__right">Space</span>
-        </span>
-        <span class="logo__subtitle">Bathroom Online</span>
-      {% endif %}
-    </a>
-  </div>
-  
-  <nav class="navigation" role="navigation">
-    <!-- Navigation Menu -->
-    <div class="navigation__wrapper">
-      <div class="navigation__header">
-        <button type="button" class="navbar-close" aria-label="Close menu">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
-          </svg>
-        </button>
-      </div>
+<div class="header__top container">
+  <div class="header__top-wrapper">
+    <!-- Logo -->
+    <div class="header__logo">
+      <!-- Mobile Toggle -->
+      <button class="navbar-toggler" type="button" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a href="{{ routes.root_url }}" class="logo">
+        {% if section.settings.logo %}
+          <img src="{{ section.settings.logo | image_url: width: 200 }}" alt="{{ shop.name }}" loading="lazy" width="200" height="200">
+        {% else %}
+          <span class="logo__text">
+            <span class="logo__left">TheBlue</span><span class="logo__right">Space</span>
+          </span>
+          <span class="logo__subtitle">Bathroom Online</span>
+        {% endif %}
+      </a>
+    </div>
+    
+    <nav class="navigation" role="navigation">
+      <!-- Navigation Menu -->
+      <div class="navigation__wrapper">
+        <div class="navigation__header">
+          <button type="button" class="navbar-close" aria-label="Close menu">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+              <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path>
+            </svg>
+          </button>
+        </div>
 
       <div class="navigation__content">
         <!-- Shop by Departments Dropdown -->
@@ -116,24 +117,25 @@
       aria_label: 'wishlist.general.view_wishlist' | t
     %}
 
-    <!-- Cart -->
-    {% capture icon_cart %}
-      {% render 'icon-or-image', icon: 'cart', width: 24 %}
-    {% endcapture %}
-    {% assign icon_cart = icon_cart | strip_newlines %}
-    {% render 'button',
-      tag: 'button',
-      style: 'ghost',
-      size: 'md',
-      icon: icon_cart,
-      icon_position: 'only',
-      icon_size: 'lg',
-      badge_text: cart.item_count,
-      badge_style: 'primary',
-      class: 'header__icon header__cart',
-      data_attributes: 'data-slide-over-target="cart-drawer"',
-      aria_label: 'cart.general.view_cart' | t
-    %}
+      <!-- Cart -->
+      {% capture icon_cart %}
+        {% render 'icon-or-image', icon: 'cart', width: 24 %}
+      {% endcapture %}
+      {% assign icon_cart = icon_cart | strip_newlines %}
+      {% render 'button',
+        tag: 'button',
+        style: 'ghost',
+        size: 'md',
+        icon: icon_cart,
+        icon_position: 'only',
+        icon_size: 'lg',
+        badge_text: cart.item_count,
+        badge_style: 'primary',
+        class: 'header__icon header__cart',
+        data_attributes: 'data-ui-drawer-target="cart-drawer"',
+        aria_label: 'cart.general.view_cart' | t
+      %}
+    </div>
   </div>
 </div>
 
@@ -155,6 +157,11 @@
 }
 
 .header__top {
+  padding: 1rem 0;
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.header__top-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;

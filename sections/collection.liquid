@@ -8,10 +8,6 @@
 
 {% liquid
   assign products_per_page = section.settings.products_per_page | default: 24
-  
-  capture filter_content
-    render 'filter-sidebar', collection: collection
-  endcapture
 %}
 
 <div class="collection-page container" data-section-id="{{ section.id }}">
@@ -27,16 +23,6 @@
     </div>
   </div>
 
-  <!-- Filter Slide-over -->
-  {% render 'slide-over',
-    id: 'collection-filters',
-    position: 'left',
-    size: 'md',
-    title: 'Filters',
-    description: 'Filter products by your preferences',
-    content: filter_content
-  %}
-
   <!-- Main Content Area -->
   <div class="collection-main">
     <!-- Products Area -->
@@ -44,13 +30,6 @@
       <!-- Toolbar -->
       <div class="collection-toolbar">
         <div class="collection-toolbar__left">
-          <button class="filter-toggle" data-slide-over-target="collection-filters" aria-label="{{ 'collections.filters.show_filters' | t }}">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"></polygon>
-            </svg>
-            {{ 'collections.filters.filters' | t }}
-          </button>
-          
           <div class="collection-results">
             {% paginate collection.products by products_per_page %}
               {% if collection.products_count > 0 %}
@@ -63,7 +42,7 @@
         </div>
 
         <div class="collection-toolbar__right">
-          <button class="button" data-slide-over-target="collection-filters" aria-label="Filters">
+          <button class="button" data-ui-drawer-target="collection-filters" aria-label="Filters">
             {% render 'icon-or-image', icon: 'filter', width: 24 %}
             Filters
           </button>
@@ -141,6 +120,22 @@
     </div>
   </div>
 </div>
+
+{% liquid
+  capture filter_content
+    render 'filter-sidebar', collection: collection
+  endcapture
+%}
+
+<!-- Filter Drawer -->
+{% render 'ui-drawer',
+  id: 'collection-filters',
+  position: 'left',
+  size: 'md',
+  title: 'Filters',
+  description: 'Filter products by your preferences',
+  content: filter_content
+%}
 
 {% stylesheet %}
   /* .collection-page {
