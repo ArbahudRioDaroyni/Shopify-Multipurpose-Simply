@@ -11,6 +11,7 @@
   @param {number} [price] - Price per item in cents for total calculation
   @param {boolean} [show_price] - Whether to show price per item
   @param {boolean} [show_total] - Whether to show total price
+  @param {boolean} [show_gst] - Whether to show total price
   @param {string} [unique_id] - Unique identifier for the input
 
   @example
@@ -34,8 +35,8 @@
   assign show_label = show_label | default: false
   assign label_text = label_text | default: 'Quantity'
   assign show_total = show_total | default: false
+  assign show_gst = show_gst | default: true
   assign price = price | default: 0
-  assign total = total
   assign show_price = show_price | default: false
   assign unique_id = unique_id | default: 'qty-' | append: input_name | handleize
 
@@ -52,7 +53,7 @@
 %}
 
 <div 
-  class="quantity-selector quantity-selector--{{ style_variant }}"
+  class="quantity-selector quantity-selector__{{ style_variant }}"
   style="
     --quantity-width: {{ input_width }}px;
     --quantity-height: {{ height }}px;
@@ -60,52 +61,57 @@
   data-quantity-selector
 >
   {% if show_label %}
-    <label class="quantity-selector__label" for="quantity-{{ unique_id }}">
+    <label class="quantity-selector__label" for="{{ unique_id }}">
       {{ label_text }}
     </label>
   {% endif %}
 
-  <div class="quantity-selector__controls">
-    <button 
-      type="button" 
-      class="quantity-selector__btn quantity-selector__btn--decrease" 
-      data-action="decrease"
-      aria-label="{{ 'general.quantity.decrease' | t }}"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-    </button>
+  <div class="quantity-selector__controls-group">
+    <div class="quantity-selector__controls">
+      <button 
+        type="button" 
+        class="quantity-selector__btn quantity-selector__btn-decrease" 
+        data-action="decrease"
+        aria-label="{{ 'general.quantity.decrease' | t }}"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
 
-    <input
-      type="number"
-      id="quantity-{{ unique_id }}"
-      name="{{ input_name }}"
-      value="{{ initial_value }}"
-      min="{{ min_value }}"
-      max="{{ max_value }}"
-      class="quantity-selector__input"
-      data-quantity-input
-    >
+      <input
+        type="number"
+        id="{{ unique_id }}"
+        name="{{ input_name }}-ui"
+        value="{{ initial_value }}"
+        min="{{ min_value }}"
+        max="{{ max_value }}"
+        class="quantity-selector__input"
+        data-quantity-input
+      >
 
-    <button 
-      type="button" 
-      class="quantity-selector__btn quantity-selector__btn--increase" 
-      data-action="increase"
-      aria-label="{{ 'general.quantity.increase' | t }}"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-      </svg>
-    </button>
-  </div>
-
-  {% if show_price and price %}
-    <div class="quantity-selector__price-row">
-      <span class="quantity-selector__price" data-price-per-item="{{ price }}">{{ price | money }}</span>
+      <button 
+        type="button" 
+        class="quantity-selector__btn quantity-selector__btn-increase" 
+        data-action="increase"
+        aria-label="{{ 'general.quantity.increase' | t }}"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
     </div>
-  {% endif %}
+
+    {% if show_price and price %}
+      <div class="quantity-selector__price-row" {% unless show_gst %}style="justify-content: center;"{% endunless %}>
+        <span><b class="quantity-selector__price" data-price-per-item="{{ price }}">{{ price | money }}</b> each</span>
+        {% if product.handle != 'tradeperks-membership' and show_gst %}
+          <span class="quantity-selector__price__gst">(<span>{{ price | divided_by: 1.1 | money }}</span> excl GST)</span>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
 
   {% if show_total %}
     {% if price %}
@@ -120,52 +126,70 @@
       </span>
     </div>
   {% endif %}
+
+  {% if template == 'product' %}
+    {% comment %} Hidden input for selected variant {% endcomment %}
+    <input type="hidden" name="{{ input_name }}" id="quantity-variant-id" value="1">
+  {% endif %}
 </div>
 
 {% stylesheet %}
   .quantity-selector {
+    --qs-border-radius: var(--border-radius);
+    --qs-label-color: var(--color-text);
+    --qs-input-color: var(--color-button-primary-bg);
+    --qs-border-color: var(--color-button-primary-border);
+    --qs-button-color: var(--color-button-primary-bg);
+    --qs-button-text-color: var(--color-button-primary-text);
+
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 8px;
     width: fit-content;
-    align-items: center;
+    align-items: flex-start;
+    border-radius: var(--qs-border-radius, 4px);
+    overflow: hidden;
+    background: transparent;
   }
 
   .quantity-selector__label {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--color-text);
-    margin-bottom: 4px;
+    color: var(--qs-label-color);
+  }
+
+  .quantity-selector__controls-group {
+    display: flex;
+    gap: 14px;
   }
 
   .quantity-selector__controls {
     display: flex;
     align-items: center;
-    border: 1px solid #e9ecef;
-    border-radius: var(--style-border-radius-inputs, 6px);
-    background: #ffffff;
+    border: 2px solid var(--qs-border-color);
+    border-radius: var(--qs-border-radius, 4px);
+    background: white;
     overflow: hidden;
     height: var(--quantity-height);
   }
 
   .quantity-selector__btn {
     display: flex;
+    padding-inline: .875rem;
     align-items: center;
     justify-content: center;
     width: var(--quantity-height);
     height: 100%;
-    background: transparent;
+    background: var(--qs-button-color);
     border: none;
     cursor: pointer;
-    color: #6c757d;
+    color: var(--qs-button-text-color);
     transition: all 0.3s ease;
     font-size: 14px;
     font-weight: 600;
   }
 
   .quantity-selector__btn:hover {
-    color: var(--color-primary);
-    background: rgba(var(--color-primary-rgb, 0, 123, 255), 0.05);
+    color: var(--qs-button-text-color);
+    background: hsl(from var(--qs-button-color) h s l / 0.9);
   }
 
   .quantity-selector__btn:disabled {
@@ -176,13 +200,13 @@
   .quantity-selector__input {
     width: var(--quantity-width);
     height: 100%;
+    font-size: 1.125rem;
     border: none;
     text-align: center;
-    font-size: 14px;
-    font-weight: 500;
     background: transparent;
-    color: var(--color-text);
+    color: var(--qs-input-color);
     outline: none;
+    margin-inline: 10px;
   }
 
   .quantity-selector__input::-webkit-outer-spin-button,
@@ -193,6 +217,12 @@
 
   .quantity-selector__input[type="number"] {
     -moz-appearance: textfield;
+  }
+
+  .quantity-selector__price-row {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .quantity-selector__total {
@@ -209,60 +239,28 @@
 
   .quantity-selector__total-price {
     font-weight: 600;
-    color: var(--color-primary);
   }
 
   /* Style variants */
-  .quantity-selector--compact {
+  .quantity-selector__compact {
     --quantity-width: 50px;
     --quantity-height: 36px;
   }
 
-  .quantity-selector--standard {
+  .quantity-selector__standard {
     --quantity-width: 50px;
-    --quantity-height: 50px;
+    --quantity-height: 46px;
   }
 
-  .quantity-selector--large {
+  .quantity-selector__large {
     --quantity-width: 70px;
     --quantity-height: 52px;
   }
 
-  /* Product page specific styles */
-  .product-form__quantity .quantity-selector {
-    border: 1px solid #ddd;
-    border-radius: var(--style-border-radius-inputs, 4px);
-    overflow: hidden;
-    background: transparent;
-  }
-
-  .product-form__quantity .quantity-selector__controls {
-    border: none;
-    background: transparent;
-  }
-
-  .product-form__quantity .quantity-selector__btn {
-    padding-inline: .875rem;
-    background: transparent;
-    color: var(--color-text);
-    transition: background 0.3s;
-  }
-
-  .product-form__quantity .quantity-selector__btn:hover {
-    background: var(--color-foreground);
-    color: var(--color-text);
-  }
-
-  .product-form__quantity .quantity-selector__input {
-    font-size: 1.125rem;
-    background: transparent;
-  }
-
   /* Focus states */
-  .quantity-selector__controls:focus-within {
+  /* .quantity-selector__controls:focus-within {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb, 0, 123, 255), 0.1);
-  }
+  } */
 
   .visually-hidden {
     position: absolute !important;
@@ -277,17 +275,17 @@
 
   /* Mobile responsive */
   @media (max-width: 768px) {
-    .quantity-selector--compact {
+    .quantity-selector__compact {
       --quantity-width: 45px;
       --quantity-height: 32px;
     }
 
-    .quantity-selector--standard {
+    .quantity-selector__standard {
       --quantity-width: 50px;
       --quantity-height: 40px;
     }
 
-    .quantity-selector--large {
+    .quantity-selector__large {
       --quantity-width: 60px;
       --quantity-height: 48px;
     }
@@ -295,70 +293,80 @@
 {% endstylesheet %}
 
 {% javascript %}
+  /**
+   * Class representing a dynamic Quantity Selector component.
+   * Manages upper bounds, interactive step buttons, localized real-time subtotal calculation,
+   * and responds dynamically to global product variant switching events.
+   */
   class QuantitySelector {
+    /**
+     * Instantiate QuantitySelector and discover elements.
+     * @param {HTMLElement} element - Parent root node containing data attributes.
+     */
     constructor(element) {
-      this.element = element;
-      this.input = element.querySelector('.quantity-selector__input');
-      this.decreaseBtn = element.querySelector('.quantity-selector__btn--decrease');
-      this.increaseBtn = element.querySelector('.quantity-selector__btn--increase');
-      this.totalPrice = element.querySelector('.quantity-selector__total-price');
-      this.priceEl = element.querySelector('.quantity-selector__price');
-
-      this.min = parseInt(this.input.getAttribute('min')) || 0;
-      this.max = parseInt(this.input.getAttribute('max')) || 999;
-
-      // Determine price per item. Priority:
-      // 1. data-price-per-item (show_price)
-      // 2. derive from data-total-price / current quantity (if total provided)
-      // 3. 0
-      this.pricePerItem = 0;
-      if (this.priceEl) {
-        this.pricePerItem = parseFloat(this.priceEl.getAttribute('data-price-per-item')) || 0;
-      } else if (this.totalPrice) {
-        const qty = parseInt(this.input.value) || 1;
-        const totalVal = parseFloat(this.totalPrice.getAttribute('data-total-price')) || 0;
-        this.pricePerItem = qty ? (totalVal / qty) : 0;
+      this.elements = {
+        quantity: element.querySelector('#quantity-variant-id'),
+        input: element.querySelector('.quantity-selector__input'),
+        decrease: element.querySelector('.quantity-selector__btn-decrease'),
+        increase: element.querySelector('.quantity-selector__btn-increase'),
+        price: element.querySelector('.quantity-selector__price'),
+        totalPrice: element.querySelector('.quantity-selector__total-price')
       }
-      
+
+      this.min = parseInt(this.elements.input.getAttribute('min')) || 0;
+      this.max = parseInt(this.elements.input.getAttribute('max')) || 999;
+
+      this.price = 0;
+
       this.init();
     }
 
+    /**
+     * Attach global and element event listeners, initialize view components.
+     */
     init() {
-      this.decreaseBtn?.addEventListener('click', () => this.decrease());
-      this.increaseBtn?.addEventListener('click', () => this.increase());
-      this.input?.addEventListener('change', () => this.validateInput());
-      this.input?.addEventListener('input', () => this.updateTotal());
+      this.elements.decrease?.addEventListener('click', this.handleDecrease);
+      this.elements.increase?.addEventListener('click', this.handleIncrease);
+      this.elements.input?.addEventListener('change', this.handleInputChange);
+      this.elements.input?.addEventListener('input', () => this.renderTotal());
       
       // Auto-select text when input is clicked or focused
-      this.input?.addEventListener('click', () => this.selectAllText());
-      this.input?.addEventListener('focus', () => this.selectAllText());
+      this.elements.input?.addEventListener('click', this.selectAllText);
+      this.elements.input?.addEventListener('focus', this.selectAllText);
       
-      this.updateButtons();
-      this.updateTotal();
+      this.updateControlsState();
+      this.renderTotal();
+
+      document.addEventListener('product-variant:changed', this.handleVariantChange);
     }
 
-    decrease() {
-      const currentValue = parseInt(this.input.value) || 0;
+    /**
+     * Decrements internal quantity values by step boundaries.
+     */
+    handleDecrease = () => {
+      const currentValue = parseInt(this.elements.input.value) || 0;
       if (currentValue > this.min) {
-        this.input.value = currentValue - 1;
-        this.input.dispatchEvent(new Event('change', { bubbles: true }));
-        this.updateButtons();
-        this.updateTotal();
+        this.elements.input.value = currentValue - 1;
+        this.elements.input.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
 
-    increase() {
-      const currentValue = parseInt(this.input.value) || 0;
+    /**
+     * Increments internal quantity values by step boundaries.
+     */
+    handleIncrease = () => {
+      const currentValue = parseInt(this.elements.input.value) || 0;
       if (currentValue < this.max) {
-        this.input.value = currentValue + 1;
-        this.input.dispatchEvent(new Event('change', { bubbles: true }));
-        this.updateButtons();
-        this.updateTotal();
+        this.elements.input.value = currentValue + 1;
+        this.elements.input.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
 
-    validateInput() {
-      let value = parseInt(this.input.value);
+    /**
+     * Orchestrates sanitization checks when changes are fired inside input controls.
+     */
+    handleInputChange = () => {
+      let value = parseInt(this.elements.input.value);
       
       if (isNaN(value) || value < this.min) {
         value = this.min;
@@ -366,87 +374,126 @@
         value = this.max;
       }
       
-      this.input.value = value;
-      this.updateButtons();
-      this.updateTotal();
+      this.setQuantity(value);
+      this.updateControlsState();
+      this.renderTotal();
     }
 
-    updateButtons() {
-      const currentValue = parseInt(this.input.value) || 0;
+    /**
+     * Adjusts active status of buttons and updates the running grand totals.
+     */
+    updateControlsState() {
+      const currentValue = parseInt(this.elements.input.value) || 0;
       
-      if (this.decreaseBtn) {
-        this.decreaseBtn.disabled = currentValue <= this.min;
+      if (this.elements.decrease) {
+        this.elements.decrease.disabled = currentValue <= this.min;
       }
       
-      if (this.increaseBtn) {
-        this.increaseBtn.disabled = currentValue >= this.max;
+      if (this.elements.increase) {
+        this.elements.increase.disabled = currentValue >= this.max;
       }
     }
 
-    updateTotal() {
-      if (this.totalPrice) {
-        const quantity = parseInt(this.input.value) || 0;
-        const total = (this.pricePerItem || 0) * quantity;
-
-        // Format as money (basic implementation)
-        const formatted = new Intl.NumberFormat('en-US', {
-          style: 'currency',
-          currency: 'USD'
-        }).format(total / 100);
-
-        this.totalPrice.textContent = formatted;
+    setPrice() {
+      if (this.elements.price) {
+        this.price = parseFloat(this.elements.price.getAttribute('data-price-per-item')) || 0;
+      } else if (this.elements.totalPrice) {
+        const qty = parseInt(this.elements.input.value) || 1;
+        const totalVal = parseFloat(this.elements.totalPrice.getAttribute('data-total-price')) || 0;
+        this.price = qty ? (totalVal / qty) : 0;
       }
     }
 
-    getValue() {
-      return parseInt(this.input.value) || 0;
+    renderPrice() {
+      this.elements.price.textContent = this.formatCurrency(this.price);
     }
 
-    setValue(value) {
-      this.input.value = value;
-      this.validateInput();
+    /**
+     * Calculates structural subtotals and injects translated currency values into DOM.
+     */
+    renderTotal() {
+      this.setPrice();
+      if (!this.elements.totalPrice) return;
+
+      const quantity = parseInt(this.elements.input.value) || 0;
+      const total = (this.price || 0) * quantity;
+
+      this.elements.totalPrice.textContent = this.formatCurrency(total);
     }
 
-    selectAllText() {
-      if (this.input && this.input.select) {
-        // Small delay to ensure the input is focused
-        setTimeout(() => {
-          this.input.select();
-        }, 10);
+    /**
+     * Hooks external variant switches to sync new prices back down into local item contexts.
+     * @param {CustomEvent} event - System emitted pricing payloads.
+     */
+    handleVariantChange = (event) => {
+      const variant = event?.detail;
+      if (!variant || !variant.price) return;
+
+      this.price = parseFloat(variant.price);
+      
+      if (this.elements.price) {
+        this.elements.price.setAttribute('data-price-per-item', variant.price);
+        this.elements.price.textContent = this.formatCurrency(this.price);
       }
+
+      this.renderPrice();
+      this.renderTotal();
+    }
+
+    setQuantity(value) {
+      this.elements.quantity.value = value;
+      this.handleInputChange;
+    }
+
+    /**
+     * Converts numbers directly from pennies into standardized localized strings.
+     * @param {number} cents - Calculated subtotal amounts.
+     * @returns {string} Fully localized structural formats.
+     */
+    formatCurrency(cents) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(cents / 100);
+    }
+
+    /**
+     * Simplifies text correction fields by selecting entire fields when clicked.
+     */
+    selectAllText = () => {
+      setTimeout(() => {
+        this.elements.input?.select();
+      }, 10);
     }
   }
 
-  // Auto-initialize quantity selectors
+  /**
+   * Global dynamic lifecycle loader configuration.
+   */
   document.addEventListener('DOMContentLoaded', () => {
-    const selectors = document.querySelectorAll('[data-quantity-selector]');
-    selectors.forEach(selector => {
-      new QuantitySelector(selector);
-    });
-  });
+    const initSelectors = (container = document) => {
+      const selectors = container.querySelectorAll('[data-quantity-selector]:not([data-quantity-initialized])');
+      selectors.forEach(selector => {
+        new QuantitySelector(selector);
+        selector.setAttribute('data-quantity-initialized', 'true');
+      });
+    };
 
-  // Initialize new quantity selectors dynamically
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((mutation) => {
-      mutation.addedNodes.forEach((node) => {
-        if (node.nodeType === 1) {
-          const selectors = node.hasAttribute?.('data-quantity-selector')
-            ? [node] 
-            : node.querySelectorAll?.('[data-quantity-selector]') || [];
-          
-          selectors.forEach(selector => {
-            if (!selector.hasAttribute('data-quantity-initialized')) {
-              new QuantitySelector(selector);
-              selector.setAttribute('data-quantity-initialized', 'true');
-            }
-          });
-        }
+    initSelectors();
+
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            initSelectors(node.hasAttribute?.('data-quantity-selector') ? node.parentNode : node);
+          }
+        });
       });
     });
-  });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
   });
 {% endjavascript %}

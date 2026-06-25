@@ -137,10 +137,12 @@
     "in_stock": "In stock",
     "out_of_stock": "Out of stock",
     "vendor": "Vendor",
+    "supplier": "Supplier",
     "categories": "Categories",
     "tags": "Tags",
     "quick_view": "Quick view",
     "price": "Price",
+    "sku": "SKU",
     "general": {
       "product": "product",
       "products": "products"
@@ -197,8 +199,17 @@
     "quantity": {
       "decrease": "Decrease quantity",
       "increase": "Increase quantity",
-      "total": "Total"
+      "total": "Total",
+      "total_quantity": "Total Quantity"
     },
+    "purchase_options": "Purchase options",
+    "buy_each": "Buy each",
+    "buy_box": "Buy box",
+    "each": "each",
+    "box_of": "box of {{ count }}",
+    "excl_gst": "excl GST",
+    "you_save": "You save",
+    "save": "Save",
     "accessibility": {
       "toggle_color_scheme": "Toggle between light and dark mode",
       "skip_to_content": "Skip to content",
@@ -313,6 +324,15 @@
           "category": "Product"
         }
       }
+    },
+    "accordion": {
+      "name": "Accordion"
+    },
+    "accordion_content": {
+      "name": "Content",
+      "fallback_title": "Accordion item",
+      "view_more": "View more",
+      "view_less": "View less"
     }
   },
   "footer": {

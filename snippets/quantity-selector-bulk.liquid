@@ -1,0 +1,593 @@
+{% doc %}
+  Renders a bulk purchase quantity selector with separate "buy each" and
+  "buy box" controls plus order summary calculations.
+
+  @param {number} [each_price] - Price per single item in cents
+  @param {number} [box_price] - Price per box in cents
+  @param {number} [box_size] - Number of items per box
+  @param {number} [each_quantity] - Initial single-item quantity
+  @param {number} [box_quantity] - Initial box quantity
+  @param {string} [each_input_name] - Input name for the single-item quantity
+  @param {string} [box_input_name] - Input name for the box quantity
+  @param {number} [each_compare_price] - Regular price per item in cents
+  @param {number} [box_compare_price] - Regular price per box in cents
+  @param {string} [class_name] - Extra class names for the outer wrapper
+  @param {string} [unique_id] - Optional unique ID suffix
+
+  @example
+  {% render 'quantity-selector-bulk',
+    each_price: 699,
+    box_price: 6650,
+    box_size: 10,
+    each_quantity: 6,
+    box_quantity: 6
+  %}
+{% enddoc %}
+
+{% liquid
+  assign each_price = each_price | default: 0
+  assign box_price = box_price | default: 0
+  assign box_size = box_size | default: 10
+  assign each_quantity = each_quantity | default: 1
+  assign box_quantity = box_quantity | default: 0
+  assign each_input_name = each_input_name | default: 'quantity_each'
+  assign box_input_name = box_input_name | default: 'quantity_box'
+  assign each_compare_price = each_compare_price | default: each_price
+  assign box_compare_price = box_compare_price | default: box_price
+  assign class_name = class_name | default: ''
+  assign currency_code = currency_code | default: cart.currency.iso_code | default: shop.currency | default: 'USD'
+
+  if unique_id == blank
+    capture bulk_quantity_uid
+      increment bulk_quantity_selector
+    endcapture
+    assign unique_id = 'quantity-selector-bulk-' | append: bulk_quantity_uid
+  endif
+
+  assign each_total = each_price | times: each_quantity
+  assign box_total = box_price | times: box_quantity
+  assign total_price = each_total | plus: box_total
+  assign box_units = box_quantity | times: box_size
+  assign total_quantity = each_quantity | plus: box_units
+
+  assign regular_each_total = each_compare_price | times: each_quantity
+  assign regular_box_total = box_compare_price | times: box_quantity
+  assign regular_total = regular_each_total | plus: regular_box_total
+  assign savings_amount = regular_total | minus: total_price
+  assign savings_percent = 0
+
+  if regular_total > 0
+    assign savings_percent = savings_amount | times: 100.0 | divided_by: regular_total | round
+  endif
+
+  assign box_unit_price = box_price
+  if box_size > 0
+    assign box_unit_price = box_price | divided_by: box_size
+  endif
+
+  assign each_excl_gst = each_price | times: 100.0 | divided_by: 110 | round
+  assign box_excl_gst = box_price | times: 100.0 | divided_by: 110 | round
+  if box_size > 0
+    assign box_unit_excl_gst = box_excl_gst | divided_by: box_size
+  else
+    assign box_unit_excl_gst = box_excl_gst
+  endif
+
+  assign box_badge_percent = box_save_percent | default: savings_percent
+  assign show_box_badge = show_box_badge | default: true
+%}
+
+  <div
+  class="quantity-selector-bulk {{ class_name }}"
+  data-quantity-selector-bulk
+  data-currency-code="{{ currency_code }}"
+  data-each-price="{{ each_price }}"
+  data-box-price="{{ box_price }}"
+  data-box-size="{{ box_size }}"
+  data-each-compare-price="{{ each_compare_price }}"
+  data-box-compare-price="{{ box_compare_price }}"
+  {{ attributes }}
+  >
+  <p class="quantity-selector-bulk__heading">
+    {{ 'general.purchase_options' | t }}:
+  </p>
+
+  <div class="quantity-selector-bulk__grid">
+    <article class="quantity-selector-bulk__card quantity-selector-bulk__card--each">
+      <header class="quantity-selector-bulk__card-header">
+        <h3 class="quantity-selector-bulk__card-title">{{ 'general.buy_each' | t }}:</h3>
+      </header>
+
+      <div class="quantity-selector-bulk__card-body">
+        <div class="quantity-selector-bulk__control-group">
+          <div class="quantity-selector-bulk__controls" aria-label="{{ 'general.buy_each' | t }}">
+            <button
+              type="button"
+              class="quantity-selector-bulk__btn quantity-selector-bulk__btn--decrease"
+              data-quantity-bulk-action="decrease"
+              data-target="each"
+              aria-label="{{ 'general.quantity.decrease' | t }}"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+            <input
+              type="number"
+              id="{{ unique_id }}-each"
+              name="{{ each_input_name }}"
+              value="{{ each_quantity }}"
+              min="0"
+              max="999"
+              inputmode="numeric"
+              class="quantity-selector-bulk__input"
+              data-quantity-bulk-input="each"
+            >
+
+            <button
+              type="button"
+              class="quantity-selector-bulk__btn quantity-selector-bulk__btn--increase"
+              data-quantity-bulk-action="increase"
+              data-target="each"
+              aria-label="{{ 'general.quantity.increase' | t }}"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quantity-selector-bulk__pricing">
+            <div class="quantity-selector-bulk__price-main">
+              <span data-each-price-display>{{ each_price | money }}</span>
+              <span>{{ 'general.each' | t }}</span>
+            </div>
+            <div class="quantity-selector-bulk__price-sub">
+              <span data-each-excl-gst-display>{{ each_excl_gst | money }}</span>
+              <span>{{ 'general.excl_gst' | t }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="quantity-selector-bulk__card-total">
+          {{ 'general.quantity.total' | t }}:
+          <strong data-each-card-total>{{ each_total | money }}</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="quantity-selector-bulk__card quantity-selector-bulk__card--box">
+      <header class="quantity-selector-bulk__card-header">
+        <h3 class="quantity-selector-bulk__card-title">{{ 'general.buy_box' | t }}:</h3>
+
+        {% if show_box_badge and box_badge_percent > 0 %}
+          <span class="quantity-selector-bulk__badge">{{ 'general.save' | t }} {{ box_badge_percent }}%</span>
+        {% endif %}
+      </header>
+
+      <div class="quantity-selector-bulk__card-body">
+        <div class="quantity-selector-bulk__control-group">
+          <div class="quantity-selector-bulk__controls" aria-label="{{ 'general.buy_box' | t }}">
+            <button
+              type="button"
+              class="quantity-selector-bulk__btn quantity-selector-bulk__btn--decrease"
+              data-quantity-bulk-action="decrease"
+              data-target="box"
+              aria-label="{{ 'general.quantity.decrease' | t }}"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+            <input
+              type="number"
+              id="{{ unique_id }}-box"
+              name="{{ box_input_name }}"
+              value="{{ box_quantity }}"
+              min="0"
+              max="999"
+              inputmode="numeric"
+              class="quantity-selector-bulk__input"
+              data-quantity-bulk-input="box"
+            >
+
+            <button
+              type="button"
+              class="quantity-selector-bulk__btn quantity-selector-bulk__btn--increase"
+              data-quantity-bulk-action="increase"
+              data-target="box"
+              aria-label="{{ 'general.quantity.increase' | t }}"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+
+          <div class="quantity-selector-bulk__pricing">
+            <div class="quantity-selector-bulk__price-main">
+              <span data-box-price-display>{{ box_price | money }}</span>
+              <span>{{ 'general.box_of' | t: count: box_size }}</span>
+            </div>
+            <div class="quantity-selector-bulk__price-sub">
+              <span data-box-unit-price-display>{{ box_unit_price | money }}</span>
+              <span>{{ 'general.each' | t }}</span>
+            </div>
+            <div class="quantity-selector-bulk__price-sub">
+              <span data-box-excl-gst-display>{{ box_unit_excl_gst | money }}</span>
+              <span>{{ 'general.excl_gst' | t }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="quantity-selector-bulk__card-total">
+          {{ 'general.quantity.total' | t }}:
+          <strong data-box-card-total>{{ box_total | money }}</strong>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="quantity-selector-bulk__summary">
+    <div class="quantity-selector-bulk__summary-left">
+      <span class="quantity-selector-bulk__summary-label">{{ 'general.quantity.total' | t }}:</span>
+      <strong data-bulk-total>{{ total_price | money }}</strong>
+      <span class="quantity-selector-bulk__summary-divider">|</span>
+      <span>{{ 'general.you_save' | t }}:</span>
+      <strong data-bulk-save>{{ savings_amount | money }}</strong>
+      <span data-bulk-save-percent>({{ savings_percent }}%)</span>
+    </div>
+
+    <div class="quantity-selector-bulk__summary-right">
+      <span class="quantity-selector-bulk__summary-label">{{ 'general.quantity.total_quantity' | t }}:</span>
+      <strong data-bulk-total-quantity>{{ total_quantity }}</strong>
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .quantity-selector-bulk {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .quantity-selector-bulk__heading {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+
+  .quantity-selector-bulk__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .quantity-selector-bulk__card {
+    border: 2px solid #ef1d0f;
+    border-radius: 4px;
+    background: #fff;
+    padding: 14px 16px 16px;
+  }
+
+  .quantity-selector-bulk__card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .quantity-selector-bulk__card-title {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .quantity-selector-bulk__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 20px;
+    padding: 0 8px;
+    border-radius: 4px;
+    background: #12a150;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .quantity-selector-bulk__card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .quantity-selector-bulk__control-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .quantity-selector-bulk__controls {
+    display: flex;
+    align-items: stretch;
+    overflow: hidden;
+    border-radius: 4px;
+    min-height: 44px;
+    border: 1px solid #ef1d0f;
+    background: #ef1d0f;
+  }
+
+  .quantity-selector-bulk__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    color: #fff;
+    background: #ef1d0f;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .quantity-selector-bulk__btn:hover {
+    background: #d91a0d;
+  }
+
+  .quantity-selector-bulk__btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .quantity-selector-bulk__input {
+    width: 68px;
+    min-width: 68px;
+    border: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    border-right: 1px solid rgba(255, 255, 255, 0.16);
+    background: #fff;
+    color: #ef1d0f;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    outline: none;
+  }
+
+  .quantity-selector-bulk__input::-webkit-outer-spin-button,
+  .quantity-selector-bulk__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .quantity-selector-bulk__pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 138px;
+    color: var(--color-text);
+  }
+
+  .quantity-selector-bulk__price-main {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+    font-size: 15px;
+    line-height: 1.25;
+    font-weight: 500;
+  }
+
+  .quantity-selector-bulk__price-sub {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    flex-wrap: wrap;
+    font-size: 14px;
+    line-height: 1.35;
+    color: #8b8b8b;
+  }
+
+  .quantity-selector-bulk__card-total {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--color-text);
+  }
+
+  .quantity-selector-bulk__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px 16px;
+    flex-wrap: wrap;
+    padding: 14px 16px;
+    border-left: 4px solid #ef1d0f;
+    border-radius: 4px;
+    background: #f8f8f8;
+    color: var(--color-text);
+  }
+
+  .quantity-selector-bulk__summary-left,
+  .quantity-selector-bulk__summary-right {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .quantity-selector-bulk__summary-label,
+  .quantity-selector-bulk__summary-divider {
+    color: #6f6f6f;
+  }
+
+  .quantity-selector-bulk__summary strong {
+    color: #ef1d0f;
+    font-weight: 700;
+  }
+
+  @media (max-width: 768px) {
+    .quantity-selector-bulk__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .quantity-selector-bulk__control-group {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .quantity-selector-bulk__pricing {
+      min-width: 0;
+    }
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  class QuantitySelectorBulk {
+    constructor(element) {
+      this.element = element;
+      this.currencyCode = element.dataset.currencyCode || 'USD';
+      this.boxSize = Number.parseInt(element.dataset.boxSize, 10) || 10;
+      this.eachPrice = Number.parseInt(element.dataset.eachPrice, 10) || 0;
+      this.boxPrice = Number.parseInt(element.dataset.boxPrice, 10) || 0;
+      this.eachComparePrice = Number.parseInt(element.dataset.eachComparePrice, 10) || this.eachPrice;
+      this.boxComparePrice = Number.parseInt(element.dataset.boxComparePrice, 10) || this.boxPrice;
+
+      this.eachInput = element.querySelector('[data-quantity-bulk-input="each"]');
+      this.boxInput = element.querySelector('[data-quantity-bulk-input="box"]');
+      this.eachDecrease = element.querySelector('[data-quantity-bulk-action="decrease"][data-target="each"]');
+      this.eachIncrease = element.querySelector('[data-quantity-bulk-action="increase"][data-target="each"]');
+      this.boxDecrease = element.querySelector('[data-quantity-bulk-action="decrease"][data-target="box"]');
+      this.boxIncrease = element.querySelector('[data-quantity-bulk-action="increase"][data-target="box"]');
+
+      this.eachCardTotal = element.querySelector('[data-each-card-total]');
+      this.boxCardTotal = element.querySelector('[data-box-card-total]');
+      this.totalPrice = element.querySelector('[data-bulk-total]');
+      this.totalSave = element.querySelector('[data-bulk-save]');
+      this.totalSavePercent = element.querySelector('[data-bulk-save-percent]');
+      this.totalQuantity = element.querySelector('[data-bulk-total-quantity]');
+
+      this.init();
+    }
+
+    init() {
+      if (!this.eachInput || !this.boxInput) return;
+
+      this.eachDecrease?.addEventListener('click', () => this.adjustQuantity('each', -1));
+      this.eachIncrease?.addEventListener('click', () => this.adjustQuantity('each', 1));
+      this.boxDecrease?.addEventListener('click', () => this.adjustQuantity('box', -1));
+      this.boxIncrease?.addEventListener('click', () => this.adjustQuantity('box', 1));
+
+      this.eachInput.addEventListener('change', () => this.validateInput('each'));
+      this.boxInput.addEventListener('change', () => this.validateInput('box'));
+      this.eachInput.addEventListener('input', () => this.update());
+      this.boxInput.addEventListener('input', () => this.update());
+
+      this.eachInput.addEventListener('click', () => this.selectAllText(this.eachInput));
+      this.boxInput.addEventListener('click', () => this.selectAllText(this.boxInput));
+
+      this.update();
+    }
+
+    getQuantity(target) {
+      const input = target === 'box' ? this.boxInput : this.eachInput;
+      return Number.parseInt(input.value, 10) || 0;
+    }
+
+    setQuantity(target, value) {
+      const input = target === 'box' ? this.boxInput : this.eachInput;
+      const nextValue = Math.max(0, Math.min(999, value));
+      input.value = nextValue;
+    }
+
+    adjustQuantity(target, delta) {
+      const currentValue = this.getQuantity(target);
+      this.setQuantity(target, currentValue + delta);
+      this.update();
+    }
+
+    validateInput(target) {
+      const input = target === 'box' ? this.boxInput : this.eachInput;
+      let value = Number.parseInt(input.value, 10);
+
+      if (Number.isNaN(value) || value < 0) {
+        value = 0;
+      } else if (value > 999) {
+        value = 999;
+      }
+
+      input.value = value;
+      this.update();
+    }
+
+    formatMoney(cents) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: this.currencyCode,
+      }).format((cents || 0) / 100);
+    }
+
+    update() {
+      const eachQty = this.getQuantity('each');
+      const boxQty = this.getQuantity('box');
+      const totalQuantity = eachQty + (boxQty * this.boxSize);
+
+      const eachTotal = eachQty * this.eachPrice;
+      const boxTotal = boxQty * this.boxPrice;
+      const totalPrice = eachTotal + boxTotal;
+
+      const regularTotal = (eachQty * this.eachComparePrice) + (boxQty * this.boxComparePrice);
+      const savingsAmount = Math.max(0, regularTotal - totalPrice);
+      const savingsPercent = regularTotal > 0
+        ? Math.round((savingsAmount / regularTotal) * 100)
+        : 0;
+
+      this.eachCardTotal && (this.eachCardTotal.textContent = this.formatMoney(eachTotal));
+      this.boxCardTotal && (this.boxCardTotal.textContent = this.formatMoney(boxTotal));
+      this.totalPrice && (this.totalPrice.textContent = this.formatMoney(totalPrice));
+      this.totalSave && (this.totalSave.textContent = this.formatMoney(savingsAmount));
+      this.totalSavePercent && (this.totalSavePercent.textContent = `(${savingsPercent}%)`);
+      this.totalQuantity && (this.totalQuantity.textContent = totalQuantity);
+
+      this.eachDecrease && (this.eachDecrease.disabled = eachQty <= 0);
+      this.boxDecrease && (this.boxDecrease.disabled = boxQty <= 0);
+      this.eachIncrease && (this.eachIncrease.disabled = eachQty >= 999);
+      this.boxIncrease && (this.boxIncrease.disabled = boxQty >= 999);
+    }
+
+    selectAllText(input) {
+      if (!input?.select) return;
+
+      setTimeout(() => {
+        input.select();
+      }, 10);
+    }
+  }
+
+  const initQuantitySelectorBulk = () => {
+    document.querySelectorAll('[data-quantity-selector-bulk]').forEach((element) => {
+      if (element.dataset.quantityBulkInitialized === 'true') return;
+      element.dataset.quantityBulkInitialized = 'true';
+      new QuantitySelectorBulk(element);
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initQuantitySelectorBulk, { once: true });
+  } else {
+    initQuantitySelectorBulk();
+  }
+{% endjavascript %}

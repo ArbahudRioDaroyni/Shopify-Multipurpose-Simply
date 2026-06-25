@@ -1,0 +1,103 @@
+{% doc %}
+  Renders a parent accordion group that wraps nested accordion content blocks.
+
+  @example
+  {% content_for 'block', type: 'accordion', id: 'product-accordion' %}
+{% enddoc %}
+
+{% liquid
+  assign accordion_single_open = block.settings.single_open | default: true
+%}
+
+<div
+  class="accordion-block"
+  data-accordion
+  data-single-open="{{ accordion_single_open }}"
+  {{ block.shopify_attributes }}
+>
+  {% content_for 'blocks' %}
+</div>
+
+{% stylesheet %}
+  .accordion-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--accordion-gap, 0);
+    width: 100%;
+  }
+
+  .accordion-block .accordion-content {
+    border-block: 1px solid var(--color-border, rgba(0, 0, 0, 0.12));
+  }
+
+  .accordion-block .shopify-block:last-child .accordion-content {
+    border-top: none;
+  }
+
+  .accordion-block .accordion-content__summary,
+  .accordion-block .accordion-content__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  const initAccordionGroups = () => {
+    document.querySelectorAll('[data-accordion][data-single-open="true"]').forEach((accordion) => {
+      if (accordion.dataset.initialized === 'true') return;
+
+      accordion.dataset.initialized = 'true';
+
+      accordion.querySelectorAll('details').forEach((details) => {
+        details.addEventListener('toggle', () => {
+          if (!details.open) return;
+
+          accordion.querySelectorAll('details').forEach((sibling) => {
+            if (sibling !== details) {
+              sibling.open = false;
+            }
+          });
+        });
+      });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAccordionGroups, { once: true });
+  } else {
+    initAccordionGroups();
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:blocks.accordion.name",
+  "blocks": [
+    {
+      "type": "accordion-content"
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:blocks.accordion.settings.layout.header"
+    },
+    {
+      "type": "checkbox",
+      "id": "single_open",
+      "label": "t:blocks.accordion.settings.single_open.label",
+      "default": true,
+      "info": "t:blocks.accordion.settings.single_open.info"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.accordion.presets.default.name",
+      "category": "t:blocks.accordion.presets.default.category"
+    }
+  ]
+}
+{% endschema %}

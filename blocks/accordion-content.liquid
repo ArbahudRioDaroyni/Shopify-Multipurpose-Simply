@@ -1,0 +1,318 @@
+{% doc %}
+  Renders a single accordion content item with optional page-backed content.
+
+  @example
+  {% content_for 'block', type: 'accordion-content', id: 'accordion-item' %}
+{% enddoc %}
+
+{% liquid
+  assign accordion_title_fallback = 'blocks.accordion_content.fallback_title' | t
+  assign accordion_title = block.settings.title | strip | default: accordion_title_fallback
+  assign accordion_display_mode = block.settings.display_mode | default: 'collapse'
+  assign accordion_content = block.settings.content
+
+  if block.settings.page != blank
+    assign accordion_content = block.settings.page.content
+  endif
+
+  assign accordion_id = 'accordion-content-' | append: block.id
+  if accordion_content != blank
+    assign accordion_has_content = true
+  else
+    assign accordion_has_content = false
+  endif
+%}
+
+{% if accordion_display_mode == 'show_all' %}
+  <div
+    class="accordion-content accordion-content--show-all"
+    data-accordion-item
+    data-display-mode="{{ accordion_display_mode }}"
+    {{ block.shopify_attributes }}
+  >
+    <div class="accordion-content__header">
+      <h2 class="accordion-content__title">{{ accordion_title | escape }}</h2>
+    </div>
+
+    {% if accordion_has_content %}
+      <div class="accordion-content__body">
+        <div class="accordion-content__content">
+          {{ accordion_content }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+{% else %}
+  <details
+    class="accordion-content accordion-content--{{ accordion_display_mode }}"
+    data-accordion-item
+    data-display-mode="{{ accordion_display_mode }}"
+    {{ block.shopify_attributes }}
+    {% if accordion_display_mode == 'view_more' %}
+      open
+    {% endif %}
+  >
+    <summary class="accordion-content__summary">
+      <h2 class="accordion-content__title">{{ accordion_title | escape }}</h2>
+      <span class="accordion-content__icon" aria-hidden="true"></span>
+    </summary>
+
+    {% if accordion_has_content %}
+      <div class="accordion-content__body">
+        <div
+          class="accordion-content__content{% if accordion_display_mode == 'view_more' %} accordion-content__content--view-more{% endif %}"
+          {% if accordion_display_mode == 'view_more' %}
+            id="{{ accordion_id }}-panel"
+            data-accordion-view-more-content
+            style="--accordion-content-max-height: 14rem;"
+          {% endif %}
+        >
+          {{ accordion_content }}
+        </div>
+
+        {% if accordion_display_mode == 'view_more' %}
+          <button
+            type="button"
+            class="accordion-content__toggle"
+            data-accordion-view-more-toggle
+            aria-controls="{{ accordion_id }}-panel"
+            aria-expanded="true"
+            data-more-label="{{ 'blocks.accordion_content.view_more' | t | escape }}"
+            data-less-label="{{ 'blocks.accordion_content.view_less' | t | escape }}"
+          >
+            {{ 'blocks.accordion_content.view_less' | t }}
+          </button>
+        {% endif %}
+      </div>
+    {% endif %}
+  </details>
+{% endif %}
+
+{% stylesheet %}
+  .accordion-content {
+    color: var(--color-text, currentColor);
+  }
+
+  .accordion-content__summary,
+  .accordion-content__header {
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .accordion-content__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .accordion-content__title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .accordion-content__icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .accordion-content__icon::before,
+  .accordion-content__icon::after {
+    content: '';
+    position: absolute;
+    inset: 50% auto auto 50%;
+    width: 1rem;
+    height: 2px;
+    background: currentColor;
+    border-radius: 999px;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .accordion-content__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .accordion-content[open] .accordion-content__icon::after {
+    opacity: 0;
+  }
+
+  .accordion-content__body {
+    padding-bottom: 1rem;
+  }
+
+  .accordion-content__content {
+    line-height: 1.7;
+  }
+
+  .accordion-content__content > :first-child {
+    margin-top: 0;
+  }
+
+  .accordion-content__content p {
+    margin-bottom: 4px;
+  }
+
+  .accordion-content__content h3,
+  .accordion-content__content h4,
+  .accordion-content__content h5,
+  .accordion-content__content h6 {
+    margin-top: 20px;
+    font-size: 20px;
+  }
+
+  .accordion-content__content > :last-child {
+    margin-bottom: 0;
+  }
+
+  .accordion-content--view_more .accordion-content__content {
+    max-height: var(--accordion-content-max-height, 14rem);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .accordion-content--view_more.is-expanded .accordion-content__content {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .accordion-content--view_more .accordion-content__content::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 4rem;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--color-background, #fff));
+    pointer-events: none;
+  }
+
+  .accordion-content--view_more.is-expanded .accordion-content__content::after {
+    display: none;
+  }
+
+  .accordion-content__toggle {
+    margin-top: 0.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-primary, currentColor);
+    font: inherit;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .accordion-content--show-all .accordion-content__header {
+    cursor: default;
+  }
+{% endstylesheet %}
+
+{% javascript %}
+  const initAccordionViewMore = () => {
+    document.querySelectorAll('[data-accordion-item][data-display-mode="view_more"]').forEach((item) => {
+      if (item.dataset.viewMoreInitialized === 'true') return;
+
+      item.dataset.viewMoreInitialized = 'true';
+
+      const content = item.querySelector('[data-accordion-view-more-content]');
+      const button = item.querySelector('[data-accordion-view-more-toggle]');
+
+      if (!content || !button) return;
+
+      const maxHeight = () => {
+        const rawValue = getComputedStyle(content).getPropertyValue('--accordion-content-max-height').trim();
+        const parsed = Number.parseFloat(rawValue);
+        return Number.isFinite(parsed) ? parsed : 224;
+      };
+
+      const updateButton = () => {
+        const expanded = item.classList.contains('is-expanded');
+        button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        button.textContent = expanded ? button.dataset.lessLabel : button.dataset.moreLabel;
+      };
+
+      const refresh = () => {
+        const shouldShow = content.scrollHeight > maxHeight() + 4;
+
+        button.hidden = !shouldShow;
+
+        if (!shouldShow) {
+          item.classList.add('is-expanded');
+        } else {
+          item.classList.remove('is-expanded');
+        }
+
+        updateButton();
+      };
+
+      button.addEventListener('click', () => {
+        item.classList.toggle('is-expanded');
+        updateButton();
+      });
+
+      refresh();
+
+      window.addEventListener('resize', refresh, { passive: true });
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAccordionViewMore, { once: true });
+  } else {
+    initAccordionViewMore();
+  }
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "t:blocks.accordion_content.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:blocks.accordion_content.settings.content.header"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:blocks.accordion_content.settings.title.label"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "t:blocks.accordion_content.settings.content.label"
+    },
+    {
+      "type": "page",
+      "id": "page",
+      "label": "t:blocks.accordion_content.settings.page.label",
+      "info": "t:blocks.accordion_content.settings.page.info"
+    },
+    {
+      "type": "select",
+      "id": "display_mode",
+      "label": "t:blocks.accordion_content.settings.display_mode.label",
+      "options": [
+        {
+          "value": "collapse",
+          "label": "t:blocks.accordion_content.settings.display_mode.options.collapse"
+        },
+        {
+          "value": "view_more",
+          "label": "t:blocks.accordion_content.settings.display_mode.options.view_more"
+        },
+        {
+          "value": "show_all",
+          "label": "t:blocks.accordion_content.settings.display_mode.options.show_all"
+        }
+      ],
+      "default": "show_all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:blocks.accordion_content.presets.default.name",
+      "category": "t:blocks.accordion_content.presets.default.category"
+    }
+  ]
+}
+{% endschema %}

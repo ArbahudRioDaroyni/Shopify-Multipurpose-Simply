@@ -1,0 +1,620 @@
+
+{%- liquid
+  assign thumb_size = 86
+  assign variant_image_selected = product.selected_or_first_available_variant.featured_image
+
+  # Prepare product gallery thumbnails and main images
+  assign product_gallery_thumbs_wrapper = ''
+  for thumbnail in product.images
+    assign index = forloop.index0
+    assign variant = product.variants | where: 'featured_image', thumbnail | first
+    assign variant_has_featured_image_or_thumbnail = variant.featured_image | default: thumbnail
+    assign class_gallery_thumb = 'product-gallery__thumb'
+
+    if variant_image_selected == blank
+      if index == 0
+        assign class_gallery_thumb = class_gallery_thumb | append: ' active'
+      endif
+    else
+      if variant_image_selected == variant_has_featured_image_or_thumbnail
+        assign class_gallery_thumb = class_gallery_thumb | append: ' active'
+      endif
+    endif
+
+    # Product gallery thumbnails
+    capture product_gallery_thumbs
+      if variant_has_featured_image_or_thumbnail == blank
+        continue
+      endif
+
+      assign attr_gallery_thumb = 'fetchpriority="high"' | append: 'data-variant-id="' | append: variant.id | append: '" data-index="' | append: index | append: '" fetchpriority="high" draggable="false"'
+      render 'image', image: variant_has_featured_image_or_thumbnail, class: class_gallery_thumb, width: thumb_size, height: thumb_size, crop: 'center', w_min: thumb_size, w_max: thumb_size, attr: attr_gallery_thumb, wrapper: false
+    endcapture
+    assign product_gallery_thumbs_wrapper = product_gallery_thumbs_wrapper | append: product_gallery_thumbs
+  endfor
+-%}
+
+<div class="product-main__gallery">
+  <!-- Main Image -->
+  <div class="product-gallery__images">
+    <figure class="product-gallery__image" data-image-url="{{ product.featured_image | image_url: width: 1206, height: 1206, crop: 'center' }}">
+      {% render 'image', image: product.featured_image, class: class_gallery_image, width: 615, height: 615, crop: 'center', w_min: 448, w_max: 1206, attr: attr_gallery_image, wrapper: false %}
+      <div class="product-gallery__hover-overlay"></div>
+    </figure>
+    <div class="product-gallery__lens" aria-hidden="true"></div>
+
+    <div class="product-main__flair-badge">
+      <a href="https://www.plumbersupplies.com.au/pages/tradeperks" class="flair-badge__tradeperks">Get Cashback with TradePerks</a>
+      <span class="flair-badge__savings">Save $25.50</span>
+      <span class="flair-badge__in-stock">In Stock</span>
+    </div>
+  </div>
+
+  <span class="product-gallery__zoom-notice">
+    <svg focusable="false" viewBox="0 0 10 10" role="presentation">
+      <path d="M7.58801492 6.8808396L9.999992 9.292784l-.70716.707208-2.41193007-2.41199543C6.15725808 8.15916409 5.24343297 8.50004 4.25 8.50004c-2.347188 0-4.249968-1.902876-4.249968-4.2501C.000032 1.902704 1.902812.000128 4.25.000128c2.347176 0 4.249956 1.902576 4.249956 4.249812 0 .99341752-.34083418 1.90724151-.91194108 2.6308996zM4.25.999992C2.455064.999992.999992 2.454944.999992 4.24994c0 1.794984 1.455072 3.249936 3.250008 3.249936 1.794924 0 3.249996-1.454952 3.249996-3.249936C7.499996 2.454944 6.044924.999992 4.25.999992z" fill="currentColor" fill-rule="evenodd"></path>
+    </svg>
+    <span class="product-gallery__zoom-notice-text">Roll over image to zoom in</span>
+  </span>
+
+  <!-- Thumbnail Images -->
+  <figure class="product-gallery__thumbs">
+    {{ product_gallery_thumbs_wrapper }}
+  </figure>
+</div>
+
+{% stylesheet %}
+  /* Product Gallery */
+  .product-main__gallery {
+    --pg-border-radius: var(--border-radius);
+    --pg-border-color: var(--color-button-primary-border);
+    --pg-color-primary: var(--color-primary);
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    position: sticky;
+    top: 1rem;
+    align-self: flex-start;
+    overflow: visible;
+    z-index: 1;
+  }
+
+  .product-gallery__images {
+    border-radius: var(--pg-border-radius);
+    overflow: visible;
+    gap: 1rem;
+    position: relative;
+  }
+
+  .product-gallery__image {
+    margin: 0;
+    opacity: 1;
+    transition: opacity .4s ease-in-out, border-color .2s ease;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    position: relative;
+    border-radius: var(--pg-border-radius);
+    overflow: hidden;
+    border: 1px solid hsl(from var(--pg-border-color) h s l / .5);
+    align-items: center;
+  }
+
+  .product-gallery__image.fade-out {
+    opacity: 0;
+  }
+
+  .product-gallery__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .product-gallery__hover-overlay {
+    display: none;
+    position: absolute;
+    border: 2px dashed rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+    background: rgba(0, 0, 0, 0.02);
+    cursor: crosshair;
+  }
+
+  .product-gallery__image:hover .product-gallery__hover-overlay {
+    display: block;
+  }
+
+  .product-gallery__lens {
+    display: none;
+    position: absolute;
+    left: calc(100% + 32px);
+    top: 0;
+    background-size: 615px 615px;
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    border-radius: var(--pg-border-radius);
+    pointer-events: none;
+  }
+
+  .product-gallery__lens.active {
+    display: block;
+  }
+
+  .product-gallery__lens::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 1px solid hsl(from var(--pg-border-color) h s l / 0.5);
+    border-radius: var(--pg-border-radius);
+    box-sizing: border-box;
+    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+  }
+
+  .product-gallery__thumbs {
+    display: flex;
+    gap: 0.75rem;
+    max-height: 574px;
+    overflow: hidden;
+    width: 100%;
+    padding-bottom: 15px;
+    cursor: grab;
+    user-select: none;
+    touch-action: pan-y;
+    margin: 0;
+  }
+
+  .product-gallery__thumbs.dragging {
+    cursor: grabbing;
+  }
+
+  .product-gallery__thumb {
+    width: 90px;
+    height: 90px;
+    border: 2px solid transparent;
+    padding: 2px;
+    border-radius: var(--pg-border-radius);
+    cursor: pointer;
+    transition: border-color 0.3s;
+    object-fit: cover;
+  }
+
+  .product-gallery__thumb:hover,
+  .product-gallery__thumb.active {
+    border-color: var(--pg-color-primary);
+  }
+
+  .product-gallery__zoom-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .product-gallery__zoom-notice svg {
+    width: 12px;
+  }
+
+  .product-gallery__zoom-notice-text {
+    font-size: 12px;
+  }
+
+  @media (max-width: 991px) {
+    .product-gallery__thumbs {
+      flex-direction: row;
+      overflow: hidden;
+      max-height: none;
+    }
+
+    .product-main__gallery {
+      position: relative;
+      width: 100%;
+    }
+
+    .product-gallery__thumb {
+      flex-shrink: 0;
+    }
+
+    .product-gallery__lens {
+      display: none !important;
+    }
+  }
+  /* End Product Gallery */
+
+  /* Product Flair Badge */
+  .product-main__flair-badge {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    gap: 10px;
+    font-size: 16px;
+    line-height: 16px;
+  }
+
+  .flair-badge__tradeperks,
+  .flair-badge__savings,
+  .flair-badge__in-stock {
+    width: fit-content;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+
+  .flair-badge__tradeperks {
+    color: #000;
+    background-color: #FCEE21;
+  }
+  
+  .flair-badge__savings {
+    color: #FFF;
+    background-color: #E02412;
+  }
+  
+  .flair-badge__in-stock {
+    color: #FFF;
+    background-color: #5E9A41;
+  }
+  /* End Product Flair Badge */
+{% endstylesheet %}
+
+{% javascript %}
+  class ImageGallery {
+    constructor(thumbsSelector, featuredImageWrapper) {
+      this.thumbs = thumbsSelector;
+      this.imageWrapper = featuredImageWrapper;
+      this.mainImage = featuredImageWrapper?.querySelector('.product-gallery__image');
+      this.imagesContainer = this.mainImage?.parentElement;
+      this.currentIndex = 0;
+      this.galleryImages = [];
+      this.zoomLevel = 2;
+      this.lensSize = 400;
+      this.thumbsContainer = this.thumbs?.[0]?.parentElement || null;
+      this.thumbDragState = {
+        active: false,
+        dragging: false,
+        moved: false,
+        startY: 0,
+        startX: 0,
+        startScrollLeft: 0,
+        pointerId: null,
+      };
+      this.thumbDragThreshold = 14;
+      this.thumbClickSuppressed = false;
+      this.init();
+    }
+    
+    init() {
+      // Store all product images data from thumbnails
+      this.galleryImages = Array.from(this.thumbs).map((thumb, index) => ({
+        index,
+        variantId: thumb.dataset.variantId,
+        thumb,
+        baseImageUrl: this.extractBaseImageUrl(thumb.src)
+      }));
+
+      // Set initial active thumb
+      const activeThumb = Array.from(this.thumbs).find(t => t.classList.contains('active'));
+      this.currentIndex = activeThumb ? Array.from(this.thumbs).indexOf(activeThumb) : 0;
+
+      // Update main image on initial load
+      this.updateMainImage(this.currentIndex, false);
+
+      // Setup lens element - find from parent gallery
+      const gallery = document.querySelector('.product-main__gallery');
+      this.lens = gallery?.querySelector('.product-gallery__lens');
+      this.setupLensListeners();
+
+      // Listen to variant change
+      this.onVariantChange('product-variant:changed');
+
+      // Add click listeners to thumbnails
+      this.thumbs.forEach((thumb, index) => {
+        thumb.addEventListener('click', (e) => {
+          if (this.thumbClickSuppressed) {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
+          this.onThumbClick(index);
+        });
+      });
+
+      this.setupThumbDrag();
+    }
+
+    extractBaseImageUrl(imageUrl) {
+      // Remove width parameter from image URL to get base URL
+      return imageUrl.split('?')[0].replace(/(_\d+x\d+)?\./, '.');
+    }
+
+    generateSrcset(baseImageUrl, widths) {
+      // Generate srcset with specified widths for main image
+      return widths.map(w => {
+        const url = baseImageUrl.includes('?') 
+          ? baseImageUrl + `&width=${w}&crop=center` 
+          : baseImageUrl + `?width=${w}&crop=center`;
+        return `${url} ${w}w`;
+      }).join(', ');
+    }
+
+    onThumbClick(index) {
+      if (index === this.currentIndex) return;
+      this.currentIndex = index;
+      this.updateMainImage(index);
+      this.updateThumbnailActive(index);
+      this.scrollToThumb(index);
+    }
+
+    setupThumbDrag() {
+      if (!this.thumbsContainer) return;
+
+      this.thumbsContainer.addEventListener('pointerdown', (e) => this.onThumbDragStart(e));
+      this.thumbsContainer.addEventListener('pointermove', (e) => this.onThumbDragMove(e));
+      this.thumbsContainer.addEventListener('pointerup', (e) => this.onThumbDragEnd(e));
+      this.thumbsContainer.addEventListener('pointercancel', (e) => this.onThumbDragEnd(e));
+      this.thumbsContainer.addEventListener('lostpointercapture', () => this.onThumbDragEnd());
+    }
+
+    onThumbDragStart(e) {
+      if (!this.thumbsContainer || e.button !== 0) return;
+
+      this.thumbDragState.active = true;
+      this.thumbDragState.dragging = false;
+      this.thumbDragState.moved = false;
+      this.thumbDragState.startX = e.clientX;
+      this.thumbDragState.startY = e.clientY;
+      this.thumbDragState.startScrollLeft = this.thumbsContainer.scrollLeft;
+      this.thumbDragState.pointerId = e.pointerId;
+    }
+
+    onThumbDragMove(e) {
+      if (!this.thumbDragState.active || !this.thumbsContainer) return;
+
+      const deltaX = e.clientX - this.thumbDragState.startX;
+      const deltaY = e.clientY - this.thumbDragState.startY;
+
+      if (Math.abs(deltaX) > this.thumbDragThreshold && Math.abs(deltaX) > Math.abs(deltaY)) {
+        this.thumbDragState.moved = true;
+        if (!this.thumbDragState.dragging) {
+          this.thumbDragState.dragging = true;
+          this.thumbsContainer.classList.add('dragging');
+          this.thumbClickSuppressed = true;
+          this.thumbsContainer.setPointerCapture?.(e.pointerId);
+        }
+      }
+
+      if (!this.thumbDragState.dragging) return;
+
+      e.preventDefault();
+      this.thumbsContainer.scrollLeft = this.thumbDragState.startScrollLeft - deltaX;
+    }
+
+    onThumbDragEnd(e) {
+      if (!this.thumbsContainer) return;
+
+      const wasDragging = this.thumbDragState.moved;
+      this.thumbDragState.active = false;
+      this.thumbDragState.dragging = false;
+      this.thumbsContainer.classList.remove('dragging');
+
+      if (this.thumbDragState.pointerId !== null && this.thumbsContainer.hasPointerCapture?.(this.thumbDragState.pointerId)) {
+        this.thumbsContainer.releasePointerCapture?.(this.thumbDragState.pointerId);
+      }
+      this.thumbDragState.pointerId = null;
+
+      this.thumbDragState.moved = false;
+
+      if (wasDragging) {
+        setTimeout(() => {
+          this.thumbClickSuppressed = false;
+        }, 50);
+      } else {
+        this.thumbClickSuppressed = false;
+      }
+    }
+
+    setupLensListeners() {
+      if (!this.lens || !this.mainImage || !this.imagesContainer) return;
+
+      this.lens.style.width = `${this.lensSize}px`;
+      this.lens.style.height = `${this.lensSize}px`;
+
+      this.imagesContainer.addEventListener('mouseenter', (e) => this.handleLensMouseOver(e));
+      this.imagesContainer.addEventListener('mousemove', (e) => this.handleLensMouseMove(e));
+      this.imagesContainer.addEventListener('mouseleave', () => this.handleLensMouseOut());
+    }
+
+    handleLensMouseOver(e) {
+      if (!this.lens) return;
+      this.lens.classList.add('active');
+      if (e) {
+        this.handleLensMouseMove(e);
+      }
+    }
+
+    handleLensMouseMove(e) {
+      if (!this.lens || !this.mainImage) return;
+
+      const imgElement = this.mainImage.querySelector('img');
+      const rect = this.mainImage.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Ensure mouse is within image bounds
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+
+      // Set background image and position
+      if (imgElement) {
+        const lensImageUrl = this.getLensImageUrl(imgElement);
+        const bgWidth = rect.width * this.zoomLevel;
+        const bgHeight = rect.height * this.zoomLevel;
+
+        this.lens.style.backgroundImage = `url("${lensImageUrl}")`;
+        this.lens.style.backgroundSize = `${bgWidth}px ${bgHeight}px`;
+
+        const bgX = Math.min(0, Math.max(this.lensSize - bgWidth, (this.lensSize / 2) - (x * this.zoomLevel)));
+        const bgY = Math.min(0, Math.max(this.lensSize - bgHeight, (this.lensSize / 2) - (y * this.zoomLevel)));
+
+        this.lens.style.backgroundPosition = `${Math.round(bgX)}px ${Math.round(bgY)}px`;
+      }
+
+      // Update hover overlay position on image
+      const overlay = this.mainImage.querySelector('.product-gallery__hover-overlay');
+      if (overlay) {
+        // Overlay size is 1/zoomLevel of lens size on the actual image
+        const overlaySize = this.lensSize / this.zoomLevel;
+        
+        // Position overlay centered on cursor
+        const overlayX = (x / rect.width) * rect.width - (overlaySize / 2);
+        const overlayY = (y / rect.height) * rect.height - (overlaySize / 2);
+        
+        // Constrain to image bounds
+        const constrainedX = Math.max(0, Math.min(overlayX, rect.width - overlaySize));
+        const constrainedY = Math.max(0, Math.min(overlayY, rect.height - overlaySize));
+        
+        overlay.style.width = overlaySize + 'px';
+        overlay.style.height = overlaySize + 'px';
+        overlay.style.left = constrainedX + 'px';
+        overlay.style.top = constrainedY + 'px';
+      }
+    }
+
+    handleLensMouseOut() {
+      if (!this.lens) return;
+      this.lens.classList.remove('active');
+    }
+
+    getLensImageUrl(imgElement) {
+      const sourceUrl = imgElement?.currentSrc || imgElement?.src || '';
+      if (!sourceUrl) return '';
+
+      if (sourceUrl.includes('?width=')) {
+        return sourceUrl.replace(/\?width=\d+/, '?width=1206');
+      }
+
+      if (sourceUrl.includes('?')) {
+        return `${sourceUrl}&width=1206&crop=center`;
+      }
+
+      return `${sourceUrl}?width=1206&crop=center`;
+    }
+
+    updateMainImage(index, animate = true) {
+      if (!this.mainImage) return;
+      const imageData = this.galleryImages[index];
+      if (!imageData) return;
+
+      const mainWidths = [448, 600, 768, 800, 960, 1024, 1206];
+      const newSrc = imageData.baseImageUrl + '?width=615&crop=center';
+      const newSrcset = this.generateSrcset(imageData.baseImageUrl, mainWidths);
+
+      if (animate) {
+        // Fade out
+        this.mainImage.classList.add('fade-out');
+        
+        setTimeout(() => {
+          const mainImg = this.mainImage.querySelector('img');
+          const thumbImg = imageData.thumb;
+          
+          if (mainImg && thumbImg) {
+            // Update src and srcset
+            mainImg.src = newSrc;
+            mainImg.srcset = newSrcset;
+            mainImg.alt = thumbImg.alt;
+            mainImg.title = thumbImg.title;
+
+            // Wait for image to load before fade in
+            const loadHandler = () => {
+              this.mainImage.classList.remove('fade-out');
+              mainImg.removeEventListener('load', loadHandler);
+              mainImg.removeEventListener('error', errorHandler);
+            };
+
+            const errorHandler = () => {
+              // If image fails to load, still fade in after 1s
+              setTimeout(() => {
+                this.mainImage.classList.remove('fade-out');
+              }, 1000);
+              mainImg.removeEventListener('load', loadHandler);
+              mainImg.removeEventListener('error', errorHandler);
+            };
+
+            // If image is already cached, load event might fire immediately
+            if (mainImg.complete) {
+              this.mainImage.classList.remove('fade-out');
+            } else {
+              mainImg.addEventListener('load', loadHandler, { once: true });
+              mainImg.addEventListener('error', errorHandler, { once: true });
+            }
+          }
+        }, 200);
+      } else {
+        // Initial load without animation
+        const mainImg = this.mainImage.querySelector('img');
+        const thumbImg = imageData.thumb;
+        
+        if (mainImg && thumbImg) {
+          mainImg.src = newSrc;
+          mainImg.srcset = newSrcset;
+          mainImg.alt = thumbImg.alt;
+          mainImg.title = thumbImg.title;
+        }
+      }
+    }
+
+    updateThumbnailActive(index) {
+      this.thumbs.forEach((t) => t.classList.remove('active'));
+      if (this.thumbs[index]) {
+        this.thumbs[index].classList.add('active');
+      }
+    }
+
+    onVariantChange(eventName) {
+      document.addEventListener(eventName, (event) => {
+        const targetThumb = Array.from(this.thumbs).find(thumb => 
+          thumb.dataset.variantId == event.detail.id
+        );
+        if (targetThumb) {
+          const targetIndex = Array.from(this.thumbs).indexOf(targetThumb);
+          if (targetIndex !== -1 && targetIndex !== this.currentIndex) {
+            this.onThumbClick(targetIndex);
+          }
+        }
+      });
+    }
+
+    scrollToThumb(index) {
+      const thumb = this.thumbs[index];
+      const thumbsContainer = thumb?.parentElement;
+      
+      if (thumb && thumbsContainer) {
+        const thumbRect = thumb.getBoundingClientRect();
+        const containerRect = thumbsContainer.getBoundingClientRect();
+        const thumbCenter = thumbRect.left + thumbRect.width / 2;
+        const containerCenter = containerRect.left + containerRect.width / 2;
+        const scrollOffset = thumbCenter - containerCenter;
+        
+        thumbsContainer.scrollTo({
+          left: thumbsContainer.scrollLeft + scrollOffset,
+          behavior: 'smooth'
+        });
+      }
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', async function () {
+    // Image Gallery
+    const thumbs = document.querySelectorAll('.product-gallery__thumb');
+    const featuredImageWrapper = document.querySelector('.product-gallery__images');
+    if (thumbs.length > 0 && featuredImageWrapper) {
+      const imageGallery = new ImageGallery(thumbs, featuredImageWrapper);
+    }
+  });
+{% endjavascript %}

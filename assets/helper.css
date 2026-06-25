@@ -1,0 +1,50 @@
+/* Global styles will be moved to a separate CSS file for future maintenance */
+.skeleton-loading {
+    --color: #d4d4d4;
+    --border-radius: 6px;
+    --speed: 2s;
+}
+
+.skeleton-loading>* {
+    color: transparent !important;
+    fill: #0000 !important;
+    border-color: transparent !important;
+    border-radius: var(--border-radius) !important;
+    animation: background-pulse var(--speed) infinite ease-in-out;
+}
+
+@keyframes background-pulse {
+	0%, 100% {
+    background-color: var(--color);
+	}
+	50% {
+    background-color: rgb(from var(--color) r g b / 40%);
+	}
+}
+
+.ellipsis {
+	--lines-ellipsis: 2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	line-clamp: var(--lines-ellipsis);
+	-webkit-line-clamp: var(--lines-ellipsis);
+	-webkit-box-orient: vertical;
+}
+
+hr.spacer {
+	--space: 24px;
+	--height: 16px;
+	border-right: 1px #B3B3B3 solid;
+	margin: 0 var(--space);
+	height: var(--height);
+}
+
+.text-link {
+  color: var(--color-text);
+  text-decoration: underline;
+}
+
+.text-link:hover {
+  color: var(--color-primary);
+}

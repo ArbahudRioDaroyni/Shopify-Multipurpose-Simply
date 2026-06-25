@@ -113,7 +113,7 @@
       "map_point": "Map point",
       "phone": "Phone",
       "search": "Search",
-      "user": "User",
+      "user": "User"
     }
   },
   "names": {
@@ -225,13 +225,13 @@
           },
           "separator": {
             "label": "Separator"
-          },
+          }
         },
         "typography": {
           "header": "Typography",
           "text_size": {
             "label": "Text size"
-          },
+          }
         },
         "spacing": {
           "header": "Spacing",
@@ -241,7 +241,7 @@
           "padding_bottom": {
             "label": "Bottom padding"
           }
-        },
+        }
       },
       "presets": {
         "default": {
@@ -527,6 +527,54 @@
           "category": "Button"
         }
       }
+    },
+    "accordion": {
+      "name": "Accordion",
+      "settings": {
+        "layout": {
+          "header": "Layout"
+        },
+        "single_open": {
+          "label": "Only one item open at a time",
+          "info": "Close the other items automatically when one opens"
+        }
+      },
+      "presets": {
+        "default": {
+          "name": "Accordion",
+          "category": "Content"
+        }
+      }
+    },
+    "accordion_content": {
+      "name": "Content",
+      "settings": {
+        "content": {
+          "header": "Content",
+          "label": "Content"
+        },
+        "title": {
+          "label": "Title"
+        },
+        "page": {
+          "label": "Content from page",
+          "info": "If specified, takes precedence over inline content."
+        },
+        "display_mode": {
+          "label": "Display mode",
+          "options": {
+            "collapse": "Collapse",
+            "view_more": "Show view more if long",
+            "show_all": "Show all"
+          }
+        }
+      },
+      "presets": {
+        "default": {
+          "name": "Content",
+          "category": "Content"
+        }
+      }
     }
-  },
+  }
 }

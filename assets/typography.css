@@ -32,8 +32,8 @@ small {
 	font-size: 0.875rem;	/* 14px */
 }
 
-strong {
-	font-weight: 700;
+strong, b {
+	font-weight: 600;
 }
 
 em {
