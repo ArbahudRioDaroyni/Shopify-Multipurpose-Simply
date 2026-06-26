@@ -39,30 +39,30 @@
 
 {% schema %}
 {
-  "name": "t:general.text",
+  "name": "t:blocks.text.presets.default.name",
   "settings": [
     {
-      "type": "textarea",
+      "type": "text",
       "id": "text",
-      "label": "t:labels.text",
-      "default": "Add your text here"
+      "label": "t:blocks.text.settings.text.label",
+      "default": "t:blocks.text.settings.text.default"
     },
     {
       "type": "select",
       "id": "tag",
-      "label": "t:labels.tag",
+      "label": "t:blocks.text.settings.tag.label",
       "default": "p",
       "options": [
-        { "value": "p", "label": "Paragraph" },
-        { "value": "h1", "label": "Heading 1" },
-        { "value": "h2", "label": "Heading 2" },
-        { "value": "h3", "label": "Heading 3" },
-        { "value": "h4", "label": "Heading 4" },
-        { "value": "h5", "label": "Heading 5" },
-        { "value": "h6", "label": "Heading 6" },
-        { "value": "span", "label": "Span" },
-        { "value": "div", "label": "Div" },
-        { "value": "a", "label": "Link (A)" }
+        { "value": "p", "label": "t:blocks.text.settings.tag.options.p" },
+        { "value": "h1", "label": "t:blocks.text.settings.tag.options.h1" },
+        { "value": "h2", "label": "t:blocks.text.settings.tag.options.h2" },
+        { "value": "h3", "label": "t:blocks.text.settings.tag.options.h3" },
+        { "value": "h4", "label": "t:blocks.text.settings.tag.options.h4" },
+        { "value": "h5", "label": "t:blocks.text.settings.tag.options.h5" },
+        { "value": "h6", "label": "t:blocks.text.settings.tag.options.h6" },
+        { "value": "span", "label": "t:blocks.text.settings.tag.options.span" },
+        { "value": "div", "label": "t:blocks.text.settings.tag.options.div" },
+        { "value": "a", "label": "t:blocks.text.settings.tag.options.a" }
       ]
     },
     {
@@ -162,6 +162,11 @@
       "unit": "px"
     }
   ],
-  "presets": [{ "name": "t:general.text" }]
+  "presets": [
+    {
+      "name": "t:blocks.text.presets.default.name",
+      "category": "t:blocks.text.presets.default.category"
+    }
+  ]
 }
 {% endschema %}
