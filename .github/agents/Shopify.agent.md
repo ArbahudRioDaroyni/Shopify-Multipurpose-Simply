@@ -1381,18 +1381,18 @@ Schema locale files, saved with a .schema.json extension, store translation stri
 
 {% schema %}
 {
-  "name": "t:general.text",
+  "name": "t:blocks.text.presets.default.name",
   "settings": [
     {
       "type": "text",
       "id": "text",
-      "label": "t:labels.text",
+      "label": "t:blocks.text.settings.text.label",
       "default": "Text"
     },
     {
       "type": "select",
       "id": "text_style",
-      "label": "t:labels.text_style",
+      "label": "t:blocks.text.settings.text.label_style",
       "options": [
         { "value": "text--title", "label": "t:options.text_style.title" },
         { "value": "text--subtitle", "label": "t:options.text_style.subtitle" },
@@ -1407,7 +1407,7 @@ Schema locale files, saved with a .schema.json extension, store translation stri
       "default": "left"
     }
   ],
-  "presets": [{ "name": "t:general.text" }]
+  "presets": [{ "name": "t:blocks.text.name" }]
 }
 {% endschema %}
 ```
