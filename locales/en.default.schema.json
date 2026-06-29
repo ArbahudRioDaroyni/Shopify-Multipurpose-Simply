@@ -573,7 +573,10 @@
             "map_point": "Map point",
             "phone": "Phone",
             "search": "Search",
-            "user": "User"
+            "user": "User",
+            "hand_money": "Hand Money",
+            "shield_check": "Shield Check",
+            "paragraph": "Paragraph"
           }
         },
         "image_upload": {

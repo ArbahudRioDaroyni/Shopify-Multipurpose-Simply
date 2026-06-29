@@ -200,7 +200,9 @@
         </button> {% endcomment %}
       </div>
 
-      {{ form | payment_button }}
+      {% if selected_variant.available %}
+        {{ form | payment_button }}
+      {% endif %}
     {% endform %}
 
     {% content_for 'block', type: 'group', id: 'product_Trust_Bar' %}

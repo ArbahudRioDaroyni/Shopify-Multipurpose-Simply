@@ -254,9 +254,7 @@
     line-height: 16px;
   }
 
-  .flair-badge__tradeperks,
-  .flair-badge__savings,
-  .flair-badge__in-stock {
+  .product-main__flair-badge > * {
     width: fit-content;
     padding: 4px 8px;
     border-radius: 4px;
@@ -464,18 +462,19 @@
       if (!this.lens || !this.mainImage) return;
 
       const imgElement = this.mainImage.querySelector('img');
-      const rect = this.mainImage.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const figureRect = this.mainImage.getBoundingClientRect();
+      const imgRect = imgElement?.getBoundingClientRect() || figureRect;
+      const x = e.clientX - imgRect.left;
+      const y = e.clientY - imgRect.top;
 
       // Ensure mouse is within image bounds
-      if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+      if (x < 0 || y < 0 || x > imgRect.width || y > imgRect.height) return;
 
       // Set background image and position
       if (imgElement) {
         const lensImageUrl = this.getLensImageUrl(imgElement);
-        const bgWidth = rect.width * this.zoomLevel;
-        const bgHeight = rect.height * this.zoomLevel;
+        const bgWidth = imgRect.width * this.zoomLevel;
+        const bgHeight = imgRect.height * this.zoomLevel;
 
         this.lens.style.backgroundImage = `url("${lensImageUrl}")`;
         this.lens.style.backgroundSize = `${bgWidth}px ${bgHeight}px`;
@@ -491,14 +490,16 @@
       if (overlay) {
         // Overlay size is 1/zoomLevel of lens size on the actual image
         const overlaySize = this.lensSize / this.zoomLevel;
+        const imageOffsetX = imgRect.left - figureRect.left;
+        const imageOffsetY = imgRect.top - figureRect.top;
         
         // Position overlay centered on cursor
-        const overlayX = (x / rect.width) * rect.width - (overlaySize / 2);
-        const overlayY = (y / rect.height) * rect.height - (overlaySize / 2);
+        const overlayX = imageOffsetX + x - (overlaySize / 2);
+        const overlayY = imageOffsetY + y - (overlaySize / 2);
         
         // Constrain to image bounds
-        const constrainedX = Math.max(0, Math.min(overlayX, rect.width - overlaySize));
-        const constrainedY = Math.max(0, Math.min(overlayY, rect.height - overlaySize));
+        const constrainedX = Math.max(imageOffsetX, Math.min(overlayX, imageOffsetX + imgRect.width - overlaySize));
+        const constrainedY = Math.max(imageOffsetY, Math.min(overlayY, imageOffsetY + imgRect.height - overlaySize));
         
         overlay.style.width = overlaySize + 'px';
         overlay.style.height = overlaySize + 'px';

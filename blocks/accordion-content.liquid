@@ -7,6 +7,7 @@
 
 {% liquid
   assign accordion_title_fallback = 'blocks.accordion_content.fallback_title' | t
+  assign accordion_icon = block.settings.icon
   assign accordion_title = block.settings.title | strip | default: accordion_title_fallback
   assign accordion_display_mode = block.settings.display_mode | default: 'collapse'
   assign accordion_content = block.settings.content
@@ -35,7 +36,15 @@
     {{ block.shopify_attributes }}
   >
     <div class="accordion-content__header">
-      <h2 class="accordion-content__title">{{ accordion_title | escape }}</h2>
+      <h2 class="accordion-content__title">
+        {% if accordion_icon != 'none' %}
+          {% render 'icon-or-image',
+            icon: accordion_icon,
+            width: 24,
+          %}
+        {% endif %}
+        {{ accordion_title | escape }}
+      </h2>
     </div>
 
     {% if accordion_has_content %}
@@ -57,7 +66,15 @@
     {% endif %}
   >
     <summary class="accordion-content__summary">
-      <h2 class="accordion-content__title">{{ accordion_title | escape }}</h2>
+      <h2 class="accordion-content__title">
+        {% if accordion_icon != 'none' %}
+          {% render 'icon-or-image',
+            icon: accordion_icon,
+            width: 24,
+          %}
+        {% endif %}
+        {{ accordion_title | escape }}
+      </h2>
       <span class="accordion-content__icon" aria-hidden="true"></span>
     </summary>
 
@@ -112,6 +129,8 @@
     font-size: 24px;
     font-weight: 400;
     line-height: 1;
+    display: flex;
+    gap: 8px;
   }
 
   .accordion-content__icon {
@@ -272,6 +291,71 @@
     {
       "type": "header",
       "content": "t:blocks.accordion_content.settings.content.header"
+    },
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:blocks.icon.name",
+      "info": "t:blocks.icon.settings.icon.info",
+      "options": [
+        {
+          "value": "none",
+          "label": "t:blocks.icon.settings.icon.options.none"
+        },
+        {
+          "value": "arrow",
+          "label": "t:blocks.icon.settings.icon.options.arrow"
+        },
+        {
+          "value": "caret",
+          "label": "t:blocks.icon.settings.icon.options.caret"
+        },
+        {
+          "value": "close",
+          "label": "t:blocks.icon.settings.icon.options.close"
+        },
+        {
+          "value": "global",
+          "label": "t:blocks.icon.settings.icon.options.global"
+        },
+        {
+          "value": "heart",
+          "label": "t:blocks.icon.settings.icon.options.heart"
+        },
+        {
+          "value": "mailbox",
+          "label": "t:blocks.icon.settings.icon.options.mailbox"
+        },
+        {
+          "value": "map_point",
+          "label": "t:blocks.icon.settings.icon.options.map_point"
+        },
+        {
+          "value": "phone",
+          "label": "t:blocks.icon.settings.icon.options.phone"
+        },
+        {
+          "value": "search",
+          "label": "t:blocks.icon.settings.icon.options.search"
+        },
+        {
+          "value": "user",
+          "label": "t:blocks.icon.settings.icon.options.user"
+        },
+        {
+          "value": "hand_money",
+          "label": "t:blocks.icon.settings.icon.options.hand_money"
+        },
+        {
+          "value": "shield_check",
+          "label": "t:blocks.icon.settings.icon.options.shield_check"
+        },
+        {
+          "value": "paragraph",
+          "label": "t:blocks.icon.settings.icon.options.paragraph"
+        }
+      ],
+      "default": "none"
     },
     {
       "type": "text",
