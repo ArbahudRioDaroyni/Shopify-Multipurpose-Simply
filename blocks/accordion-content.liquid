@@ -15,6 +15,10 @@
     assign accordion_content = block.settings.page.content
   endif
 
+  if block.settings.liquid != blank
+    assign accordion_content = block.settings.liquid
+  endif
+
   assign accordion_id = 'accordion-content-' | append: block.id
   if accordion_content != blank
     assign accordion_has_content = true
@@ -44,7 +48,7 @@
   </div>
 {% else %}
   <details
-    class="accordion-content accordion-content--{{ accordion_display_mode }}"
+    class="accordion-content accordion-content--{{ accordion_display_mode }}{% if accordion_display_mode == 'view_more' %} is-expanded{% endif %}"
     data-accordion-item
     data-display-mode="{{ accordion_display_mode }}"
     {{ block.shopify_attributes }}
@@ -238,8 +242,6 @@
 
         if (!shouldShow) {
           item.classList.add('is-expanded');
-        } else {
-          item.classList.remove('is-expanded');
         }
 
         updateButton();
@@ -286,6 +288,12 @@
       "id": "page",
       "label": "t:blocks.accordion_content.settings.page.label",
       "info": "t:blocks.accordion_content.settings.page.info"
+    },
+    {
+      "type": "liquid",
+      "id": "liquid",
+      "label": "t:blocks.accordion_content.settings.liquid.label",
+      "info": "t:blocks.accordion_content.settings.liquid.info"
     },
     {
       "type": "select",

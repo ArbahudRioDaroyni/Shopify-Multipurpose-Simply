@@ -7,12 +7,20 @@
   @param {number} [min_value] - Minimum allowed value
   @param {number} [max_value] - Maximum allowed value
   @param {boolean} [show_label] - Whether to show label
-  @param {string} [label_text] - Label text
-  @param {number} [price] - Price per item in cents for total calculation
   @param {boolean} [show_price] - Whether to show price per item
+  @param {boolean} [show_gst] - Whether to show total price gst
   @param {boolean} [show_total] - Whether to show total price
-  @param {boolean} [show_gst] - Whether to show total price
   @param {string} [unique_id] - Unique identifier for the input
+
+  @param {number} [price] - Price per item in cents for total calculation
+  @param {number} [compare_at_price] - Compare at price per item in cents for total calculation
+  @param {number} [discount_percentage] - Discount
+  @param {string} [label_text] - Label text
+  @param {string} [label_text_each] - Label text each
+  @param {string} [label_text_box] - Label text box
+  
+  @param {boolean} [can_box] - Style mode: bulk or each
+  @param {number} [box_size] - Number of items per box
 
   @example
   {% render 'quantity-selector', 
@@ -21,8 +29,8 @@
     initial_value: item.quantity,
     min_value: 0,
     show_total: true,
-    price: item.final_price,
     unique_id: item.key
+    price: item.final_price,
   %}
 {% enddoc %}
 
@@ -33,12 +41,20 @@
   assign min_value = min_value | default: 0
   assign max_value = max_value | default: 999
   assign show_label = show_label | default: false
-  assign label_text = label_text | default: 'Quantity'
-  assign show_total = show_total | default: false
-  assign show_gst = show_gst | default: true
-  assign price = price | default: 0
   assign show_price = show_price | default: false
-  assign unique_id = unique_id | default: 'qty-' | append: input_name | handleize
+  assign show_gst = show_gst | default: true
+  assign show_total = show_total | default: false
+  assign unique_id = unique_id | default: 'qty-' | handleize
+
+  assign price = price | default: 0
+  assign compare_at_price = compare_at_price | default: 0
+  assign discount_percentage = discount_percentage | default: 0
+  assign label_text = label_text | default: 'Quantity'
+  assign label_text_each = label_text_each | default: 'Buy each:'
+  assign label_text_box = label_text_box | default: 'Buy box:'
+  
+  assign can_box = can_box | default: false
+  assign box_size = box_size | default: 10
 
   if style_variant == 'compact'
     assign input_width = 50
@@ -50,91 +66,195 @@
     assign input_width = 50
     assign height = 50
   endif
+
+  if can_box
+    assign initial_value = 0
+  endif
 %}
 
-<div 
-  class="quantity-selector quantity-selector__{{ style_variant }}"
-  style="
-    --quantity-width: {{ input_width }}px;
-    --quantity-height: {{ height }}px;
-  "
+<div class="quantity-selector_wrapper"
   data-quantity-selector
+  {% if can_box %}data-box-size="{{ box_size }}"{%- endif %}
+  data-currency-code="{{ cart.currency.iso_code | default: shop.currency | default: 'AUD' }}"
+  data-price="{{ price }}"
+  data-compare-at-price="{{ compare_at_price }}"
+  data-discount-percentage="{{ discount_percentage }}"
 >
-  {% if show_label %}
-    <label class="quantity-selector__label" for="{{ unique_id }}">
-      {{ label_text }}
-    </label>
-  {% endif %}
+  {% if can_box %}<p class="quantity-selector__title">Purchase options:</p>{% endif %}
+  <div 
+    class="quantity-selector quantity-selector__{{ style_variant }} {% if can_box %}quantity-selector__card{% endif %}"
+    data-quantity-role="each"
+    style="
+      --quantity-width: {{ input_width }}px;
+      --quantity-height: {{ height }}px;
+    "
+  >
+    {% if show_label %}
+      <label class="quantity-selector__label" for="{{ unique_id }}-each">
+        {{ label_text_each }}
+      </label>
+    {% endif %}
 
-  <div class="quantity-selector__controls-group">
-    <div class="quantity-selector__controls">
-      <button 
-        type="button" 
-        class="quantity-selector__btn quantity-selector__btn-decrease" 
-        data-action="decrease"
-        aria-label="{{ 'general.quantity.decrease' | t }}"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </button>
+    <div class="quantity-selector__controls-group">
+      <div class="quantity-selector__controls">
+        <button 
+          type="button" 
+          class="quantity-selector__btn quantity-selector__btn-decrease" 
+          data-action="decrease"
+          aria-label="{{ 'general.quantity.decrease' | t }}"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
 
-      <input
-        type="number"
-        id="{{ unique_id }}"
-        name="{{ input_name }}-ui"
-        value="{{ initial_value }}"
-        min="{{ min_value }}"
-        max="{{ max_value }}"
-        class="quantity-selector__input"
-        data-quantity-input
-      >
+        <input
+          type="number"
+          id="{{ unique_id }}-each"
+          name="{{ input_name }}-ui"
+          value="{{ initial_value }}"
+          min="{{ min_value }}"
+          max="{{ max_value }}"
+          class="quantity-selector__input"
+          data-quantity-input
+        >
 
-      <button 
-        type="button" 
-        class="quantity-selector__btn quantity-selector__btn-increase" 
-        data-action="increase"
-        aria-label="{{ 'general.quantity.increase' | t }}"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19"></line>
-          <line x1="5" y1="12" x2="19" y2="12"></line>
-        </svg>
-      </button>
+        <button 
+          type="button" 
+          class="quantity-selector__btn quantity-selector__btn-increase" 
+          data-action="increase"
+          aria-label="{{ 'general.quantity.increase' | t }}"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+        </button>
+      </div>
+
+      {% if show_price and price %}
+        <div class="quantity-selector__price-row" {% unless show_gst %}style="justify-content: center;"{% endunless %}>
+          <span><b class="quantity-selector__price-per-each">{{ price | money }}</b> each</span>
+          {% if show_gst %}
+            <span class="quantity-selector__price__gst">(<span data-price-gst>{{ price | divided_by: 1.1 | money }}</span> excl GST)</span>
+          {% endif %}
+        </div>
+      {% endif %}
     </div>
 
-    {% if show_price and price %}
-      <div class="quantity-selector__price-row" {% unless show_gst %}style="justify-content: center;"{% endunless %}>
-        <span><b class="quantity-selector__price" data-price-per-item="{{ price }}">{{ price | money }}</b> each</span>
-        {% if product.handle != 'tradeperks-membership' and show_gst %}
-          <span class="quantity-selector__price__gst">(<span>{{ price | divided_by: 1.1 | money }}</span> excl GST)</span>
-        {% endif %}
+    {% if show_total %}
+      {% if price %}
+        {% assign total_value = price | times: initial_value %}
+      {% else %}
+        {% assign total_value = 0 %}
+      {% endif %}
+      <div class="quantity-selector__total">
+        <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
+        <span class="quantity-selector__sub-total-price" data-total-price="{{ total_value }}">
+          {{ total_value | money }}
+        </span>
       </div>
     {% endif %}
   </div>
 
-  {% if show_total %}
-    {% if price %}
-      {% assign total_value = price | times: initial_value %}
-    {% else %}
-      {% assign total_value = 0 %}
-    {% endif %}
-    <div class="quantity-selector__total">
-      <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
-      <span class="quantity-selector__total-price" data-total-price="{{ total_value }}">
-        {{ total_value | money }}
-      </span>
+  {% if can_box %}
+    <div 
+      class="quantity-selector quantity-selector__{{ style_variant }} {% if can_box %}quantity-selector__card{% endif %}"
+      data-quantity-role="box"
+      style="
+        --quantity-width: {{ input_width }}px;
+        --quantity-height: {{ height }}px;
+      "
+    >
+      {% if show_label %}
+        <label class="quantity-selector__label" for="{{ unique_id }}-box">
+          {{ label_text_box }}
+        </label>
+      {% endif %}
+
+      <div class="quantity-selector__controls-group">
+        <div class="quantity-selector__controls">
+          <button 
+            type="button" 
+            class="quantity-selector__btn quantity-selector__btn-decrease" 
+            data-action="decrease"
+            aria-label="{{ 'general.quantity.decrease' | t }}"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <input
+            type="number"
+            id="{{ unique_id }}-box"
+            name="{{ input_name }}-ui"
+            value="{{ initial_value }}"
+            min="{{ min_value }}"
+            max="{{ max_value }}"
+            class="quantity-selector__input"
+            data-quantity-input
+          >
+
+          <button 
+            type="button" 
+            class="quantity-selector__btn quantity-selector__btn-increase" 
+            data-action="increase"
+            aria-label="{{ 'general.quantity.increase' | t }}"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+
+        {% if show_price and price %}
+          <div class="quantity-selector__price-row" {% unless show_gst %}style="justify-content: center;"{% endunless %}>
+            {% assign box_price = price | times: box_size %}
+            {% assign discounted_box_price = box_price | times: 0.05 %} {% comment %} 5% discount {% endcomment %}
+            {% assign final_box_price = box_price | minus: discounted_box_price %}
+            <p><b class="quantity-selector__price-per-box">{{ final_box_price | money }}</b> box of {{ box_size }}</p>
+            <p><b class="quantity-selector__price-per-each-discounted">{{ price | money }}</b> each</p>
+            {% if show_gst %}
+              <span class="quantity-selector__price__gst">(<span data-price-gst>{{ final_box_price | divided_by: box_size | divided_by: 1.1 | money }}</span> excl GST)</span>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if show_total %}
+        {% if price %}
+          {% assign total_value = price | times: initial_value %}
+        {% else %}
+          {% assign total_value = 0 %}
+        {% endif %}
+        <div class="quantity-selector__total">
+          <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
+          <span class="quantity-selector__sub-total-price" data-total-price="{{ total_value }}">
+            {{ total_value | money }}
+          </span>
+        </div>
+      {% endif %}
+
+    </div>
+  {% endif %}
+  
+  {% if can_box %}
+    <div class="quantity-selector__note">
+      <p>Total: <span class="quantity-selector__note-total-price">$0.00</span> | You save: <span class="quantity-selector__note-total-savings">$0.00</span></p>
+      <p>Total Quantity: <span class="quantity-selector__note-total-quantity">0</span></p>
     </div>
   {% endif %}
 
   {% if template == 'product' %}
     {% comment %} Hidden input for selected variant {% endcomment %}
-    <input type="hidden" name="{{ input_name }}" id="quantity-variant-id" value="1">
+    <input type="hidden" name="{{ input_name }}" id="quantity-variant-id" value="{{ initial_value }}" min="0" max="999">
   {% endif %}
 </div>
 
 {% stylesheet %}
-  .quantity-selector {
+  .quantity-selector_wrapper {
     --qs-border-radius: var(--border-radius);
     --qs-label-color: var(--color-text);
     --qs-input-color: var(--color-button-primary-bg);
@@ -142,6 +262,22 @@
     --qs-button-color: var(--color-button-primary-bg);
     --qs-button-text-color: var(--color-button-primary-text);
 
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  @media (max-width: 768px) {
+    .quantity-selector_wrapper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .quantity-selector__title {
+    grid-column: span 2;
+  }
+
+  .quantity-selector {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -150,6 +286,18 @@
     border-radius: var(--qs-border-radius, 4px);
     overflow: hidden;
     background: transparent;
+  }
+
+  .quantity-selector__card {
+    border: 2px var(--qs-border-color) solid;
+    padding: 14px;
+    width: 100%;
+  }
+
+  .quantity-selector__card .quantity-selector__price-row,
+  .quantity-selector__card .quantity-selector__total {
+    font-size: 12.25px;
+    justify-content: space-around;
   }
 
   .quantity-selector__label {
@@ -237,8 +385,29 @@
     color: #6c757d;
   }
 
-  .quantity-selector__total-price {
+  .quantity-selector__sub-total-price {
     font-weight: 600;
+  }
+
+  .quantity-selector__note {
+    grid-column: span 2;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background-color: #f9f9f9;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--qs-border-color);
+  }
+
+  .quantity-selector__note p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+    color: #333;
+  }
+
+  .quantity-selector__note span {
+    font-weight: 600;
+    color: var(--qs-border-color);
   }
 
   /* Style variants */
@@ -303,62 +472,128 @@
      * Instantiate QuantitySelector and discover elements.
      * @param {HTMLElement} element - Parent root node containing data attributes.
      */
-    constructor(element) {
+    constructor(root) {
+      this.canBox = root.hasAttribute('data-box-size');
+
       this.elements = {
-        quantity: element.querySelector('#quantity-variant-id'),
-        input: element.querySelector('.quantity-selector__input'),
-        decrease: element.querySelector('.quantity-selector__btn-decrease'),
-        increase: element.querySelector('.quantity-selector__btn-increase'),
-        price: element.querySelector('.quantity-selector__price'),
-        totalPrice: element.querySelector('.quantity-selector__total-price')
+        quantity: root.querySelector('#quantity-variant-id'),
+        increase: root.querySelectorAll('.quantity-selector__btn-increase'),
+        decrease: root.querySelectorAll('.quantity-selector__btn-decrease'),
+        totalPrice: root.querySelector('.quantity-selector__note-total-price'),
+        totalQuantity: root.querySelector('.quantity-selector__note-total-quantity'),
+        totalSavings: root.querySelector('.quantity-selector__note-total-savings')
+      }
+ 
+      this.eachCard = root.querySelector('[data-quantity-role="each"]');
+      this.eachCardElements = {
+        input: this.eachCard.querySelector('.quantity-selector__input'),
+        pricePerEach: this.eachCard.querySelector('.quantity-selector__price-per-each'),
+        priceGST: this.eachCard.querySelector('[data-price-gst]'),
+        subTotalPrice: this.eachCard.querySelector('.quantity-selector__sub-total-price')
       }
 
-      this.min = parseInt(this.elements.input.getAttribute('min')) || 0;
-      this.max = parseInt(this.elements.input.getAttribute('max')) || 999;
+      if (this.canBox) {
+        this.boxCard = root.querySelector('[data-quantity-role="box"]');
+        this.boxCardElements = {
+          input: this.boxCard.querySelector('.quantity-selector__input'),
+          pricePerBox: this.boxCard.querySelector('.quantity-selector__price-per-box'),
+          pricePerEachDiscounted: this.boxCard.querySelector('.quantity-selector__price-per-each-discounted'),
+          priceGST: this.boxCard.querySelector('[data-price-gst]'),
+          subTotalPrice: this.boxCard.querySelector('.quantity-selector__sub-total-price')
+        }
+      }
 
-      this.price = 0;
+      this.boxSize = this.canBox ? root.dataset.boxSize : 0;
+      this.min = parseInt(this.elements.quantity.getAttribute('min')) || 0;
+      this.max = parseInt(this.elements.quantity.getAttribute('max')) || 999;
+      this.value = parseInt(this.elements.quantity.value);
+      this.price = parseInt(root.dataset.price);
+      this.compareAtPrice = parseInt(root.dataset.compareAtPrice);
+      this.discountPercentage = parseInt(root.dataset.discountPercentage);
 
-      this.init();
+      this.bind();
+      // this.updateControlsState();
+
+      this.renderPriceGST();
+      if (this.canBox) {
+        this.renderPricePerBox();
+        this.renderPricePerEachBuyBox();
+        this.renderNoteTotal();
+        this.renderNoteQuantity();
+      }
     }
 
     /**
      * Attach global and element event listeners, initialize view components.
      */
-    init() {
-      this.elements.decrease?.addEventListener('click', this.handleDecrease);
-      this.elements.increase?.addEventListener('click', this.handleIncrease);
-      this.elements.input?.addEventListener('change', this.handleInputChange);
-      this.elements.input?.addEventListener('input', () => this.renderTotal());
-      
-      // Auto-select text when input is clicked or focused
-      this.elements.input?.addEventListener('click', this.selectAllText);
-      this.elements.input?.addEventListener('focus', this.selectAllText);
-      
-      this.updateControlsState();
-      this.renderTotal();
+    bind() {
+      this.elements.increase.forEach(button => button.addEventListener('click', this.handleIncrease));
+      this.elements.decrease.forEach(button => button.addEventListener('click', this.handleDecrease));
+      this.eachCardElements.input?.addEventListener('change', this.handleInputChange);
+      if (this.canBox) {
+        this.boxCardElements.input?.addEventListener('change', this.handleInputChange);
+      }
+      this.eachCardElements.input?.addEventListener('input', this.handleInputChange);
+      if (this.canBox) {
+        this.boxCardElements.input?.addEventListener('input', this.handleInputChange);
+      }
+      // this.elements.input?.addEventListener('input', () => this.renderNoteTotal());
+      // // Auto-select text when input is clicked or focused
+
+      this.eachCardElements.input?.addEventListener('click', this.selectAllText);
+      this.eachCardElements.input?.addEventListener('focus', this.selectAllText);
+      if (this.canBox) {
+        this.boxCardElements.input?.addEventListener('click', this.selectAllText);
+        this.boxCardElements.input?.addEventListener('focus', this.selectAllText);
+      }
 
       document.addEventListener('product-variant:changed', this.handleVariantChange);
+    }
+
+    getPriceDiscounted() {
+      const discountMultiplier = parseFloat((100 - this.discountPercentage) / 100);
+      const priceEach = (this.price * discountMultiplier) / 100;
+      const finalPrice = parseFloat((Math.ceil(priceEach * 100) / 100).toFixed(2)) * 100;
+
+      return finalPrice;
+    }
+
+    getPrice() {
+      return this.value >= this.boxSize ? this.getPriceDiscounted() : this.price;
+    }
+
+    
+    getSavings() {
+      const baseTotalPrice = this.price * this.value;
+      const discountedTotalPrice = this.getPrice() * this.value;
+      return baseTotalPrice - discountedTotalPrice;
+    }
+
+    getPriceGST(price) {
+      return Math.round(price / 1.1);
     }
 
     /**
      * Decrements internal quantity values by step boundaries.
      */
-    handleDecrease = () => {
-      const currentValue = parseInt(this.elements.input.value) || 0;
+    handleDecrease = (e) => {
+      const input = e.target.closest('.quantity-selector__controls').querySelector('[data-quantity-input]');
+      const currentValue = parseInt(input.value) || 0;
       if (currentValue > this.min) {
-        this.elements.input.value = currentValue - 1;
-        this.elements.input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.value = currentValue - 1;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
 
     /**
      * Increments internal quantity values by step boundaries.
      */
-    handleIncrease = () => {
-      const currentValue = parseInt(this.elements.input.value) || 0;
+    handleIncrease = (e) => {
+      const input = e.target.closest('.quantity-selector__controls').querySelector('[data-quantity-input]');
+      const currentValue = parseInt(input.value) || 0;
       if (currentValue < this.max) {
-        this.elements.input.value = currentValue + 1;
-        this.elements.input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.value = currentValue + 1;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
 
@@ -366,59 +601,30 @@
      * Orchestrates sanitization checks when changes are fired inside input controls.
      */
     handleInputChange = () => {
-      let value = parseInt(this.elements.input.value);
-      
+      const valueEach = parseInt(this.eachCardElements.input.value || 0);
+      const valueBox = this.canBox ? parseInt(this.boxCardElements.input.value || 0) * this.boxSize : 0;
+      const value = valueEach + valueBox;
+
       if (isNaN(value) || value < this.min) {
         value = this.min;
       } else if (value > this.max) {
         value = this.max;
       }
-      
-      this.setQuantity(value);
-      this.updateControlsState();
-      this.renderTotal();
-    }
 
-    /**
-     * Adjusts active status of buttons and updates the running grand totals.
-     */
-    updateControlsState() {
-      const currentValue = parseInt(this.elements.input.value) || 0;
-      
-      if (this.elements.decrease) {
-        this.elements.decrease.disabled = currentValue <= this.min;
+      this.value = value;
+
+      this.setQuantity();
+      // this.updateControlsState();
+
+      this.renderSubTotalPriceEach();
+      if (this.canBox) {
+        this.renderSubTotalPriceBox();
+        this.renderNoteTotal();
+        this.renderNoteQuantity();
+        this.renderNoteSavings();
       }
-      
-      if (this.elements.increase) {
-        this.elements.increase.disabled = currentValue >= this.max;
-      }
-    }
 
-    setPrice() {
-      if (this.elements.price) {
-        this.price = parseFloat(this.elements.price.getAttribute('data-price-per-item')) || 0;
-      } else if (this.elements.totalPrice) {
-        const qty = parseInt(this.elements.input.value) || 1;
-        const totalVal = parseFloat(this.elements.totalPrice.getAttribute('data-total-price')) || 0;
-        this.price = qty ? (totalVal / qty) : 0;
-      }
-    }
-
-    renderPrice() {
-      this.elements.price.textContent = this.formatCurrency(this.price);
-    }
-
-    /**
-     * Calculates structural subtotals and injects translated currency values into DOM.
-     */
-    renderTotal() {
-      this.setPrice();
-      if (!this.elements.totalPrice) return;
-
-      const quantity = parseInt(this.elements.input.value) || 0;
-      const total = (this.price || 0) * quantity;
-
-      this.elements.totalPrice.textContent = this.formatCurrency(total);
+      this.dispatchQuantityChangeEvent(this.value);
     }
 
     /**
@@ -430,19 +636,79 @@
       if (!variant || !variant.price) return;
 
       this.price = parseFloat(variant.price);
-      
-      if (this.elements.price) {
-        this.elements.price.setAttribute('data-price-per-item', variant.price);
-        this.elements.price.textContent = this.formatCurrency(this.price);
-      }
 
-      this.renderPrice();
-      this.renderTotal();
+      this.renderSubTotalPriceEach();
+      this.renderPricePerEach();
+      this.renderPriceGST();
+      if (this.canBox) {
+        this.renderSubTotalPriceBox();
+        this.renderPricePerBox();
+        this.renderPricePerEachBuyBox();
+        this.renderNoteTotal();
+        this.renderNoteQuantity();
+      }
     }
 
-    setQuantity(value) {
-      this.elements.quantity.value = value;
-      this.handleInputChange;
+    renderSubTotalPriceEach() {
+      if (!this.eachCardElements.subTotalPrice) return;
+      const total = parseInt(this.eachCardElements.input.value || 0) * this.getPrice();
+      this.eachCardElements.subTotalPrice.textContent = this.formatCurrency(total);
+    }
+
+    renderPricePerEach() {
+      if (!this.eachCardElements.pricePerEach) return;
+      this.eachCardElements.pricePerEach.textContent = this.formatCurrency(this.getPrice());
+    }
+
+    renderSubTotalPriceBox() {
+      const total = parseInt(this.boxCardElements.input.value || 0) * this.getPrice() * this.boxSize;
+      this.boxCardElements.subTotalPrice.textContent = this.formatCurrency(total);
+    }
+
+    renderPricePerBox() {
+      const price = this.getPriceDiscounted() * this.boxSize;
+      this.boxCardElements.pricePerBox.textContent = this.formatCurrency(price);
+    }
+
+    renderPricePerEachBuyBox() {
+      const price = this.getPriceDiscounted();
+      this.boxCardElements.pricePerEachDiscounted.textContent = this.formatCurrency(price);
+    }
+
+    renderPriceGST() {
+      if (this.eachCardElements.priceGST) {
+        this.eachCardElements.priceGST.textContent = this.formatCurrency(this.getPriceGST(this.price));
+      }
+      if (this.canBox) {
+        this.boxCardElements.priceGST.textContent = this.formatCurrency(this.getPriceGST(this.getPriceDiscounted()));
+      }
+    }
+
+    /**
+     * Calculates structural subtotals and injects translated currency values into DOM.
+     */
+    renderNoteTotal() {
+      const quantity = parseInt(this.value) || 0;
+      const total = (this.getPrice() || 0) * quantity;
+      
+      this.elements.totalPrice.textContent = this.formatCurrency(total);
+    }
+
+    renderNoteQuantity() {
+      this.elements.totalQuantity.textContent = this.value;
+    }
+
+    renderNoteSavings() {
+      const savingsAmount = this.getSavings();
+      if (savingsAmount > 0) {
+        this.elements.totalSavings.textContent = this.formatCurrency(savingsAmount) + ' (5%)';
+      } else {
+        this.elements.totalSavings.textContent = this.formatCurrency(savingsAmount);
+      }
+    }
+
+    setQuantity() {
+      this.elements.quantity.value = this.value;
     }
 
     /**
@@ -460,10 +726,32 @@
     /**
      * Simplifies text correction fields by selecting entire fields when clicked.
      */
-    selectAllText = () => {
+    selectAllText = (e) => {
       setTimeout(() => {
-        this.elements.input?.select();
+        e.target?.select();
       }, 10);
+    }
+
+    // Dispatch custom event on quantity change
+    dispatchQuantityChangeEvent(total) {
+      const event = new CustomEvent('product-quantity:changed', { detail: total });
+      document.dispatchEvent(event);
+    }
+
+    // ==========================
+    /**
+     * Adjusts active status of buttons and updates the running grand totals.
+     */
+    updateControlsState() {
+      const currentValue = parseInt(this.elements.input.value) || 0;
+
+      if (this.elements.decrease) {
+        this.elements.decrease.disabled = currentValue <= this.min;
+      }
+
+      if (this.elements.increase) {
+        this.elements.increase.disabled = currentValue >= this.max;
+      }
     }
   }
 

@@ -593,6 +593,10 @@
           "label": "Content from page",
           "info": "If specified, takes precedence over inline content."
         },
+        "liquid": {
+          "label": "Content liquid custom",
+          "info": "If specified, takes precedence over inline page and content."
+        },
         "display_mode": {
           "label": "Display mode",
           "options": {

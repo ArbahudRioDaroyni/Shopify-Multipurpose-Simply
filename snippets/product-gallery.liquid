@@ -45,8 +45,13 @@
 
     <div class="product-main__flair-badge">
       <a href="https://www.plumbersupplies.com.au/pages/tradeperks" class="flair-badge__tradeperks">Get Cashback with TradePerks</a>
-      <span class="flair-badge__savings">Save $25.50</span>
-      <span class="flair-badge__in-stock">In Stock</span>
+      {%- assign discount_amount = product.selected_or_first_available_variant.compare_at_price | minus: product.selected_or_first_available_variant.price | money -%}
+      <span class="flair-badge__savings" data-flair-savings>Save <span data-flair-discount-amount>{{ discount_amount }}</span></span>
+      {% if product.selected_or_first_available_variant.available %}
+        <span class="flair-badge__in-stock">In Stock</span>
+      {% else %}
+        <span class="flair-badge__out-of-stock">Out of Stock</span>
+      {% endif %}
     </div>
   </div>
 
@@ -114,13 +119,13 @@
   .product-gallery__hover-overlay {
     display: none;
     position: absolute;
-    border: 2px dashed rgba(0, 0, 0, 0.3);
+    border: 1px var(--pg-border-color) solid;
     border-radius: 4px;
     top: 0;
     left: 0;
     pointer-events: none;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
-    background: rgba(0, 0, 0, 0.02);
+    background: hsl(from var(--pg-border-color) h s l / .1);
     cursor: crosshair;
   }
 
@@ -131,7 +136,7 @@
   .product-gallery__lens {
     display: none;
     position: absolute;
-    left: calc(100% + 32px);
+    left: calc(100% + 2rem);
     top: 0;
     background-size: 615px 615px;
     background-repeat: no-repeat;
@@ -153,8 +158,17 @@
     border: 1px solid hsl(from var(--pg-border-color) h s l / 0.5);
     border-radius: var(--pg-border-radius);
     box-sizing: border-box;
-    box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15);
     pointer-events: none;
+  }
+
+  .product-gallery__lens::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--pg-border-radius);
+    background-color: #ffffff;
+    z-index: -1;
   }
 
   .product-gallery__thumbs {
@@ -221,7 +235,8 @@
       flex-shrink: 0;
     }
 
-    .product-gallery__lens {
+    .product-gallery__lens,
+    .product-gallery__hover-overlay {
       display: none !important;
     }
   }
@@ -250,6 +265,7 @@
   .flair-badge__tradeperks {
     color: #000;
     background-color: #FCEE21;
+    text-decoration: underline;
   }
   
   .flair-badge__savings {
@@ -260,6 +276,11 @@
   .flair-badge__in-stock {
     color: #FFF;
     background-color: #5E9A41;
+  }
+
+  .flair-badge__out-of-stock {
+    color: #FFF;
+    background-color: #fab83e;
   }
   /* End Product Flair Badge */
 {% endstylesheet %}
@@ -617,4 +638,30 @@
       const imageGallery = new ImageGallery(thumbs, featuredImageWrapper);
     }
   });
+
+  const savingsElement = document.querySelector('[data-flair-savings]');
+  const discountAmountElement = document.querySelector('[data-flair-discount-amount]');
+  document.addEventListener('product-variant:changed', (e) => {
+    const variant = e.detail;
+    const discountAmount = variant.compare_at_price - variant.price;
+    
+    if (discountAmount > 0) {
+      discountAmountElement.textContent = formatCurrency(discountAmount);
+      savingsElement.style.display = '';
+    } else {
+      savingsElement.style.display = 'none';
+    }
+  });
+
+  /**
+   * Converts numbers directly from pennies into standardized localized strings.
+   * @param {number} cents - Calculated subtotal amounts.
+   * @returns {string} Fully localized structural formats.
+   */
+  function formatCurrency(cents) {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(cents / 100);
+  }
 {% endjavascript %}

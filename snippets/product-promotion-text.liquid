@@ -1,0 +1,93 @@
+{% liquid
+  assign promotions = shop.metaobjects.product_promo_text.values
+  assign selected_promotion = nil
+  assign selected_priority = 999
+
+  # Step 1: Check product_references first
+  for promotion in promotions
+    if promotion.product_references
+      assign product_references = promotion.product_references.value
+      assign has_product_match = false
+
+      # Check if current product is in the product_references
+      if product_references
+        for product_reference in product_references
+          if product_reference.handle == product.handle
+            assign has_product_match = true
+            break
+          endif
+        endfor
+      endif
+
+      # If product matches, check priority
+      if has_product_match
+        assign priority = promotion.priority | escape | plus: 0
+        if priority < selected_priority
+          assign selected_priority = priority
+          assign selected_promotion = promotion
+        endif
+      endif
+    endif
+  endfor
+
+  # Step 2: If no product match found, check collection_references
+  unless selected_promotion
+    for promotion in promotions
+      if promotion.collection_references
+        assign collection_references = promotion.collection_references.value
+        assign has_collection_match = false
+
+        # Check if any of product's collections match with collection_references
+        if collection_references
+          for collection_reference in collection_references
+            assign has_collection_match = product.collections | has: 'handle', collection_reference.handle
+
+            # If product matches, check priority
+            if has_collection_match
+              assign priority = promotion.priority | escape | plus: 0
+              if priority < selected_priority
+                assign selected_priority = priority
+                assign selected_promotion = promotion
+              endif
+              break
+            endif
+          endfor
+        endif
+      endif
+    endfor
+  endunless
+
+  # Step 3: If no product or collection match found, check tag_reference
+  unless selected_promotion
+    for promotion in promotions
+      if promotion.tag_references
+        assign tag_references = promotion.tag_references.value
+        assign has_tag_match = false
+
+        # Check if any of product's tags match with tag_reference
+        if tag_references
+          for tag_reference in tag_references
+            assign has_tag_match = product.tags | has: tag_reference
+
+            # If tag matches, check priority
+            if has_tag_match
+              assign priority = promotion.priority | escape | plus: 0
+              if priority < selected_priority
+                assign selected_priority = priority
+                assign selected_promotion = promotion
+              endif
+              break
+            endif
+          endfor
+        endif
+      endif
+    endfor
+  endunless
+%}
+{% if selected_promotion %}
+  {% if selected_promotion.link_to %}
+    <a class="product-promotion text-link" href="{{ selected_promotion.link_to }}" target="_blank">{{ selected_promotion.content }}</a>
+  {% else %}
+    <p class="product-promotion">{{ selected_promotion.content }}</p>
+  {% endif %}
+{% endif %}

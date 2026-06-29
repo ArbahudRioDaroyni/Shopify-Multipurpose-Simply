@@ -19,6 +19,18 @@
             "single_open": true
           },
           "blocks": {
+            "accordion_Description": {
+              "type": "accordion-content",
+              "name": "t:blocks.accordion_content.presets.default.name",
+              "settings": {
+                "title": "Description",
+                "content": "",
+                "page": "",
+                "liquid": "{{ product.description }}",
+                "display_mode": "collapse"
+              },
+              "blocks": {}
+            },
             "accordion_Payment_Delivery_and_Returns": {
               "type": "accordion-content",
               "name": "t:blocks.accordion_content.presets.default.name",
@@ -26,6 +38,7 @@
                 "title": "Payment, Delivery & Returns",
                 "content": "<p><strong>Orders are shipped within 2 to 4 business days Ex Warehouse. If you would like a more accurate time frame, please reach out to us.</strong></p><p>We reserve the right to refund any order where freight is not a viable option. This is typically applicable to rural/remote areas where our couriers cannot service. We can accomodate rural/remote orders by arranging a custom freight quote - please reach out to us to arrange a quote.</p><h3>Payment Methods</h3><p>Budgeting for a renovation or new build? We have a range of options to pay including buy now and pay later solutions to suit your circumstances.</p><p>We accept the following methods; Visa, MasterCard, American Express, Afterpay and PayPal.</p><p>If you are a trade customer, please ‘add to quote’ and we will be in touch with trade pricing.</p><h3>Delivery Services</h3><p>See our delivery information for more details on our courier services.<br/>Items will be dispatched from our Sydney/Melbourne/Brisbane warehouse as soon as we receive your order,for delivery timeframes, please see more here.</p><h3>Estimate Shipping</h3><p>Please see our Return and Cancellation Policy for more details.</p><p>Visit our help centre to view our full returns policy and more!</p><p>Returns Information</p><p>You have 30 days from date of purchase to return your product. For change of mind purchases, the customer is to return the goods to 2/71 Jijaws Street, Sumner at their expense. As the item has already been shipped, the initial shipping fee paid will not be refunded. </p><h3>My order was damaged or faulty</h3><p>Your satisfaction is our priority! If you've ordered an item that damaged or faulty, please email sales@plumbersupplies.com.au.</p><p>We encourage you to inspect all orders within 24 hours of receiving them, even if your renovation is not yet underway. We cannot accept damage claims after this 24 hour period as we cannot determine when or how the damage occurred. </p><p>We require photographic evidence of the damages are required within 24 hours of receiving an order.  </p><p>We also do not accept damages that occur as a result of product installation. </p><h3>Change of mind - within 30 days of purchase</h3><p>You must return the goods to 2/71 Jijaws Street, Sumner QLD 4074. A restocking fee of 20% will be incurred across all items returned.</p>",
                 "page": "",
+                "liquid": "",
                 "display_mode": "collapse"
               },
               "blocks": {}
@@ -37,6 +50,7 @@
                 "title": "Warranty",
                 "content": "<p><strong>Each brand and product has different warranty timelines and conditions. Please </strong><a href=\"https://www.plumbersupplies.com.au/pages/returns\" title=\"Warranty & Return\"><strong>click here</strong></a><strong> for further information or email us at sales@plumbersupplies and we will be in touch.</strong></p>",
                 "page": "",
+                "liquid": "",
                 "display_mode": "collapse"
               },
               "blocks": {}
