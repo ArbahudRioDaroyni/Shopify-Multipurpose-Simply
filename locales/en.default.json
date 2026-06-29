@@ -325,11 +325,7 @@
         }
       }
     },
-    "accordion": {
-      "name": "Accordion"
-    },
     "accordion_content": {
-      "name": "Content",
       "fallback_title": "Accordion item",
       "view_more": "View more",
       "view_less": "View less"

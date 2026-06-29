@@ -137,9 +137,9 @@
         # Collection ID for "Box of 24 - Discount 5%" collection
         assign has_box_of_24_discount = product.collections | has: 'id', 359975878805
         
-        assign canBox = false
+        assign can_box = false
         if has_box_of_10_discount or has_box_of_24_discount
-          assign canBox = true
+          assign can_box = true
         endif
         
         assign per_box = 0
@@ -161,11 +161,11 @@
         price: product.selected_or_first_available_variant.price,
         compare_at_price: product.selected_or_first_available_variant.compare_at_price
         discount_percentage: 5
-        show_price: true,
-        show_total: true,
+        show_price: can_box,
+        show_total: can_box,
         show_gst: show_gst,
-        can_box: true,
-        box_size: 10,
+        can_box: can_box,
+        box_size: per_box,
       %}
 
       {% comment %} {% render 'quantity-selector-bulk',
@@ -203,20 +203,7 @@
       {{ form | payment_button }}
     {% endform %}
 
-    <div class="product-info-section__trust-bar">
-      <div class="trust-bar__item">
-        <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mask0_35_345" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="18" height="16"><path d="M16.9541 0.5V15.5H0.5V0.5H16.9541Z" fill="white" stroke="white"/></mask><g mask="url(#mask0_35_345)"><path d="M4.72723 7.90515H2.54541M4.72723 11.5415H3.99996" stroke="black" stroke-width="1.5" stroke-linecap="square"/><path d="M13.33 12.2687H17.0908V7.90511L14.1817 6.4506L13.4544 3.5415H7.63623V12.2687H9.21514" stroke="black" stroke-width="1.5"/><path d="M1.09082 4.26886H4.72718" stroke="black" stroke-width="1.5" stroke-linecap="square"/><path d="M1.09082 0.632446H7.63628V3.54154" stroke="black" stroke-width="1.5" stroke-linecap="square"/><path d="M11.2726 15.1779C12.4777 15.1779 13.4545 14.2011 13.4545 12.9961C13.4545 11.7911 12.4777 10.8143 11.2726 10.8143C10.0676 10.8143 9.09082 11.7911 9.09082 12.9961C9.09082 14.2011 10.0676 15.1779 11.2726 15.1779Z" stroke="black" stroke-width="1.5" stroke-linecap="square"/><path d="M10.5454 5.72333V7.17784H12" stroke="black" stroke-width="1.5" stroke-linecap="square"/></g></svg>
-        <span>Fast Delivery</span>
-      </div>
-      <div class="trust-bar__item">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><mask id="mask0_35_357" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="16" height="16"><path d="M16 0H0V16H16V0Z" fill="white"/></mask><g mask="url(#mask0_35_357)"><mask id="mask1_35_357" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="-1" y="0" width="17" height="17"><path d="M15.6362 0.206177H-0.36377V16.2062H15.6362V0.206177Z" fill="white"/></mask><g mask="url(#mask1_35_357)"><path d="M6.13623 13.2062C6.13623 12.378 5.46436 11.7062 4.63623 11.7062H1.63623C1.36123 11.7062 1.13623 11.4812 1.13623 11.2062V2.20618C1.13623 1.93118 1.36123 1.70618 1.63623 1.70618H13.6362C13.9112 1.70618 14.1362 1.93118 14.1362 2.20618V11.2062C14.1362 11.4812 13.9112 11.7062 13.6362 11.7062H9.30184C8.97684 11.7062 8.66124 11.8124 8.40184 12.0062L6.13623 13.7062V13.2062ZM6.12998 15.5874L6.13623 15.5812L9.30184 13.2062H13.6362C14.7394 13.2062 15.6362 12.3093 15.6362 11.2062V2.20618C15.6362 1.10305 14.7394 0.206177 13.6362 0.206177H1.63623C0.533104 0.206177 -0.36377 1.10305 -0.36377 2.20618V11.2062C-0.36377 12.3093 0.533104 13.2062 1.63623 13.2062H3.13623H4.63623V14.7062V14.8312V14.8406V15.0406V15.7062C4.63623 15.8968 4.74248 16.0687 4.91123 16.153C5.07998 16.2374 5.2831 16.2187 5.43623 16.1062L5.9706 15.7062L6.12998 15.5874ZM5.63623 5.70618C5.90144 5.70618 6.1558 5.60082 6.3433 5.41329C6.5309 5.22575 6.63624 4.97139 6.63624 4.70618C6.63624 4.44096 6.5309 4.18661 6.3433 3.99907C6.1558 3.81153 5.90144 3.70618 5.63623 3.70618C5.37102 3.70618 5.11666 3.81153 4.92912 3.99907C4.74159 4.18661 4.63623 4.44096 4.63623 4.70618C4.63623 4.97139 4.74159 5.22575 4.92912 5.41329C5.11666 5.60082 5.37102 5.70618 5.63623 5.70618ZM9.63624 5.70618C9.90144 5.70618 10.1558 5.60082 10.3433 5.41329C10.5309 5.22575 10.6362 4.97139 10.6362 4.70618C10.6362 4.44096 10.5309 4.18661 10.3433 3.99907C10.1558 3.81153 9.90144 3.70618 9.63624 3.70618C9.37104 3.70618 9.11664 3.81153 8.9291 3.99907C8.74157 4.18661 8.63624 4.44096 8.63624 4.70618C8.63624 4.97139 8.74157 5.22575 8.9291 5.41329C9.11664 5.60082 9.37104 5.70618 9.63624 5.70618ZM4.33936 7.64683C4.02998 7.92183 4.00498 8.39683 4.27998 8.70617C5.10186 9.6249 6.30186 10.2062 7.6331 10.2062C8.96437 10.2062 10.1644 9.6249 10.9862 8.70617C11.2612 8.39683 11.2362 7.9249 10.9268 7.64683C10.6175 7.3687 10.1456 7.39683 9.8675 7.70617C9.3175 8.32183 8.52064 8.70617 7.62997 8.70617C6.73937 8.70617 5.9456 8.32183 5.39248 7.70617C5.11748 7.39683 4.64248 7.37183 4.3331 7.64683H4.33936Z" fill="black"/></g></g></svg>
-        <span>Caring Support</span>
-      </div>
-      <div class="trust-bar__item">
-        <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15.15 7.15V8.75M15.15 8.75V11.15C15.15 12.0337 14.4337 12.75 13.55 12.75H2.35C1.46634 12.75 0.75 12.0337 0.75 11.15V8.75M15.15 8.75H0.75M7.95 2.35H2.35C1.46634 2.35 0.75 3.06634 0.75 3.95V8.75M16.75 0.75L12.75 4.75L11.15 3.15" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span>No Credit Card Fees</span>
-      </div>
-    </div>
+    {% content_for 'block', type: 'group', id: 'product_Trust_Bar' %}
 
     {% if product.metafields.custom.downloadable_content != blank %}
       <a href="{{ product.metafields.custom.downloadable_content |  file_url }}" download class="product-info__downloadable-button">
@@ -227,8 +214,10 @@
       </a>
     {% endif %}
 
+    {% comment %} {% content_for 'blocks' %} {% endcomment %}
+    
     {% comment %} block accordion here {% endcomment %}
-    {% content_for 'blocks' %}
+    {% content_for 'block', type: 'accordion', id: 'accordion_Product' %}
   </div>
 </main>
 
@@ -310,8 +299,13 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    flex-wrap: wrap;
     row-gap: 20px;
+  }
+  
+  @media (max-width: 991px) {
+    .product-info__price-availability-promotions {
+      display: grid;
+    }
   }
   .product-info__price {
     display: flex;
@@ -332,6 +326,7 @@
     font-size: 16px;
     line-height: 20px;
     color: var(--pm-text-gst-color);
+    white-space: nowrap;
   }
   .product-price__compare {
     font-size: 16px;
@@ -488,17 +483,17 @@
   /* Product Trust Bar */
   .product-info-section__trust-bar {
     display: flex;
-    gap: 24px;
+    gap: 24px !important;
     background-color: #f7f7f7;
-    padding-block: 16px;
-    justify-content: center;
+    padding-block: 16px !important;
+    justify-content: center !important;
     border-radius: 4px;
     line-height: 1;
   }
   @media (max-width: 991px) {
     .product-info-section__trust-bar {
-      align-items: center;
-      flex-direction: column;
+      align-items: center !important;
+      flex-direction: column !important;
     }
   }
   .trust-bar__item {

@@ -12,14 +12,193 @@
     "default": {
       "type": "product-main-default",
       "blocks": {
+        "product_Trust_Bar": {
+          "type": "group",
+          "name": "Product Trust Bar",
+          "static": true,
+          "settings": {
+            "tag": "div",
+            "url": "",
+            "layout_direction": "group--horizontal",
+            "alignment": "flex-start",
+            "class": "product-info-section__trust-bar",
+            "attributes": "",
+            "gap": 0,
+            "margin": 0,
+            "padding": 0
+          },
+          "blocks": {
+            "group_3rEUaN": {
+              "type": "group",
+              "name": "Fast Delivery",
+              "settings": {
+                "tag": "div",
+                "url": "",
+                "layout_direction": "group--horizontal",
+                "alignment": "flex-start",
+                "class": "trust-bar__item",
+                "attributes": "",
+                "gap": 8,
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {
+                "icon_HwcCxJ": {
+                  "type": "icon",
+                  "name": "t:names.icon",
+                  "settings": {
+                    "icon": "phone",
+                    "custom_svg": "<svg width=\"18\" height=\"16\" viewbox=\"0 0 18 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><mask id=\"mask0_35_345\" style=\"mask-type:luminance\" maskunits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"18\" height=\"16\"><path d=\"M16.9541 0.5V15.5H0.5V0.5H16.9541Z\" fill=\"white\" stroke=\"white\"></path></mask><g mask=\"url(#mask0_35_345)\"><path d=\"M4.72723 7.90515H2.54541M4.72723 11.5415H3.99996\" stroke=\"black\" stroke-width=\"1.5\" stroke-linecap=\"square\"></path><path d=\"M13.33 12.2687H17.0908V7.90511L14.1817 6.4506L13.4544 3.5415H7.63623V12.2687H9.21514\" stroke=\"black\" stroke-width=\"1.5\"></path><path d=\"M1.09082 4.26886H4.72718\" stroke=\"black\" stroke-width=\"1.5\" stroke-linecap=\"square\"></path><path d=\"M1.09082 0.632446H7.63628V3.54154\" stroke=\"black\" stroke-width=\"1.5\" stroke-linecap=\"square\"></path><path d=\"M11.2726 15.1779C12.4777 15.1779 13.4545 14.2011 13.4545 12.9961C13.4545 11.7911 12.4777 10.8143 11.2726 10.8143C10.0676 10.8143 9.09082 11.7911 9.09082 12.9961C9.09082 14.2011 10.0676 15.1779 11.2726 15.1779Z\" stroke=\"black\" stroke-width=\"1.5\" stroke-linecap=\"square\"></path><path d=\"M10.5454 5.72333V7.17784H12\" stroke=\"black\" stroke-width=\"1.5\" stroke-linecap=\"square\"></path></g></svg>",
+                    "width": 16,
+                    "link": "",
+                    "open_in_new_tab": false
+                  },
+                  "blocks": {}
+                },
+                "text_9i98fE": {
+                  "type": "text",
+                  "name": "t:blocks.text.presets.default.name",
+                  "settings": {
+                    "text": "Fast Delivery",
+                    "tag": "span",
+                    "url": "",
+                    "class": "",
+                    "attributes": "",
+                    "font_size": 16,
+                    "font_weight": "400",
+                    "line_height": 1,
+                    "alignment": "left",
+                    "color": "",
+                    "margin": 0,
+                    "padding": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "icon_HwcCxJ",
+                "text_9i98fE"
+              ]
+            },
+            "group_mc6Wih": {
+              "type": "group",
+              "name": "Caring Support",
+              "settings": {
+                "tag": "div",
+                "url": "",
+                "layout_direction": "group--horizontal",
+                "alignment": "flex-start",
+                "class": "trust-bar__item",
+                "attributes": "",
+                "gap": 8,
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {
+                "icon_cwqMRh": {
+                  "type": "icon",
+                  "name": "t:names.icon",
+                  "settings": {
+                    "icon": "heart",
+                    "custom_svg": "<svg width=\"16\" height=\"16\" viewbox=\"0 0 16 16\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><mask id=\"mask0_35_357\" style=\"mask-type:luminance\" maskunits=\"userSpaceOnUse\" x=\"0\" y=\"0\" width=\"16\" height=\"16\"><path d=\"M16 0H0V16H16V0Z\" fill=\"white\"></path></mask><g mask=\"url(#mask0_35_357)\"><mask id=\"mask1_35_357\" style=\"mask-type:luminance\" maskunits=\"userSpaceOnUse\" x=\"-1\" y=\"0\" width=\"17\" height=\"17\"><path d=\"M15.6362 0.206177H-0.36377V16.2062H15.6362V0.206177Z\" fill=\"white\"></path></mask><g mask=\"url(#mask1_35_357)\"><path d=\"M6.13623 13.2062C6.13623 12.378 5.46436 11.7062 4.63623 11.7062H1.63623C1.36123 11.7062 1.13623 11.4812 1.13623 11.2062V2.20618C1.13623 1.93118 1.36123 1.70618 1.63623 1.70618H13.6362C13.9112 1.70618 14.1362 1.93118 14.1362 2.20618V11.2062C14.1362 11.4812 13.9112 11.7062 13.6362 11.7062H9.30184C8.97684 11.7062 8.66124 11.8124 8.40184 12.0062L6.13623 13.7062V13.2062ZM6.12998 15.5874L6.13623 15.5812L9.30184 13.2062H13.6362C14.7394 13.2062 15.6362 12.3093 15.6362 11.2062V2.20618C15.6362 1.10305 14.7394 0.206177 13.6362 0.206177H1.63623C0.533104 0.206177 -0.36377 1.10305 -0.36377 2.20618V11.2062C-0.36377 12.3093 0.533104 13.2062 1.63623 13.2062H3.13623H4.63623V14.7062V14.8312V14.8406V15.0406V15.7062C4.63623 15.8968 4.74248 16.0687 4.91123 16.153C5.07998 16.2374 5.2831 16.2187 5.43623 16.1062L5.9706 15.7062L6.12998 15.5874ZM5.63623 5.70618C5.90144 5.70618 6.1558 5.60082 6.3433 5.41329C6.5309 5.22575 6.63624 4.97139 6.63624 4.70618C6.63624 4.44096 6.5309 4.18661 6.3433 3.99907C6.1558 3.81153 5.90144 3.70618 5.63623 3.70618C5.37102 3.70618 5.11666 3.81153 4.92912 3.99907C4.74159 4.18661 4.63623 4.44096 4.63623 4.70618C4.63623 4.97139 4.74159 5.22575 4.92912 5.41329C5.11666 5.60082 5.37102 5.70618 5.63623 5.70618ZM9.63624 5.70618C9.90144 5.70618 10.1558 5.60082 10.3433 5.41329C10.5309 5.22575 10.6362 4.97139 10.6362 4.70618C10.6362 4.44096 10.5309 4.18661 10.3433 3.99907C10.1558 3.81153 9.90144 3.70618 9.63624 3.70618C9.37104 3.70618 9.11664 3.81153 8.9291 3.99907C8.74157 4.18661 8.63624 4.44096 8.63624 4.70618C8.63624 4.97139 8.74157 5.22575 8.9291 5.41329C9.11664 5.60082 9.37104 5.70618 9.63624 5.70618ZM4.33936 7.64683C4.02998 7.92183 4.00498 8.39683 4.27998 8.70617C5.10186 9.6249 6.30186 10.2062 7.6331 10.2062C8.96437 10.2062 10.1644 9.6249 10.9862 8.70617C11.2612 8.39683 11.2362 7.9249 10.9268 7.64683C10.6175 7.3687 10.1456 7.39683 9.8675 7.70617C9.3175 8.32183 8.52064 8.70617 7.62997 8.70617C6.73937 8.70617 5.9456 8.32183 5.39248 7.70617C5.11748 7.39683 4.64248 7.37183 4.3331 7.64683H4.33936Z\" fill=\"black\"></path></g></g></svg>",
+                    "width": 16,
+                    "link": "",
+                    "open_in_new_tab": false
+                  },
+                  "blocks": {}
+                },
+                "text_6txVqy": {
+                  "type": "text",
+                  "name": "t:blocks.text.presets.default.name",
+                  "settings": {
+                    "text": "Caring Support",
+                    "tag": "span",
+                    "url": "",
+                    "class": "",
+                    "attributes": "",
+                    "font_size": 16,
+                    "font_weight": "400",
+                    "line_height": 1,
+                    "alignment": "left",
+                    "color": "",
+                    "margin": 0,
+                    "padding": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "icon_cwqMRh",
+                "text_6txVqy"
+              ]
+            },
+            "group_jf7E64": {
+              "type": "group",
+              "name": "No Credit Card Fees",
+              "settings": {
+                "tag": "div",
+                "url": "",
+                "layout_direction": "group--horizontal",
+                "alignment": "flex-start",
+                "class": "trust-bar__item",
+                "attributes": "",
+                "gap": 8,
+                "margin": 0,
+                "padding": 0
+              },
+              "blocks": {
+                "icon_HJGEBE": {
+                  "type": "icon",
+                  "name": "t:names.icon",
+                  "settings": {
+                    "icon": "caret",
+                    "custom_svg": "<svg width=\"18\" height=\"14\" viewbox=\"0 0 18 14\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M15.15 7.15V8.75M15.15 8.75V11.15C15.15 12.0337 14.4337 12.75 13.55 12.75H2.35C1.46634 12.75 0.75 12.0337 0.75 11.15V8.75M15.15 8.75H0.75M7.95 2.35H2.35C1.46634 2.35 0.75 3.06634 0.75 3.95V8.75M16.75 0.75L12.75 4.75L11.15 3.15\" stroke=\"black\" stroke-width=\"1.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></path></svg>",
+                    "width": 16,
+                    "link": "",
+                    "open_in_new_tab": false
+                  },
+                  "blocks": {}
+                },
+                "text_RKxaqW": {
+                  "type": "text",
+                  "name": "t:blocks.text.presets.default.name",
+                  "settings": {
+                    "text": "No Credit Card Fees",
+                    "tag": "span",
+                    "url": "",
+                    "class": "",
+                    "attributes": "",
+                    "font_size": 16,
+                    "font_weight": "400",
+                    "line_height": 1,
+                    "alignment": "left",
+                    "color": "",
+                    "margin": 0,
+                    "padding": 0
+                  },
+                  "blocks": {}
+                }
+              },
+              "block_order": [
+                "icon_HJGEBE",
+                "text_RKxaqW"
+              ]
+            }
+          },
+          "block_order": [
+            "group_3rEUaN",
+            "group_mc6Wih",
+            "group_jf7E64"
+          ]
+        },
         "accordion_Product": {
           "type": "accordion",
-          "name": "t:blocks.accordion.presets.default.name",
+          "static": true,
           "settings": {
             "single_open": true
           },
           "blocks": {
-            "accordion_Description": {
+            "accordion_content_mMteJ3": {
               "type": "accordion-content",
               "name": "t:blocks.accordion_content.presets.default.name",
               "settings": {
@@ -27,11 +206,11 @@
                 "content": "",
                 "page": "",
                 "liquid": "{{ product.description }}",
-                "display_mode": "collapse"
+                "display_mode": "view_more"
               },
               "blocks": {}
             },
-            "accordion_Payment_Delivery_and_Returns": {
+            "accordion_content_GBAWUQ": {
               "type": "accordion-content",
               "name": "t:blocks.accordion_content.presets.default.name",
               "settings": {
@@ -43,28 +222,81 @@
               },
               "blocks": {}
             },
-            "accordion_Warranty": {
+            "accordion_content_GfJWUL": {
               "type": "accordion-content",
               "name": "t:blocks.accordion_content.presets.default.name",
               "settings": {
                 "title": "Warranty",
-                "content": "<p><strong>Each brand and product has different warranty timelines and conditions. Please </strong><a href=\"https://www.plumbersupplies.com.au/pages/returns\" title=\"Warranty & Return\"><strong>click here</strong></a><strong> for further information or email us at sales@plumbersupplies and we will be in touch.</strong></p>",
+                "content": "",
                 "page": "",
-                "liquid": "",
+                "liquid": "Each brand and product has different warranty timelines and conditions. Please click here for further information or email us at sales@plumbersupplies and we will be in touch.",
                 "display_mode": "collapse"
               },
               "blocks": {}
             }
           },
           "block_order": [
-            "accordion_Payment_Delivery_and_Returns",
-            "accordion_Warranty"
+            "accordion_content_mMteJ3",
+            "accordion_content_GBAWUQ",
+            "accordion_content_GfJWUL"
           ]
         }
       },
-      "block_order": [
-        "accordion_Product"
-      ],
+      // "blocks": {
+      //   "accordion_Product": {
+      //     "type": "accordion",
+      //     "name": "t:blocks.accordion.presets.default.name",
+      //     "settings": {
+      //       "single_open": true
+      //     },
+      //     "blocks": {
+      //       "accordion_Description": {
+      //         "type": "accordion-content",
+      //         "name": "t:blocks.accordion_content.presets.default.name",
+      //         "settings": {
+      //           "title": "Description",
+      //           "content": "",
+      //           "page": "",
+      //           "liquid": "{{ product.description }}",
+      //           "display_mode": "view_more"
+      //         },
+      //         "blocks": {}
+      //       },
+      //       "accordion_Payment_Delivery_and_Returns": {
+      //         "type": "accordion-content",
+      //         "name": "t:blocks.accordion_content.presets.default.name",
+      //         "settings": {
+      //           "title": "Payment, Delivery & Returns",
+      //           "content": "<p><strong>Orders are shipped within 2 to 4 business days Ex Warehouse. If you would like a more accurate time frame, please reach out to us.</strong></p><p>We reserve the right to refund any order where freight is not a viable option. This is typically applicable to rural/remote areas where our couriers cannot service. We can accomodate rural/remote orders by arranging a custom freight quote - please reach out to us to arrange a quote.</p><h3>Payment Methods</h3><p>Budgeting for a renovation or new build? We have a range of options to pay including buy now and pay later solutions to suit your circumstances.</p><p>We accept the following methods; Visa, MasterCard, American Express, Afterpay and PayPal.</p><p>If you are a trade customer, please ‘add to quote’ and we will be in touch with trade pricing.</p><h3>Delivery Services</h3><p>See our delivery information for more details on our courier services.<br/>Items will be dispatched from our Sydney/Melbourne/Brisbane warehouse as soon as we receive your order,for delivery timeframes, please see more here.</p><h3>Estimate Shipping</h3><p>Please see our Return and Cancellation Policy for more details.</p><p>Visit our help centre to view our full returns policy and more!</p><p>Returns Information</p><p>You have 30 days from date of purchase to return your product. For change of mind purchases, the customer is to return the goods to 2/71 Jijaws Street, Sumner at their expense. As the item has already been shipped, the initial shipping fee paid will not be refunded. </p><h3>My order was damaged or faulty</h3><p>Your satisfaction is our priority! If you've ordered an item that damaged or faulty, please email sales@plumbersupplies.com.au.</p><p>We encourage you to inspect all orders within 24 hours of receiving them, even if your renovation is not yet underway. We cannot accept damage claims after this 24 hour period as we cannot determine when or how the damage occurred. </p><p>We require photographic evidence of the damages are required within 24 hours of receiving an order.  </p><p>We also do not accept damages that occur as a result of product installation. </p><h3>Change of mind - within 30 days of purchase</h3><p>You must return the goods to 2/71 Jijaws Street, Sumner QLD 4074. A restocking fee of 20% will be incurred across all items returned.</p>",
+      //           "page": "",
+      //           "liquid": "",
+      //           "display_mode": "collapse"
+      //         },
+      //         "blocks": {}
+      //       },
+      //       "accordion_Warranty": {
+      //         "type": "accordion-content",
+      //         "name": "t:blocks.accordion_content.presets.default.name",
+      //         "settings": {
+      //           "title": "Warranty",
+      //           "content": "<p><strong>Each brand and product has different warranty timelines and conditions. Please </strong><a href=\"https://www.plumbersupplies.com.au/pages/returns\" title=\"Warranty & Return\"><strong>click here</strong></a><strong> for further information or email us at sales@plumbersupplies and we will be in touch.</strong></p>",
+      //           "page": "",
+      //           "liquid": "",
+      //           "display_mode": "collapse"
+      //         },
+      //         "blocks": {}
+      //       }
+      //     },
+      //     "block_order": [
+      //       "accordion_Description",
+      //       "accordion_Payment_Delivery_and_Returns",
+      //       "accordion_Warranty"
+      //     ]
+      //   }
+      // },
+      // "block_order": [
+      //   "accordion_Product"
+      // ],
       "settings": {}
     },
     // "recently-viewed": {

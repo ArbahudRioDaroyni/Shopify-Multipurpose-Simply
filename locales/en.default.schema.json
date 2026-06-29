@@ -102,19 +102,6 @@
       "small": "Small",
       "standard": "Standard"
     },
-    "icon": {
-      "arrow": "Arrow",
-      "none": "None",
-      "caret": "Caret",
-      "close": "Close",
-      "global": "Global",
-      "heart": "Heart",
-      "mailbox": "Mailbox",
-      "map_point": "Map point",
-      "phone": "Phone",
-      "search": "Search",
-      "user": "User"
-    }
   },
   "names": {
     "icon": "Icon",
@@ -122,7 +109,6 @@
     "group": "Group"
   },
   "settings": {
-    "icon": "Icon",
     "color_schemes": {
       "background": "Background",
       "foreground": "Foreground",
@@ -350,9 +336,6 @@
     "text": {
       "name": "Text",
       "settings": {
-        "layout": {
-          "header": "Layout"
-        },
         "text": {
           "label": "Text Content",
           "default": "Add your text here"
@@ -371,6 +354,18 @@
             "div": "Div",
             "a": "Link (A)"
           }
+        },
+        "url": {
+          "label": "CSS classes",
+          "info": "Link destination (required when using A tag)"
+        },
+        "class": {
+          "label": "Link to (URL)",
+          "info": "Add custom CSS class names"
+        },
+        "attributes": {
+          "label": "Attributes",
+          "info": "Add custom HTML attributes ex: data-attr='custom'"
         }
       },
       "presets": {
@@ -561,6 +556,46 @@
         }
       }
     },
+    "icon": {
+      "name": "Icon",
+      "settings": {
+        "icon": {
+          "label": "Icon",
+          "info": "Select Icon",
+          "options": {
+            "arrow": "Arrow",
+            "none": "None",
+            "caret": "Caret",
+            "close": "Close",
+            "global": "Global",
+            "heart": "Heart",
+            "mailbox": "Mailbox",
+            "map_point": "Map point",
+            "phone": "Phone",
+            "search": "Search",
+            "user": "User"
+          }
+        },
+        "image_upload": {
+          "label": "Select or upload Icon",
+        },
+        "width": {
+          "label": "Set width",
+        },
+        "link": {
+          "label": "Add link to Icon",
+        },
+        "open_in_new_tab": {
+          "label": "Open in new tab?",
+        }
+      },
+      "presets": {
+        "default": {
+          "name": "Icon",
+          "category": "Content"
+        }
+      }
+    },
     "accordion": {
       "name": "Accordion",
       "settings": {
@@ -608,7 +643,7 @@
       },
       "presets": {
         "default": {
-          "name": "Content",
+          "name": "Accordion Content",
           "category": "Content"
         }
       }

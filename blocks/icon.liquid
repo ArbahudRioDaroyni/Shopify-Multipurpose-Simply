@@ -3,76 +3,45 @@
   Renders an icon block that can display either an SVG icon or an uploaded image, with optional linking functionality.
 
   @example
-  {% schema %}
-    {
-      "name": "t:names.icon",
-      "class": "icon-block",
-      "settings": [
-        {
-          "type": "select",
-          "id": "icon",
-          "label": "t:settings.icon",
-          "options": [ ... ],
-          "default": "caret"
-        },
-        {
-          "type": "image_picker",
-          "id": "image_upload",
-          "label": "t:settings.image_icon"
-        },
-        {
-          "type": "range",
-          "id": "width",
-          "label": "t:settings.width",
-          "min": 12,
-          "max": 200,
-          "step": 2,
-          "unit": "px",
-          "default": 24
-        },
-        {
-          "type": "url",
-          "id": "link",
-          "label": "t:settings.link"
-        },
-        {
-          "type": "checkbox",
-          "id": "open_in_new_tab",
-          "label": "t:settings.open_new_tab",
-          "default": false
-        }
-      ]
-    }
-  {% endschema %}
-
+  {% content_for 'block', type: 'icon', id: 'icon-svg' %}
 {% enddoc %}
 
-{% assign block_settings = block.settings %}
-{% assign icon_block_class = 'icon-block__media icon-block-' | append: block.id %}
+{% liquid
+  assign icon = block.settings.icon | default: 'none'
+  assign image = block.settings.image_upload
+  assign custom_svg = block.settings.custom_svg | default: false
+  assign size = block.settings.width
+  assign link = block.settings.link
+  assign open_in_new_tab = block.settings.open_in_new_tab
+  assign icon_block_class = 'icon-block__media icon-block-' | append: block.id
+%}
 
 {% capture icon %}
   {% render 'icon-or-image',
-    icon: block_settings.icon,
-    image_upload: block_settings.image_upload,
-    width: block_settings.width,
+    icon: icon,
+    image_upload: image,
+    width: size,
     class_name: icon_block_class,
     attributes: block.shopify_attributes
   %}
 {% endcapture %}
-
-{%- if block_settings.link != blank -%}
-  <a
-    href="{{ block_settings.link }}"
-    class="text-inherit"
-    {% if block_settings.open_in_new_tab %}
-      target="_blank" rel="noopener"
-    {% endif %}
-  >
+{% if custom_svg %}
+  {{ custom_svg }}
+{% else %}
+  {%- if link != blank -%}
+    <a
+      href="{{ link }}"
+      class="text-inherit"
+      {% if open_in_new_tab %}
+        target="_blank" rel="noopener"
+      {% endif %}
+    >
+      {{ icon }}
+    </a>
+  {%- else -%}
     {{ icon }}
-  </a>
-{%- else -%}
-  {{ icon }}
-{%- endif -%}
+  {%- endif -%}
+{% endif %}
 
 {% stylesheet %}
   .icon-block {
@@ -88,57 +57,58 @@
 {% comment %} "name": "t:names.icon", {% endcomment %}
 {% schema %}
 {
-  "name": "Icon",
+  "name": "t:blocks.icon.name",
   "class": "icon-block",
   "settings": [
     {
       "type": "select",
       "id": "icon",
-      "label": "t:settings.icon",
+      "label": "t:blocks.icon.name",
+      "info": "t:blocks.icon.settings.icon.info",
       "options": [
         {
           "value": "none",
-          "label": "t:options.icon.none"
+          "label": "t:blocks.icon.settings.icon.options.none"
         },
         {
           "value": "arrow",
-          "label": "t:options.icon.arrow"
+          "label": "t:blocks.icon.settings.icon.options.arrow"
         },
         {
           "value": "caret",
-          "label": "t:options.icon.caret"
+          "label": "t:blocks.icon.settings.icon.options.caret"
         },
         {
           "value": "close",
-          "label": "t:options.icon.close"
+          "label": "t:blocks.icon.settings.icon.options.close"
         },
         {
           "value": "global",
-          "label": "t:options.icon.global"
+          "label": "t:blocks.icon.settings.icon.options.global"
         },
         {
           "value": "heart",
-          "label": "t:options.icon.heart"
+          "label": "t:blocks.icon.settings.icon.options.heart"
         },
         {
           "value": "mailbox",
-          "label": "t:options.icon.mailbox"
+          "label": "t:blocks.icon.settings.icon.options.mailbox"
         },
         {
           "value": "map_point",
-          "label": "t:options.icon.map_point"
+          "label": "t:blocks.icon.settings.icon.options.map_point"
         },
         {
           "value": "phone",
-          "label": "t:options.icon.phone"
+          "label": "t:blocks.icon.settings.icon.options.phone"
         },
         {
           "value": "search",
-          "label": "t:options.icon.search"
+          "label": "t:blocks.icon.settings.icon.options.search"
         },
         {
           "value": "user",
-          "label": "t:options.icon.user"
+          "label": "t:blocks.icon.settings.icon.options.user"
         }
       ],
       "default": "caret"
@@ -146,13 +116,19 @@
     {
       "type": "image_picker",
       "id": "image_upload",
-      "label": "t:settings.image_icon"
+      "label": "t:blocks.icon.settings.image_upload.label"
+    },
+    {
+      "type": "html",
+      "id": "custom_svg",
+      "label": "Custom SVG (HTML)",
+      "info": "If specified, takes precedence over inline icon and image."
     },
     {
       "type": "range",
       "id": "width",
-      "label": "t:settings.width",
-      "min": 12,
+      "label": "t:blocks.icon.settings.width.label",
+      "min": 4,
       "max": 200,
       "step": 2,
       "unit": "px",
@@ -161,15 +137,20 @@
     {
       "type": "url",
       "id": "link",
-      "label": "t:settings.link"
+      "label": "t:blocks.icon.settings.link.label"
     },
     {
       "type": "checkbox",
       "id": "open_in_new_tab",
-      "label": "t:settings.open_new_tab",
+      "label": "t:blocks.icon.settings.open_in_new_tab.label",
       "default": false
     }
   ],
-  "presets": [{ "name": "t:names.icon" }]
+  "presets": [
+    {
+      "name": "t:blocks.icon.presets.default.name",
+      "category": "t:blocks.icon.presets.default.category"
+    }
+  ]
 }
 {% endschema %}

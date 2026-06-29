@@ -39,7 +39,7 @@
 
 {% schema %}
 {
-  "name": "t:blocks.text.presets.default.name",
+  "name": "t:blocks.text.name",
   "settings": [
     {
       "type": "text",
@@ -69,22 +69,20 @@
       "visible_if": "{{ block.settings.tag == 'a' }}",
       "type": "url",
       "id": "url",
-      "label": "t:labels.url",
-      "info": "Link destination (required when using A tag)"
+      "label": "t:blocks.text.settings.url.label",
+      "info": "t:blocks.text.settings.url.info"
     },
     {
       "type": "text",
       "id": "class",
-      "label": "t:labels.class",
-      "placeholder": "custom-text-class",
-      "info": "Add custom CSS class names"
+      "label": "t:blocks.text.settings.class.label",
+      "info": "t:blocks.text.settings.class.info"
     },
     {
       "type": "text",
       "id": "attributes",
-      "label": "t:labels.attributes",
-      "placeholder": "id=\"my-text\" data-custom=\"value\"",
-      "info": "Add custom HTML attributes"
+      "label": "t:blocks.text.settings.attributes.label",
+      "info": "t:blocks.text.settings.attributes.info"
     },
     {
       "type": "header",
