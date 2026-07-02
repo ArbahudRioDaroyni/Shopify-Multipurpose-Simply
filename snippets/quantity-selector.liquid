@@ -246,11 +246,6 @@
       <p>Total Quantity: <span class="quantity-selector__note-total-quantity">0</span></p>
     </div>
   {% endif %}
-
-  {% if template == 'product' %}
-    {% comment %} Hidden input for selected variant {% endcomment %}
-    <input type="hidden" name="{{ input_name }}" id="quantity-variant-id" value="{{ initial_value }}" min="0" max="999">
-  {% endif %}
 </div>
 
 {% stylesheet %}
@@ -414,16 +409,19 @@
   .quantity-selector__compact {
     --quantity-width: 50px;
     --quantity-height: 36px;
+        grid-column: span 2;
   }
 
   .quantity-selector__standard {
     --quantity-width: 50px;
     --quantity-height: 46px;
+        grid-column: span 2;
   }
 
   .quantity-selector__large {
     --quantity-width: 70px;
     --quantity-height: 52px;
+        grid-column: span 2;
   }
 
   /* Focus states */
@@ -476,7 +474,7 @@
       this.canBox = root.hasAttribute('data-box-size');
 
       this.elements = {
-        quantity: root.querySelector('#quantity-variant-id'),
+        quantity: document.querySelector('#quantity-variant-id'),
         increase: root.querySelectorAll('.quantity-selector__btn-increase'),
         decrease: root.querySelectorAll('.quantity-selector__btn-decrease'),
         totalPrice: root.querySelector('.quantity-selector__note-total-price'),

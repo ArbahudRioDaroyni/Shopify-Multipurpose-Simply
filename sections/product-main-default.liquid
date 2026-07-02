@@ -12,9 +12,11 @@
     <h1 class="product-info__title">{{ product.title }}</h1>
 
     <div class="product-info__sku_vendor_reviews">
-      <span class="product-info__sku">
-        {{- 'products.sku' | t -}}: <b data-product-sku>{{ product.selected_or_first_available_variant.sku }}</b>
-      </span>
+      {% if selected_variant.sku %}
+        <span class="product-info__sku">
+          {{- 'products.sku' | t -}}: <b data-product-sku>{{ selected_variant.sku }}</b>
+        </span>
+      {% endif %}
 
       <a class="product-info__vendor text-link" href="{{ product.vendor | url_for_vendor }}">
         {{- 'products.supplier' | t -}}: <b>{{ product.vendor }}</b>
@@ -148,13 +150,18 @@
         elsif has_box_of_24_discount
           assign per_box = 24
         endif
+
+        assign max_value = 999
+        if product.inventory_policy != 'continue' and product.selected_or_first_available_variant.inventory_management != nil 
+          assign max_value = product.selected_or_first_available_variant.inventory_quantity
+        endif
       %}
       {% render 'quantity-selector', 
         style_variant: 'standard',
         input_name: 'quantity',
         initial_value: 1,
         min_value: 0,
-        max_value: 999,
+        max_value: max_value,
         unique_id: 'product-quantity',
         show_label: true,
         label_text: 'Quantity:',
@@ -167,6 +174,10 @@
         can_box: can_box,
         box_size: per_box,
       %}
+      {% if template == 'product' %}
+        {% comment %} Hidden input for selected variant {% endcomment %}
+        <input type="hidden" name="quantity" id="quantity-variant-id" value="1" min="0" max="{{ max_value }}">
+      {% endif %}
 
       {% comment %} {% render 'quantity-selector-bulk',
         each_price: 699,
@@ -563,7 +574,7 @@
     height: var(--height);
   }
   
-  @media screen and (max-width: 749px) {
+  @media screen and (max-width: 768px) {
     hr.spacer {
       display: none;
     }

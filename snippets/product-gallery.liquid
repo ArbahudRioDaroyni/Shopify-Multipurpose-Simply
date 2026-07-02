@@ -112,7 +112,10 @@
 
   .product-gallery__image img {
     width: 100%;
-    height: auto;
+    max-width: 100%;
+    height: 100%;
+    max-height: 100%;
+    object-fit: contain;
     display: block;
   }
 
@@ -464,17 +467,18 @@
       const imgElement = this.mainImage.querySelector('img');
       const figureRect = this.mainImage.getBoundingClientRect();
       const imgRect = imgElement?.getBoundingClientRect() || figureRect;
-      const x = e.clientX - imgRect.left;
-      const y = e.clientY - imgRect.top;
+      const renderedImageRect = this.getRenderedImageRect(imgElement, figureRect) || imgRect;
+      const x = e.clientX - renderedImageRect.left;
+      const y = e.clientY - renderedImageRect.top;
 
       // Ensure mouse is within image bounds
-      if (x < 0 || y < 0 || x > imgRect.width || y > imgRect.height) return;
+      if (x < 0 || y < 0 || x > renderedImageRect.width || y > renderedImageRect.height) return;
 
       // Set background image and position
       if (imgElement) {
         const lensImageUrl = this.getLensImageUrl(imgElement);
-        const bgWidth = imgRect.width * this.zoomLevel;
-        const bgHeight = imgRect.height * this.zoomLevel;
+        const bgWidth = renderedImageRect.width * this.zoomLevel;
+        const bgHeight = renderedImageRect.height * this.zoomLevel;
 
         this.lens.style.backgroundImage = `url("${lensImageUrl}")`;
         this.lens.style.backgroundSize = `${bgWidth}px ${bgHeight}px`;
@@ -490,22 +494,53 @@
       if (overlay) {
         // Overlay size is 1/zoomLevel of lens size on the actual image
         const overlaySize = this.lensSize / this.zoomLevel;
-        const imageOffsetX = imgRect.left - figureRect.left;
-        const imageOffsetY = imgRect.top - figureRect.top;
+        const imageOffsetX = renderedImageRect.left - figureRect.left;
+        const imageOffsetY = renderedImageRect.top - figureRect.top;
         
         // Position overlay centered on cursor
         const overlayX = imageOffsetX + x - (overlaySize / 2);
         const overlayY = imageOffsetY + y - (overlaySize / 2);
         
         // Constrain to image bounds
-        const constrainedX = Math.max(imageOffsetX, Math.min(overlayX, imageOffsetX + imgRect.width - overlaySize));
-        const constrainedY = Math.max(imageOffsetY, Math.min(overlayY, imageOffsetY + imgRect.height - overlaySize));
+        const constrainedX = Math.max(imageOffsetX, Math.min(overlayX, imageOffsetX + renderedImageRect.width - overlaySize));
+        const constrainedY = Math.max(imageOffsetY, Math.min(overlayY, imageOffsetY + renderedImageRect.height - overlaySize));
         
         overlay.style.width = overlaySize + 'px';
         overlay.style.height = overlaySize + 'px';
         overlay.style.left = constrainedX + 'px';
         overlay.style.top = constrainedY + 'px';
       }
+    }
+
+    getRenderedImageRect(imgElement, figureRect) {
+      if (!imgElement || !figureRect) return null;
+
+      const naturalWidth = imgElement.naturalWidth;
+      const naturalHeight = imgElement.naturalHeight;
+      if (!naturalWidth || !naturalHeight) return null;
+
+      const figureRatio = figureRect.width / figureRect.height;
+      const imageRatio = naturalWidth / naturalHeight;
+
+      let renderedWidth = figureRect.width;
+      let renderedHeight = figureRect.height;
+      let offsetX = 0;
+      let offsetY = 0;
+
+      if (imageRatio > figureRatio) {
+        renderedHeight = figureRect.width / imageRatio;
+        offsetY = (figureRect.height - renderedHeight) / 2;
+      } else {
+        renderedWidth = figureRect.height * imageRatio;
+        offsetX = (figureRect.width - renderedWidth) / 2;
+      }
+
+      return {
+        left: figureRect.left + offsetX,
+        top: figureRect.top + offsetY,
+        width: renderedWidth,
+        height: renderedHeight,
+      };
     }
 
     handleLensMouseOut() {

@@ -34,6 +34,7 @@
     data-accordion-item
     data-display-mode="{{ accordion_display_mode }}"
     {{ block.shopify_attributes }}
+    {% if accordion_content == blank %}hidden{% endif %}
   >
     <div class="accordion-content__header">
       <h2 class="accordion-content__title">
@@ -64,6 +65,7 @@
     {% if accordion_display_mode == 'view_more' %}
       open
     {% endif %}
+    {% if accordion_content == blank %}hidden{% endif %}
   >
     <summary class="accordion-content__summary">
       <h2 class="accordion-content__title">
@@ -132,6 +134,11 @@
     display: flex;
     gap: 8px;
   }
+  @media (max-width: 768px){
+    .accordion-content__title {
+      font-size: 22px;
+    }
+  }
 
   .accordion-content__icon {
     position: relative;
@@ -166,6 +173,7 @@
   }
 
   .accordion-content__content {
+    font-size: 16px;
     line-height: 1.7;
   }
 
@@ -183,6 +191,43 @@
   .accordion-content__content h6 {
     margin-top: 20px;
     font-size: 20px;
+    color: var(--pm-border-color-option);
+  }
+
+  .accordion-content__content a {
+    color: var(--pm-border-color-option);
+    text-decoration: underline;
+  }
+  
+  .accordion-content__content table {
+    width: 100%;
+    border-collapse: collapse; /* Prevents double borders */
+    font-family: Arial, sans-serif;
+    margin: 20px 0;
+    font-size: 16px;
+  }
+
+  .accordion-content__content thead {
+    background-color: #f2f2f2;
+    border-bottom: 2px solid #cccccc;
+  }
+
+  .accordion-content__content th,
+  .accordion-content__content td {
+    padding: 12px 15px;
+    text-align: left;
+  }
+
+  .accordion-content__content tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .accordion-content__content tbody tr {
+    border-bottom: 1px solid #dddddd;
+  }
+
+  .accordion-content__content tbody tr:hover {
+    background-color: #f1f1f1;
   }
 
   .accordion-content__content > :last-child {
@@ -227,6 +272,10 @@
 
   .accordion-content--show-all .accordion-content__header {
     cursor: default;
+  }
+
+  .accordion-content--collapse {
+    scroll-margin-top: 12rem;
   }
 {% endstylesheet %}
 
@@ -277,10 +326,34 @@
     });
   };
 
+  const initAccordionCollapseScroll = () => {
+    document.querySelectorAll('[data-accordion-item][data-display-mode="collapse"]').forEach((item) => {
+      if (item.dataset.collapseScrollInitialized === 'true') return;
+
+      item.dataset.collapseScrollInitialized = 'true';
+
+      item.addEventListener('toggle', () => {
+        if (!item.open) return;
+
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const behavior = prefersReducedMotion ? 'auto' : 'smooth';
+
+        window.requestAnimationFrame(() => {
+          item.scrollIntoView({
+            behavior,
+            block: 'start',
+          });
+        });
+      });
+    });
+  };
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initAccordionViewMore, { once: true });
+    document.addEventListener('DOMContentLoaded', initAccordionCollapseScroll, { once: true });
   } else {
     initAccordionViewMore();
+    initAccordionCollapseScroll();
   }
 {% endjavascript %}
 
