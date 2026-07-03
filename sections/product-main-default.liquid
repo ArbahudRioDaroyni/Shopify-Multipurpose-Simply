@@ -37,7 +37,7 @@
           {% endif %}
         </div>
 
-        <div class="product-price__bottom" {% if selected_variant.compare_at_price == blank %}style="display: none" aria-hidden="true"{% endif %}>
+        <div class="product-price__bottom" {% if selected_variant.compare_at_price == blank or selected_variant.compare_at_price < selected_variant.price %}style="display: none" aria-hidden="true"{% endif %}>
           <span class="visually-hidden">Regular price</span>
           <b><s class="product-price__compare" data-product-price-compare>{{ selected_variant.compare_at_price | money }}</s></b>
           {%- assign discount_amount = selected_variant.compare_at_price | minus: selected_variant.price | money -%}
@@ -130,62 +130,86 @@
     {% form 'product', product, class: 'product-main__form' %}
       <input type="hidden" name="id" id="selected-variant-id" value="{{ product.selected_or_first_available_variant.id }}">
 
-      {% liquid
-        if product.handle != 'tradeperks-membership'
-          assign show_gst = true
-        endif
-        # Collection ID for "Box of 10 - Discount 5%" collection
-        assign has_box_of_10_discount = product.collections | has: 'id', 359964442773
-        # Collection ID for "Box of 24 - Discount 5%" collection
-        assign has_box_of_24_discount = product.collections | has: 'id', 359975878805
-        
-        assign can_box = false
-        if has_box_of_10_discount or has_box_of_24_discount
-          assign can_box = true
-        endif
-        
-        assign per_box = 0
-        if has_box_of_10_discount
-          assign per_box = 10
-        elsif has_box_of_24_discount
-          assign per_box = 24
-        endif
+      {% if product.handle != 'tradeperks-membership' %}
+        {% liquid
+          # Collection ID for "Box of 10 - Discount 5%" collection
+          assign get_box_of_10_discount = product.collections | find: 'id', 359964442773
+          # Collection ID for "Box of 24 - Discount 5%" collection
+          assign get_box_of_24_discount = product.collections | find: 'id', 359975878805
 
-        assign max_value = 999
-        if product.inventory_policy != 'continue' and product.selected_or_first_available_variant.inventory_management != nil 
-          assign max_value = product.selected_or_first_available_variant.inventory_quantity
-        endif
-      %}
-      {% render 'quantity-selector', 
-        style_variant: 'standard',
-        input_name: 'quantity',
-        initial_value: 1,
-        min_value: 0,
-        max_value: max_value,
-        unique_id: 'product-quantity',
-        show_label: true,
-        label_text: 'Quantity:',
-        price: product.selected_or_first_available_variant.price,
-        compare_at_price: product.selected_or_first_available_variant.compare_at_price
-        discount_percentage: 5
-        show_price: can_box,
-        show_total: can_box,
-        show_gst: show_gst,
-        can_box: can_box,
-        box_size: per_box,
-      %}
+          assign is_bulk_buy = false
+          assign show_bulk_buy = false
+          if get_box_of_10_discount or get_box_of_24_discount
+            assign is_bulk_buy = true
+            assign show_bulk_buy = true
+          endif
+
+          assign list_variant_box_of_10 = get_box_of_10_discount.metafields.custom.bulk_buy_variant_selected | remove: '[' | remove: ']' | remove: '"' | remove: "gid://shopify/ProductVariant/" | split: ','
+          assign list_variant_can_bulk_buy = nil
+          for variant in product.variants
+            assign id = variant.id | handleize
+            if list_variant_box_of_10 contains id
+              assign list_variant_can_bulk_buy = list_variant_can_bulk_buy | append: id | append: ','
+            endif
+          endfor
+          assign can_box_variants = list_variant_can_bulk_buy | split: ',' | json
+
+          if list_variant_can_bulk_buy != blank
+            assign selected_variant_id = selected_variant.id | handleize
+            unless list_variant_can_bulk_buy contains selected_variant_id
+              assign show_bulk_buy = false
+            endunless
+          endif
+
+          assign label_text_each = "Quantity:"
+          if is_bulk_buy
+            assign label_text_each = "Buy each:"
+          endif
+
+          assign per_box = 0
+          if get_box_of_10_discount
+            assign per_box = 10
+          elsif get_box_of_24_discount
+            assign per_box = 24
+          endif
+
+          assign max_value = 9999
+          if selected_variant.inventory_policy != 'continue' and selected_variant.inventory_management != nil 
+            assign max_value = selected_variant.inventory_quantity
+          endif
+
+          assign initial_value = 1
+          if is_bulk_buy and show_bulk_buy
+            assign initial_value = 0
+          endif
+        %}
+        {% render 'quantity-selector', 
+          style_variant: 'standard',
+          input_name: 'quantity',
+          initial_value: initial_value,
+          min_value: 0,
+          max_value: max_value,
+          show_label: true,
+          show_price: is_bulk_buy,
+          show_gst: true,
+          show_total: is_bulk_buy,
+          unique_id: 'product-quantity',
+          price: product.selected_or_first_available_variant.price,
+          compare_at_price: product.selected_or_first_available_variant.compare_at_price
+          discount_percentage: 5
+          label_text: 'Purchase options:',
+          label_text_each: label_text_each,
+          label_text_box: 'Buy box'
+          box_size: per_box,
+          can_box_variants: can_box_variants,
+          is_bulk_buy: is_bulk_buy,
+          show_bulk_buy: show_bulk_buy
+        %}
+      {% endif %}
       {% if template == 'product' %}
         {% comment %} Hidden input for selected variant {% endcomment %}
-        <input type="hidden" name="quantity" id="quantity-variant-id" value="1" min="0" max="{{ max_value }}">
+        <input type="hidden" name="quantity" id="quantity-variant-id" value="{{ initial_value }}" min="0" max="{{ max_value }}">
       {% endif %}
-
-      {% comment %} {% render 'quantity-selector-bulk',
-        each_price: 699,
-        box_price: 6650,
-        box_size: 10,
-        each_quantity: 6,
-        box_quantity: 6
-      %} {% endcomment %}
 
       <div class="product-form__actions">
         <button

@@ -19,8 +19,10 @@
   @param {string} [label_text_each] - Label text each
   @param {string} [label_text_box] - Label text box
   
-  @param {boolean} [can_box] - Style mode: bulk or each
   @param {number} [box_size] - Number of items per box
+  @param {boolean} [can_box_variants] - 
+  @param {boolean} [is_bulk_buy] - Style mode: bulk or each
+  @param {boolean} [show_bulk_buy] - 
 
   @example
   {% render 'quantity-selector', 
@@ -53,8 +55,10 @@
   assign label_text_each = label_text_each | default: 'Buy each:'
   assign label_text_box = label_text_box | default: 'Buy box:'
   
-  assign can_box = can_box | default: false
   assign box_size = box_size | default: 10
+  assign can_box_variants = can_box_variants | default: nil
+  assign is_bulk_buy = is_bulk_buy | default: false
+  assign show_bulk_buy = show_bulk_buy | default: false
 
   if style_variant == 'compact'
     assign input_width = 50
@@ -66,23 +70,24 @@
     assign input_width = 50
     assign height = 50
   endif
-
-  if can_box
-    assign initial_value = 0
-  endif
 %}
 
 <div class="quantity-selector_wrapper"
   data-quantity-selector
-  {% if can_box %}data-box-size="{{ box_size }}"{%- endif %}
+  data-is-bulk-buy="{{ is_bulk_buy }}"
+  data-show-bulk-buy="{{ show_bulk_buy }}"
+  data-box-size="{{ box_size }}"
   data-currency-code="{{ cart.currency.iso_code | default: shop.currency | default: 'AUD' }}"
   data-price="{{ price }}"
   data-compare-at-price="{{ compare_at_price }}"
   data-discount-percentage="{{ discount_percentage }}"
+  data-can-box-variants='{{ can_box_variants }}'
 >
-  {% if can_box %}<p class="quantity-selector__title">Purchase options:</p>{% endif %}
+  {% if is_bulk_buy -%}
+    <p class="quantity-selector__title" {% unless show_bulk_buy %}hidden{% endunless %}>{{ label_text }}</p>
+  {%- endif %}
   <div 
-    class="quantity-selector quantity-selector__{{ style_variant }} {% if can_box %}quantity-selector__card{% endif %}"
+    class="quantity-selector quantity-selector__{{ style_variant }} {% if is_bulk_buy %}{% if show_bulk_buy %}quantity-selector__card{% endif %}{% endif %}"
     data-quantity-role="each"
     style="
       --quantity-width: {{ input_width }}px;
@@ -90,8 +95,14 @@
     "
   >
     {% if show_label %}
-      <label class="quantity-selector__label" for="{{ unique_id }}-each">
-        {{ label_text_each }}
+      <label class="quantity-selector__label" for="{{ unique_id }}-each" data-text="{{ label_text_each }}">
+        {%- liquid
+          if is_bulk_buy and show_bulk_buy
+            echo label_text_each
+          else
+            echo 'Quantity:'
+          endif
+        -%}
       </label>
     {% endif %}
 
@@ -101,7 +112,7 @@
           type="button" 
           class="quantity-selector__btn quantity-selector__btn-decrease" 
           data-action="decrease"
-          aria-label="{{ 'general.quantity.decrease' | t }}"
+          aria-label="Decrease quantity"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -123,7 +134,7 @@
           type="button" 
           class="quantity-selector__btn quantity-selector__btn-increase" 
           data-action="increase"
-          aria-label="{{ 'general.quantity.increase' | t }}"
+          aria-label="Increase quantity"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -133,7 +144,10 @@
       </div>
 
       {% if show_price and price %}
-        <div class="quantity-selector__price-row" {% unless show_gst %}style="justify-content: center;"{% endunless %}>
+        <div class="quantity-selector__price-row"
+          {%- unless show_gst %} style="justify-content: center;"{% endunless -%}
+          {%- unless show_bulk_buy %} hidden{% endunless -%}
+        >
           <span><b class="quantity-selector__price-per-each">{{ price | money }}</b> each</span>
           {% if show_gst %}
             <span class="quantity-selector__price__gst">(<span data-price-gst>{{ price | divided_by: 1.1 | money }}</span> excl GST)</span>
@@ -148,8 +162,8 @@
       {% else %}
         {% assign total_value = 0 %}
       {% endif %}
-      <div class="quantity-selector__total">
-        <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
+      <div class="quantity-selector__total" {%- unless show_bulk_buy %} hidden{% endunless -%}>
+        <span class="quantity-selector__total-label">Total:</span>
         <span class="quantity-selector__sub-total-price" data-total-price="{{ total_value }}">
           {{ total_value | money }}
         </span>
@@ -157,10 +171,11 @@
     {% endif %}
   </div>
 
-  {% if can_box %}
+  {% if is_bulk_buy -%}
     <div 
-      class="quantity-selector quantity-selector__{{ style_variant }} {% if can_box %}quantity-selector__card{% endif %}"
+      class="quantity-selector quantity-selector__{{ style_variant }} {% if is_bulk_buy %}quantity-selector__card{% endif %}"
       data-quantity-role="box"
+      {% unless show_bulk_buy %}hidden{% endunless %}
       style="
         --quantity-width: {{ input_width }}px;
         --quantity-height: {{ height }}px;
@@ -178,7 +193,7 @@
             type="button" 
             class="quantity-selector__btn quantity-selector__btn-decrease" 
             data-action="decrease"
-            aria-label="{{ 'general.quantity.decrease' | t }}"
+            aria-label="Decrease quantity"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -200,7 +215,7 @@
             type="button" 
             class="quantity-selector__btn quantity-selector__btn-increase" 
             data-action="increase"
-            aria-label="{{ 'general.quantity.increase' | t }}"
+            aria-label="Increase quantity"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -230,7 +245,7 @@
           {% assign total_value = 0 %}
         {% endif %}
         <div class="quantity-selector__total">
-          <span class="quantity-selector__total-label">{{ 'general.quantity.total' | t }}:</span>
+          <span class="quantity-selector__total-label">Total:</span>
           <span class="quantity-selector__sub-total-price" data-total-price="{{ total_value }}">
             {{ total_value | money }}
           </span>
@@ -238,10 +253,10 @@
       {% endif %}
 
     </div>
-  {% endif %}
+  {%- endif %}
   
-  {% if can_box %}
-    <div class="quantity-selector__note">
+  {% if is_bulk_buy %}
+    <div class="quantity-selector__note" {% unless show_bulk_buy %}hidden{% endunless %}>
       <p>Total: <span class="quantity-selector__note-total-price">$0.00</span> | You save: <span class="quantity-selector__note-total-savings">$0.00</span></p>
       <p>Total Quantity: <span class="quantity-selector__note-total-quantity">0</span></p>
     </div>
@@ -290,8 +305,11 @@
   }
 
   .quantity-selector__card .quantity-selector__price-row,
+  .quantity-selector__price-row p,
+  .quantity-selector__price-row span,
   .quantity-selector__card .quantity-selector__total {
     font-size: 12.25px;
+    line-height: 1;
     justify-content: space-around;
   }
 
@@ -358,9 +376,9 @@
     margin: 0;
   }
 
-  .quantity-selector__input[type="number"] {
+  /* .quantity-selector__input[type="number"] {
     -moz-appearance: textfield;
-  }
+  } */
 
   .quantity-selector__price-row {
     display: flex;
@@ -409,19 +427,16 @@
   .quantity-selector__compact {
     --quantity-width: 50px;
     --quantity-height: 36px;
-        grid-column: span 2;
   }
 
   .quantity-selector__standard {
     --quantity-width: 50px;
     --quantity-height: 46px;
-        grid-column: span 2;
   }
 
   .quantity-selector__large {
     --quantity-width: 70px;
     --quantity-height: 52px;
-        grid-column: span 2;
   }
 
   /* Focus states */
@@ -445,16 +460,19 @@
     .quantity-selector__compact {
       --quantity-width: 45px;
       --quantity-height: 32px;
+        grid-column: span 2;
     }
 
     .quantity-selector__standard {
       --quantity-width: 50px;
       --quantity-height: 40px;
+        grid-column: span 2;
     }
 
     .quantity-selector__large {
       --quantity-width: 60px;
       --quantity-height: 48px;
+        grid-column: span 2;
     }
   }
 {% endstylesheet %}
@@ -471,27 +489,33 @@
      * @param {HTMLElement} element - Parent root node containing data attributes.
      */
     constructor(root) {
-      this.canBox = root.hasAttribute('data-box-size');
+      this.root = root
+      this.canBox = this.root.dataset.isBulkBuy === 'true';
+      this.showBulkBuy = this.root.dataset.showBulkBuy === 'true';
 
       this.elements = {
         quantity: document.querySelector('#quantity-variant-id'),
-        increase: root.querySelectorAll('.quantity-selector__btn-increase'),
-        decrease: root.querySelectorAll('.quantity-selector__btn-decrease'),
-        totalPrice: root.querySelector('.quantity-selector__note-total-price'),
-        totalQuantity: root.querySelector('.quantity-selector__note-total-quantity'),
-        totalSavings: root.querySelector('.quantity-selector__note-total-savings')
+        increase: this.root.querySelectorAll('.quantity-selector__btn-increase'),
+        decrease: this.root.querySelectorAll('.quantity-selector__btn-decrease'),
+        note: this.root.querySelector('.quantity-selector__note'),
+        totalPrice: this.root.querySelector('.quantity-selector__note-total-price'),
+        totalQuantity: this.root.querySelector('.quantity-selector__note-total-quantity'),
+        totalSavings: this.root.querySelector('.quantity-selector__note-total-savings')
       }
  
-      this.eachCard = root.querySelector('[data-quantity-role="each"]');
+      this.eachCard = this.root.querySelector('[data-quantity-role="each"]');
       this.eachCardElements = {
+        label: this.eachCard.querySelector('.quantity-selector__label'),
         input: this.eachCard.querySelector('.quantity-selector__input'),
+        price: this.eachCard.querySelector('.quantity-selector__price-row'),
         pricePerEach: this.eachCard.querySelector('.quantity-selector__price-per-each'),
         priceGST: this.eachCard.querySelector('[data-price-gst]'),
+        total: this.eachCard.querySelector('.quantity-selector__total'),
         subTotalPrice: this.eachCard.querySelector('.quantity-selector__sub-total-price')
       }
 
       if (this.canBox) {
-        this.boxCard = root.querySelector('[data-quantity-role="box"]');
+        this.boxCard = this.root.querySelector('[data-quantity-role="box"]');
         this.boxCardElements = {
           input: this.boxCard.querySelector('.quantity-selector__input'),
           pricePerBox: this.boxCard.querySelector('.quantity-selector__price-per-box'),
@@ -501,13 +525,13 @@
         }
       }
 
-      this.boxSize = this.canBox ? root.dataset.boxSize : 0;
+      this.boxSize = this.canBox ? this.root.dataset.boxSize : 0;
       this.min = parseInt(this.elements.quantity.getAttribute('min')) || 0;
       this.max = parseInt(this.elements.quantity.getAttribute('max')) || 999;
       this.value = parseInt(this.elements.quantity.value);
-      this.price = parseInt(root.dataset.price);
-      this.compareAtPrice = parseInt(root.dataset.compareAtPrice);
-      this.discountPercentage = parseInt(root.dataset.discountPercentage);
+      this.price = parseInt(this.root.dataset.price);
+      this.compareAtPrice = parseInt(this.root.dataset.compareAtPrice);
+      this.discountPercentage = parseInt(this.root.dataset.discountPercentage);
 
       this.bind();
       // this.updateControlsState();
@@ -518,6 +542,7 @@
         this.renderPricePerEachBuyBox();
         this.renderNoteTotal();
         this.renderNoteQuantity();
+        this.toggleLabel(this.showBulkBuy);
       }
     }
 
@@ -598,22 +623,23 @@
     /**
      * Orchestrates sanitization checks when changes are fired inside input controls.
      */
-    handleInputChange = () => {
-      const valueEach = parseInt(this.eachCardElements.input.value || 0);
-      const valueBox = this.canBox ? parseInt(this.boxCardElements.input.value || 0) * this.boxSize : 0;
-      const value = valueEach + valueBox;
+    handleInputChange = (e) => {
+      let valueEach = parseInt(this.eachCardElements.input.value || 0);
+      let valueBox = this.canBox ? parseInt(this.boxCardElements.input.value || 0) * this.boxSize : 0;
+      let value = valueEach + valueBox;
 
       if (isNaN(value) || value < this.min) {
         value = this.min;
-      } else if (value > this.max) {
+      }
+      
+      if (value > this.max) {
         value = this.max;
       }
 
       this.value = value;
-
+      // e.target.value = this.value
       this.setQuantity();
       // this.updateControlsState();
-
       this.renderSubTotalPriceEach();
       if (this.canBox) {
         this.renderSubTotalPriceBox();
@@ -644,6 +670,14 @@
         this.renderPricePerEachBuyBox();
         this.renderNoteTotal();
         this.renderNoteQuantity();
+        this.renderNoteSavings();
+      }
+
+      if (this.canBox) {
+        let isBulk = this.root.dataset.canBoxVariants.includes(variant.id);
+        this.toggleBulkBuy(isBulk);
+        this.reset(isBulk);
+        this.toggleLabel(isBulk);
       }
     }
 
@@ -721,6 +755,57 @@
       }).format(cents / 100);
     }
 
+    toggleBulkBuy(show) {
+      const visible = Boolean(show);
+
+      const title = this.root.querySelector('.quantity-selector__title');
+      if (title) {
+        title.hidden = !visible;
+      }
+
+      if (this.eachCard) {
+        this.eachCard.classList.toggle('quantity-selector__card', visible);
+      }
+
+      if (this.eachCardElements.price) {
+        this.eachCardElements.price.hidden = !visible;
+      }
+
+      if (this.eachCardElements.total) {
+        this.eachCardElements.total.hidden = !visible;
+      }
+
+      if (this.boxCard) {
+        this.boxCard.hidden = !visible;
+      }
+
+      if (this.elements.note) {
+        this.elements.note.hidden = !visible;
+      }
+    }
+
+    reset(isBulk) {
+      const bulk = Boolean(isBulk);
+      if (bulk) {        
+        this.eachCardElements.input.value = this.min;
+        if (this.canBox) {
+          this.boxCardElements.input.value = this.min;
+        }
+      } else {
+        this.eachCardElements.input.value = 1;
+        if (this.canBox) {
+          this.boxCardElements.input.value = this.min;
+        }
+      }
+
+      this.handleInputChange();
+    }
+
+    toggleLabel(isBulk){
+      const bulk = Boolean(isBulk);
+      this.eachCardElements.label.textContent = bulk ? this.eachCardElements.label.dataset.text : 'Quantity:';
+    }
+
     /**
      * Simplifies text correction fields by selecting entire fields when clicked.
      */
@@ -736,7 +821,7 @@
       document.dispatchEvent(event);
     }
 
-    // ==========================
+    // ========================== unused
     /**
      * Adjusts active status of buttons and updates the running grand totals.
      */

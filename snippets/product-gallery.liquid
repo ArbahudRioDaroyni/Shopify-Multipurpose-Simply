@@ -46,7 +46,7 @@
     <div class="product-main__flair-badge">
       <a href="https://www.plumbersupplies.com.au/pages/tradeperks" class="flair-badge__tradeperks">Get Cashback with TradePerks</a>
       {%- assign discount_amount = product.selected_or_first_available_variant.compare_at_price | minus: product.selected_or_first_available_variant.price | money -%}
-      <span class="flair-badge__savings" data-flair-savings>Save <span data-flair-discount-amount>{{ discount_amount }}</span></span>
+      <span class="flair-badge__savings" data-flair-savings {% if product.selected_or_first_available_variant.compare_at_price < product.selected_or_first_available_variant.price %}hidden{% endif %}>Save <span data-flair-discount-amount>{{ discount_amount }}</span></span>
       {% if product.selected_or_first_available_variant.available %}
         <span class="flair-badge__in-stock">In Stock</span>
       {% else %}
