@@ -19,6 +19,7 @@
           "name": "t:general.row",
           "settings": {
             "tag": "div",
+            "url": "",
             "layout_direction": "group--horizontal",
             "alignment": "flex-start",
             "class": "announcement-bar__content",
@@ -34,6 +35,7 @@
               "settings": {
                 "text": "Blue November - Up to 70% off + Free Gifts!",
                 "tag": "span",
+                "url": "",
                 "class": "announcement-bar__text--mobile",
                 "attributes": "",
                 "font_size": 12,
@@ -52,6 +54,7 @@
               "settings": {
                 "text": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
                 "tag": "p",
+                "url": "",
                 "class": "announcement-bar__text--desktop",
                 "attributes": "",
                 "font_size": 12,
@@ -75,8 +78,6 @@
         "group_text"
       ],
       "settings": {
-        "mobile_text": "Blue November - Up to 70% off + Free Gifts!",
-        "desktop_text": "Blue November Sale on now! Up to 70% off storewide + our biggest ever gift giveaway!",
         "link_url": "shopify://collections/all",
         "link_text": "Hurry up!",
         "show_countdown": true,
@@ -87,11 +88,10 @@
     },
     "header_info_bar": {
       "type": "header-info-bar",
-      "name": "t:sections.header_info_bar.title",
       "blocks": {
         "phone-group": {
-          "name": "Phone Group",
           "type": "group",
+          "name": "Phone Group",
           "static": true,
           "settings": {
             "tag": "a",
@@ -109,6 +109,7 @@
               "type": "icon",
               "settings": {
                 "icon": "phone",
+                "custom_svg": "",
                 "width": 14,
                 "link": "",
                 "open_in_new_tab": false
@@ -120,6 +121,7 @@
               "settings": {
                 "text": "+1 (234) 567-890",
                 "tag": "span",
+                "url": "",
                 "class": "",
                 "attributes": "",
                 "font_size": 12,
@@ -139,8 +141,8 @@
           ]
         },
         "email-group": {
-          "name": "Email Group",
           "type": "group",
+          "name": "Email Group",
           "static": true,
           "settings": {
             "tag": "a",
@@ -158,6 +160,7 @@
               "type": "icon",
               "settings": {
                 "icon": "mailbox",
+                "custom_svg": "",
                 "width": 14,
                 "link": "",
                 "open_in_new_tab": false
@@ -169,6 +172,7 @@
               "settings": {
                 "text": "arbahudriodaroyni@gmail.com",
                 "tag": "span",
+                "url": "",
                 "class": "",
                 "attributes": "",
                 "font_size": 12,
@@ -188,8 +192,8 @@
           ]
         },
         "promotion-group": {
-          "name": "Promotion Group",
           "type": "group",
+          "name": "Promotion Group",
           "static": true,
           "settings": {
             "tag": "div",
@@ -219,6 +223,7 @@
                 "margin": 0,
                 "padding": 0
               },
+              "blocks": {}
             },
             "text_k436er": {
               "type": "text",
@@ -236,6 +241,7 @@
                 "margin": 0,
                 "padding": 0
               },
+              "blocks": {}
             },
             "text_k46er": {
               "type": "text",
@@ -253,6 +259,7 @@
                 "margin": 0,
                 "padding": 0
               },
+              "blocks": {}
             }
           },
           "block_order": [
@@ -262,8 +269,8 @@
           ]
         },
         "map-point-group": {
-          "name": "Location Group",
           "type": "group",
+          "name": "Location Group",
           "static": true,
           "settings": {
             "tag": "a",
@@ -281,6 +288,7 @@
               "type": "icon",
               "settings": {
                 "icon": "map_point",
+                "custom_svg": "",
                 "width": 14,
                 "link": "",
                 "open_in_new_tab": false
@@ -292,6 +300,7 @@
               "settings": {
                 "text": "Location",
                 "tag": "span",
+                "url": "",
                 "class": "",
                 "attributes": "",
                 "font_size": 12,
@@ -311,31 +320,49 @@
           ]
         }
       },
+      "name": "t:sections.header_info_bar.title",
       "settings": {
-        "show_phone": true,
-        "show_email": true,
-        "email": "kolles@domain.com",
+        "color_scheme": "",
         "show_promo_text": true,
         "promo_text": "Summer sale discount off 50%!",
         "promo_link": "",
         "promo_link_text": "Shop Now",
-        "show_location": true,
-        "location_text": "Location",
         "show_currency_selector": true,
-        "show_language_selector": true,
-        "color_scheme": ""
+        "show_language_selector": true
       }
     },
     "header": {
       "type": "header",
+      "blocks": {
+        "departments-arrow": {
+          "type": "icon",
+          "static": true,
+          "settings": {
+            "icon": "none",
+            "custom_svg": "",
+            "width": 24,
+            "link": "",
+            "open_in_new_tab": false
+          },
+          "blocks": {}
+        }
+      },
       "settings": {
-        "logo": "shopify://shop_images/Coloured_Logo_-_HD.avif",
+        "logo": "shopify://shop_images/logo.svg",
         "menu": "main-menu",
         "departments_menu": "main-menu"
       }
     },
     "header-breadcrumbs": {
       "type": "header-breadcrumbs",
+      "settings": {
+        "alignment": "breadcrumbs--left",
+        "separator_text": "/",
+        "text_size": 14,
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "color_scheme": ""
+      }
     }
   },
   "order": [
@@ -343,5 +370,5 @@
     "header_info_bar",
     "header",
     "header-breadcrumbs"
-  ],
+  ]
 }
