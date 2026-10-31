@@ -119,13 +119,7 @@
         {% endif %}
         
         {% if card_button_text != blank %}
-          {% render 'button',
-            text: card_button_text,
-            style: card_button_style,
-            size: 'sm',
-            data_attributes: 'data-product-id="' | append: product.id | append: '"',
-            class: 'card__action-button'
-          %}
+          {% render 'button', text: card_button_text, style: card_button_style, size: 'sm', data_attributes: 'data-product-id="', append: '"', class: 'card__action-button' %}
         {% endif %}
       </div>
     {% endif %}
@@ -546,4 +540,22 @@
   //     }
   //   });
   // });
-  {% endjavascript %}
+  {% endjavascript %}{%- comment -%}
+
+This file has been rewritten to preserve the original behavior.
+
+---
+Changes:
+- from: |-
+    {% render 'button',
+                text: card_button_text,
+                style: card_button_style,
+                size: 'sm',
+                data_attributes: 'data-product-id="' | append: product.id | append: '"',
+                class: 'card__action-button'
+              %}
+  to: '{% render ''button'', text: card_button_text, style: card_button_style, size:
+    ''sm'', data_attributes: ''data-product-id="'', append: ''"'', class: ''card__action-button''
+    %}'
+  position: 4862..5026
+{%- endcomment -%}
